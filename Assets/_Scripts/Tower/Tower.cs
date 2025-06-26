@@ -29,44 +29,64 @@ public class Tower : MonoBehaviour
 
     [Header("Attributes")]
     public Targetting targetting;
-    public float reloadTime;
+    public float bulletDamage = 2f;
+    public float bulletLifespan = 10f;
+    public float reloadTime = 0.5f;
+    public float rotationSpeed = 4.5f;
+    public float fireForce = 4f;
+    
     private float o_reloadTime;
+
+    [Header("Firing")]
+    public float searchDelay = 1f;
+    private float o_SearchDelay;
+    public float angleOffset = 2f;
+    public Transform firePoint;
+    public GameObject bulletPrefab;
 
     [Header("Range")]
     public GameObject rangeObj;
     public SpriteRenderer rangeRend;
-    public float range;
+    public float range = 2f;
     private bool isHovering;
     public bool isSelected;
 
     [Header("Enemy detection")]
+    public float predictionMultiplyer = 10f;
     public List<EnemyInfo> enemy = new List<EnemyInfo>();
     public GameObject lockOnEnemy;
+    private int indexOfEnemy;
 
     void Start()
     {
         o_reloadTime = reloadTime;
+        o_SearchDelay = searchDelay;
         rangeRend.enabled = false;
         rangeObj.SetActive(true);
         UpdateRange();
-    }
 
-    void Update()
-    {
         if(isDebug)
         {
             rangeRend.enabled = true;
             rangeObj.SetActive(true);
-            return;
+            this.enabled = false;
         }
+    }
 
+    void Update()
+    {
         if(reloadTime > 0)
         {
             reloadTime -= Time.deltaTime;
         }
+
+        if(searchDelay > 0)
+        {
+            searchDelay -= Time.deltaTime;
+        }
         else
         {
-            reloadTime = o_reloadTime;
+            searchDelay = o_SearchDelay;
             UpdateValues();
             SelectEnemy();
         }
@@ -81,15 +101,60 @@ public class Tower : MonoBehaviour
         }
     }
 
-    public void GatherEnemy(GameObject obj)
+    void FixedUpdate()
+    {
+        if(lockOnEnemy == null)
+        {
+            return;
+        }
+
+        Vector3 predictedPosition = Vector3.MoveTowards(lockOnEnemy.transform.position, enemy[indexOfEnemy].enemy.waypoint[enemy[indexOfEnemy].enemy.waypointIndex], Time.deltaTime * enemy[indexOfEnemy].enemy.speed * predictionMultiplyer);
+
+        Vector3 direction = (predictedPosition - transform.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed * 100f);
+        float difference = Quaternion.Angle(transform.rotation, targetRotation);
+        if(difference <= angleOffset && reloadTime <= 0)
+        {
+            reloadTime = o_reloadTime;
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        GameObject go = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        go.transform.rotation = transform.rotation;
+        Rigidbody2D rb = go.GetComponent<Rigidbody2D>();
+        Bullet bullet = go.GetComponent<Bullet>();
+        bullet.damage = bulletDamage;
+        Destroy(go, bulletLifespan);
+        rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
+    }
+
+    public void GatherEnemy(Enemy enemyScript)
     {
         EnemyInfo colScript = new EnemyInfo();
-        colScript.enemy = obj.gameObject.GetComponent<Enemy>();
+        colScript.enemy = enemyScript;
         enemy.Add(colScript);
         UpdateValues(); 
     }
+    public void RemoveEnemy(Enemy enemyScript)
+    {
+        for(int i = 0; i < enemy.Count; i++)
+        {
+            if(enemy[i].enemy == enemyScript)
+            {
+                enemy.RemoveAt(i);
+                UpdateValues();
+                SelectEnemy();
+                break;
+            }
+        }
+    }
 
-    void UpdateValues()
+    public void UpdateValues()
     {
         foreach(EnemyInfo info in enemy)
         {
@@ -107,8 +172,10 @@ public class Tower : MonoBehaviour
         }
     }
 
-    void SelectEnemy()
+    public void SelectEnemy()
     {
+        lockOnEnemy = null;
+        indexOfEnemy = 0;
         if(enemy.Count == 0)
         {
             return;
@@ -131,6 +198,7 @@ public class Tower : MonoBehaviour
                 }
 
                 lockOnEnemy = enemy[firstEnemy].enemy.gameObject;
+                indexOfEnemy = firstEnemy;
                 break;
 
             case Targetting.Last:
@@ -148,6 +216,7 @@ public class Tower : MonoBehaviour
                 }
 
                 lockOnEnemy = enemy[lastEnemy].enemy.gameObject;
+                indexOfEnemy = lastEnemy;
                 break;
 
             case Targetting.Strong:
@@ -177,6 +246,7 @@ public class Tower : MonoBehaviour
                 }
 
                 lockOnEnemy = enemy[strongEnemy].enemy.gameObject;
+                indexOfEnemy = strongEnemy;
                 break;
 
             case Targetting.Weak:
@@ -206,6 +276,7 @@ public class Tower : MonoBehaviour
                 }
 
                 lockOnEnemy = enemy[weakEnemy].enemy.gameObject;
+                indexOfEnemy = weakEnemy;
                 break;
 
             case Targetting.Close:
@@ -221,6 +292,7 @@ public class Tower : MonoBehaviour
                 }
 
                 lockOnEnemy = enemy[closeEnemy].enemy.gameObject;
+                indexOfEnemy = closeEnemy;
                 break;
 
         }

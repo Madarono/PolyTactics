@@ -10,15 +10,24 @@ public class Enemy : MonoBehaviour
     [Header("Attributes")]
     public float speed = 1f;
     public float health;
+    private float o_health;
 
     [Header("Rotation")]
     public float rotationRatio = 10/3;
     private float rotationSpeed = 2f;
     public float requirementDistance = 0.01f;
 
+    [Header("Health bar")]
+    public Transform healthBar;
+    public float maxScale = 0.95f;
+    public float minScale = 0f;
+    
+
     void Start()
     {
+        o_health = health;
         rotationSpeed = speed * rotationRatio;
+        Refresh();
     }
 
     public void SetWaypoints(Vector3[] pos)
@@ -26,6 +35,18 @@ public class Enemy : MonoBehaviour
         foreach(Vector3 p in pos)
         {
             waypoint.Add(p);
+        }
+    }
+
+    public void Refresh()
+    {
+        float percentage = health / o_health;
+        float newScale = Mathf.Lerp(minScale, maxScale, percentage);
+        healthBar.localScale = new Vector3(newScale, healthBar.localScale.y, healthBar.localScale.z);
+        if(health <= 0)
+        {
+            //Give coins here
+            Destroy(gameObject);
         }
     }
 
@@ -49,6 +70,5 @@ public class Enemy : MonoBehaviour
         {
             waypointIndex++;
         }
-
     }
 }

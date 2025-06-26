@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
 
@@ -9,11 +10,13 @@ public class TowerPrefab
 {
     public GameObject prefab;
     public GameObject display;
+    public int price;
 }
 
 
 public class TowerManager : MonoBehaviour
 {
+    public Settings settings;
     public TowerPrefab[] towerPrefab;
     public GameObject[] placeButtons;
     
@@ -29,9 +32,11 @@ public class TowerManager : MonoBehaviour
 
     [Header("Towers")]
     public List<Tower> tower = new List<Tower>();
+    public TextMeshProUGUI priceVisual;
 
 
     private GameObject selectedPrefab;
+    private int currentPrefabIndex;
     private GameObject displayPrefab;
     private Camera cam;
     private Vector3 mouseWorldPos;
@@ -97,9 +102,11 @@ public class TowerManager : MonoBehaviour
     {
         int tileIndex = tilePositions.IndexOf(cellPos);
         bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
-
-        if(validTile)
+        
+        if(validTile && settings.money >= towerPrefab[currentPrefabIndex].price)
         {
+            settings.money -= towerPrefab[currentPrefabIndex].price;
+            settings.UpdateVisual();
             PlaceTower(cellPos, tileIndex);
             InactiveSelection();
         }
@@ -131,6 +138,8 @@ public class TowerManager : MonoBehaviour
             obj.SetActive(true);
         }
         selectedPrefab = towerPrefab[index].prefab;
+        currentPrefabIndex = index;
+        priceVisual.SetText("${0}", towerPrefab[index].price);
         isSelecting = true;
         displayPrefab = Instantiate(towerPrefab[index].display, Vector3.zero, Quaternion.identity);
         displayPrefab.SetActive(false);
