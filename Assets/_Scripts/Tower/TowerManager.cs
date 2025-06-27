@@ -75,31 +75,79 @@ public class TowerManager : MonoBehaviour
 
     void Update()
     {
-        if (isSelecting && Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+        if (isSelecting)
         {
-            mouseWorldPos = cam.ScreenToWorldPoint(Input.mousePosition);
-            cellPos = tilemap.WorldToCell(mouseWorldPos);
-            clickedTile = tilemap.GetTile(cellPos);
-            int tileIndex = tilePositions.IndexOf(cellPos);
-
-            bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
-
-            displayPrefab.SetActive(validTile);
-            dots[cacheDotIndex].SetActive(true);
-            if(validTile)
+            if (Application.isMobilePlatform && Input.touchCount > 0)
             {
-                displayPrefab.transform.position = tilemap.GetCellCenterWorld(cellPos);
-                dots[tileIndex].SetActive(false);
-                cacheDotIndex = tileIndex;
+                Touch touch = Input.GetTouch(0);
+
+                if (touch.phase == TouchPhase.Began)
+                {
+                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                    {
+                        return;
+                    }
+
+                    HandlePlacement(touch.position);
+                }
+            }
+            else if (Input.GetMouseButtonDown(0))
+            {
+                if (EventSystem.current.IsPointerOverGameObject())
+                {
+                    return;
+                }
+
+                HandlePlacement(Input.mousePosition);
             }
         }
 
-        if(Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+        if (Application.isMobilePlatform && Input.touchCount > 0)
         {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                {
+                    return; 
+                }
+
+                HideOtherTowerInfo();
+            }
+        }
+        else if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             HideOtherTowerInfo();
         }
-
     }
+
+    void HandlePlacement(Vector3 inputPosition)
+    {
+        mouseWorldPos = cam.ScreenToWorldPoint(inputPosition);
+        cellPos = tilemap.WorldToCell(mouseWorldPos);
+        clickedTile = tilemap.GetTile(cellPos);
+        int tileIndex = tilePositions.IndexOf(cellPos);
+    
+        bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
+    
+        displayPrefab.SetActive(validTile);
+        dots[cacheDotIndex].SetActive(true);
+    
+        if (validTile)
+        {
+            displayPrefab.transform.position = tilemap.GetCellCenterWorld(cellPos);
+            dots[tileIndex].SetActive(false);
+            cacheDotIndex = tileIndex;
+        }
+    }
+
+
 
     public void ConfirmPlaceTower()
     {
