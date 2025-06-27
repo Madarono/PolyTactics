@@ -34,6 +34,9 @@ public class TowerManager : MonoBehaviour
     public List<Tower> tower = new List<Tower>();
     public TextMeshProUGUI priceVisual;
 
+    [Header("Scripts for tower")]
+    public UpgradeManager upgradeManager;
+
 
     private GameObject selectedPrefab;
     private int currentPrefabIndex;
@@ -124,6 +127,9 @@ public class TowerManager : MonoBehaviour
             GameObject go = Instantiate(selectedPrefab, worldPos, Quaternion.identity);
             Tower goScript = go.GetComponent<Tower>();
             goScript.manager = this;
+            goScript.upgradeManager = upgradeManager;
+            // goScript.upgrade.sellValue = (int)Mathf.Round(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
+            goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
             tower.Add(goScript);
             selectedPrefab = null;
             isSelecting = false;
@@ -137,9 +143,10 @@ public class TowerManager : MonoBehaviour
         {
             obj.SetActive(true);
         }
+        HideOtherTowerInfo();
         selectedPrefab = towerPrefab[index].prefab;
         currentPrefabIndex = index;
-        priceVisual.SetText("${0}", towerPrefab[index].price);
+        priceVisual.text = "$" + towerPrefab[index].price.ToString();
         isSelecting = true;
         displayPrefab = Instantiate(towerPrefab[index].display, Vector3.zero, Quaternion.identity);
         displayPrefab.SetActive(false);
@@ -170,5 +177,7 @@ public class TowerManager : MonoBehaviour
             script.HideInfo();
             script.HideRange();
         }
+
+        upgradeManager.HideLevelRemovers();
     }
 }

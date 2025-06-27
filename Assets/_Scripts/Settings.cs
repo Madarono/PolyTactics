@@ -8,6 +8,8 @@ public class Settings : MonoBehaviour
     public int money;
     public TextMeshProUGUI moneyVisual;
 
+    public float sellPercentage = 0.7f;
+
     void Start()
     {
         UpdateVisual();
@@ -15,6 +17,6 @@ public class Settings : MonoBehaviour
 
     public void UpdateVisual()
     {
-        moneyVisual.SetText("${0}", money);
+        moneyVisual.text = "$" + money.ToString();
     }
 }

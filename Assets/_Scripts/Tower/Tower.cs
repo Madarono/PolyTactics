@@ -23,7 +23,14 @@ public enum Targetting
 
 public class Tower : MonoBehaviour
 {
+    [Header("Identity")]
+    public Factions faction;
+    public string towerName;
+
+    public TowerUpgrade upgrade;
+    [HideInInspector]public UpgradeManager upgradeManager;
     [HideInInspector]public TowerManager manager;
+    
     [Tooltip("This is when you're preparing to buy the turrent, this avoids any checks and only checks for range.")]
     public bool isDebug;
 
@@ -34,8 +41,11 @@ public class Tower : MonoBehaviour
     public float reloadTime = 0.5f;
     public float rotationSpeed = 4.5f;
     public float fireForce = 4f;
+
+    [Header("Animation")]
+    public Animator towerAnim;
     
-    private float o_reloadTime;
+    [HideInInspector]public float o_reloadTime;
 
     [Header("Firing")]
     public float searchDelay = 1f;
@@ -131,6 +141,7 @@ public class Tower : MonoBehaviour
         bullet.damage = bulletDamage;
         Destroy(go, bulletLifespan);
         rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
+        towerAnim.SetTrigger("Shoot");
     }
 
     public void GatherEnemy(Enemy enemyScript)
@@ -298,7 +309,7 @@ public class Tower : MonoBehaviour
         }
     }
 
-    void UpdateRange()
+    public void UpdateRange()
     {
         float diameter = range * 2f;
         rangeObj.transform.localScale = new Vector3(diameter, diameter, 1f);
@@ -306,15 +317,32 @@ public class Tower : MonoBehaviour
 
     public void ShowRange()
     {
+        if(manager.isSelecting)
+        {
+            isHovering = false;
+            return;
+        }
+
         isHovering = true;
     }
     public void HideRange()
     {
+        if(manager.isSelecting)
+        {
+            isHovering = false;
+            return;
+        }
+
         isHovering = false;
     }
 
     public void BothInfo()
     {
+        if(manager.isSelecting)
+        {
+            return;
+        }
+
         isSelected = !isSelected;
 
         if(isSelected)
@@ -329,10 +357,16 @@ public class Tower : MonoBehaviour
     public void ShowInfo()
     {
         manager.HideOtherTowerInfo();
+        upgradeManager.tower = upgrade;
+        upgradeManager.UpdateValues();
         isSelected = true;
     }
     public void HideInfo()
     {
         isSelected = false; 
+        if(upgradeManager.tower == upgrade)
+        {
+            upgradeManager.tower = null;
+        }
     }
 }
