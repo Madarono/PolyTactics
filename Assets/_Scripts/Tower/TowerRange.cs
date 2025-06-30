@@ -28,7 +28,8 @@ public class TowerRange : MonoBehaviour
                 tower.GatherEnemy(enemy);
             }
         }
-        tower.searchDelay = 0;
+        tower.UpdateValues();
+        tower.SelectEnemy();
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -36,6 +37,10 @@ public class TowerRange : MonoBehaviour
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
             tower.GatherEnemy(enemy);
+            if(tower.towerType == TowerType.Freezer)
+            {
+                enemy.speed = enemy.o_speed * tower.slowPercentage;
+            }
         }
     }
     void OnTriggerExit2D(Collider2D col)
@@ -43,6 +48,10 @@ public class TowerRange : MonoBehaviour
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
             tower.RemoveEnemy(enemy);
+            if(tower.towerType == TowerType.Freezer)
+            {
+                enemy.speed = enemy.o_speed;
+            }
         }
     }
 }

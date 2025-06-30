@@ -37,6 +37,9 @@ public class TowerManager : MonoBehaviour
     [Header("Scripts for tower")]
     public UpgradeManager upgradeManager;
 
+    [Header("Search for towet")]
+    public float searchDelay = 0.5f;
+
 
     private GameObject selectedPrefab;
     private int currentPrefabIndex;
@@ -49,6 +52,7 @@ public class TowerManager : MonoBehaviour
 
     void Start()
     {
+        StopAllCoroutines();
         foreach(GameObject obj in placeButtons)
         {
             obj.SetActive(false);
@@ -70,6 +74,8 @@ public class TowerManager : MonoBehaviour
                 dots.Add(go);
             }
         }
+
+        StartCoroutine(SearchDelay());
 
     }
 
@@ -147,8 +153,6 @@ public class TowerManager : MonoBehaviour
         }
     }
 
-
-
     public void ConfirmPlaceTower()
     {
         int tileIndex = tilePositions.IndexOf(cellPos);
@@ -196,6 +200,11 @@ public class TowerManager : MonoBehaviour
         currentPrefabIndex = index;
         priceVisual.text = "$" + towerPrefab[index].price.ToString();
         isSelecting = true;
+        if(displayPrefab != null)
+        {
+            Destroy(displayPrefab);
+        }
+        
         displayPrefab = Instantiate(towerPrefab[index].display, Vector3.zero, Quaternion.identity);
         displayPrefab.SetActive(false);
         for(int i = 0; i < dots.Count; i++)
@@ -227,5 +236,20 @@ public class TowerManager : MonoBehaviour
         }
 
         upgradeManager.HideLevelRemovers();
+    }
+
+    IEnumerator SearchDelay()
+    {
+        bool loop = true;
+        
+        while(loop)
+        {
+            yield return new WaitForSeconds(searchDelay);
+            foreach(Tower script in tower)
+            {
+                script.UpdateValues();
+                script.SelectEnemy();
+            }
+        }
     }
 }

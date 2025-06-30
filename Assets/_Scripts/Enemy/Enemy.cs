@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [HideInInspector]public List<Vector3> waypoint = new List<Vector3>();
-    [HideInInspector]public int waypointIndex;
+    [HideInInspector]public EnemyManager manager;
+    [HideInInspector]public Settings settings;
+    public List<Vector3> waypoint = new List<Vector3>();
+    public int waypointIndex;
     
     [Header("Attributes")]
     public float speed = 1f;
+    [HideInInspector]public float o_speed;
     public float health;
+    public int damageToBase = 2;
     private float o_health;
 
     [Header("Rotation")]
@@ -21,11 +25,18 @@ public class Enemy : MonoBehaviour
     public Transform healthBar;
     public float maxScale = 0.95f;
     public float minScale = 0f;
+
+    [Header("Reward")]
+    public int moneyReward = 5;
+
+
+    private float slowSpeed;
     
 
     void Start()
     {
         o_health = health;
+        o_speed = speed;
         rotationSpeed = speed * rotationRatio;
         Refresh();
     }
@@ -45,8 +56,9 @@ public class Enemy : MonoBehaviour
         healthBar.localScale = new Vector3(newScale, healthBar.localScale.y, healthBar.localScale.z);
         if(health <= 0)
         {
-            //Give coins here
-            Destroy(gameObject);
+            settings.money += moneyReward;
+            settings.UpdateVisual();
+            manager.DestroyEnemy(gameObject);
         }
     }
 
@@ -66,9 +78,27 @@ public class Enemy : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * rotationSpeed);
 
         float distance = Vector2.Distance(transform.position, waypoint[waypointIndex]);
-        if((distance <= requirementDistance) && waypointIndex < waypoint.Count)
+        if((distance <= requirementDistance) && waypointIndex <= waypoint.Count - 1)
         {
             waypointIndex++;
+            if(waypointIndex == waypoint.Count)
+            {
+                settings.health -= damageToBase;
+                settings.CheckHealth();
+                manager.DestroyEnemy(gameObject);
+            }
         }
+    }
+
+    public void Freeze(float duration, float slowSpeed)
+    {
+        speed = 0;
+        this.slowSpeed = slowSpeed;
+        Invoke("ReturnToSlow", duration);
+    }
+
+    void ReturnToSlow()
+    {
+        speed = slowSpeed;
     }
 }

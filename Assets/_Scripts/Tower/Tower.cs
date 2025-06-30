@@ -21,10 +21,17 @@ public enum Targetting
     Close
 }
 
+public enum TowerType
+{
+    Basic,
+    Freezer,
+}
+
 public class Tower : MonoBehaviour
 {
     [Header("Identity")]
     public Factions faction;
+    public TowerType towerType;
     public string towerName;
 
     public TowerUpgrade upgrade;
@@ -34,13 +41,19 @@ public class Tower : MonoBehaviour
     [Tooltip("This is when you're preparing to buy the turrent, this avoids any checks and only checks for range.")]
     public bool isDebug;
 
-    [Header("Attributes")]
+    [Header("Attributes - Tower")]
     public Targetting targetting;
     public float bulletDamage = 2f;
     public float bulletLifespan = 10f;
     public float reloadTime = 0.5f;
     public float rotationSpeed = 4.5f;
+    public int bulletPierce = 1;
     public float fireForce = 4f;
+
+    [Header("Attrubutes - Freezer")]
+    public float slowPercentage = 0.5f;
+    public float freezeChance = 10f;
+    public float freezeDuration = 1f;
 
     [Header("Animation")]
     public Animator towerAnim;
@@ -48,8 +61,8 @@ public class Tower : MonoBehaviour
     [HideInInspector]public float o_reloadTime;
 
     [Header("Firing")]
-    public float searchDelay = 1f;
-    private float o_SearchDelay;
+    // public float searchDelay = 1f;
+    // private float o_SearchDelay;
     public float angleOffset = 2f;
     public Transform firePoint;
     public GameObject bulletPrefab;
@@ -70,7 +83,7 @@ public class Tower : MonoBehaviour
     void Start()
     {
         o_reloadTime = reloadTime;
-        o_SearchDelay = searchDelay;
+        // o_SearchDelay = searchDelay;
         rangeRend.enabled = false;
         rangeObj.SetActive(true);
         UpdateRange();
@@ -90,16 +103,16 @@ public class Tower : MonoBehaviour
             reloadTime -= Time.deltaTime;
         }
 
-        if(searchDelay > 0)
-        {
-            searchDelay -= Time.deltaTime;
-        }
-        else
-        {
-            searchDelay = o_SearchDelay;
-            UpdateValues();
-            SelectEnemy();
-        }
+        // if(searchDelay > 0)
+        // {
+        //     searchDelay -= Time.deltaTime;
+        // }
+        // else
+        // {
+        //     searchDelay = o_SearchDelay;
+        //     UpdateValues();
+        //     SelectEnemy();
+        // }
 
         if(isHovering || isSelected)
         {
@@ -113,7 +126,7 @@ public class Tower : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(lockOnEnemy == null)
+        if(lockOnEnemy == null || towerType == TowerType.Freezer)
         {
             return;
         }
@@ -136,12 +149,15 @@ public class Tower : MonoBehaviour
     {
         GameObject go = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         go.transform.rotation = transform.rotation;
-        Rigidbody2D rb = go.GetComponent<Rigidbody2D>();
-        Bullet bullet = go.GetComponent<Bullet>();
-        bullet.damage = bulletDamage;
-        Destroy(go, bulletLifespan);
-        rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
-        towerAnim.SetTrigger("Shoot");
+
+        if(go.TryGetComponent(out Rigidbody2D rb) && go.TryGetComponent(out Bullet bullet))
+        {
+            bullet.damage = bulletDamage;
+            bullet.pierce = bulletPierce;
+            Destroy(go, bulletLifespan);
+            rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
+            towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+        }
     }
 
     public void GatherEnemy(Enemy enemyScript)
@@ -192,121 +208,149 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        switch(targetting)
+        if(towerType == TowerType.Basic)
         {
-            case Targetting.First:
-                int firstEnemy = 0; 
-                float closestDistance = 999;
-                int highestPlacement = 0;
-                for(int i = 0; i < enemy.Count; i++)
-                {
-                    if(enemy[i].placement >= highestPlacement && enemy[i].distance < closestDistance)
+            switch(targetting)
+            {
+                case Targetting.First:
+                    int firstEnemy = 0; 
+                    float closestDistance = 999;
+                    int highestPlacement = 0;
+                    for(int i = 0; i < enemy.Count; i++)
                     {
-                        firstEnemy = i;
-                        closestDistance = enemy[i].distance;
-                        highestPlacement = enemy[i].placement;
+                        if(enemy[i].placement > highestPlacement)
+                        {
+                            firstEnemy = i;
+                            closestDistance = enemy[i].distance;
+                            highestPlacement = enemy[i].placement;
+                        }
+                        else if(enemy[i].placement == highestPlacement && enemy[i].distance < closestDistance)
+                        {
+                            firstEnemy = i;
+                            closestDistance = enemy[i].distance;
+                            highestPlacement = enemy[i].placement;
+                        }
                     }
-                }
 
-                lockOnEnemy = enemy[firstEnemy].enemy.gameObject;
-                indexOfEnemy = firstEnemy;
-                break;
+                    lockOnEnemy = enemy[firstEnemy].enemy.gameObject;
+                    indexOfEnemy = firstEnemy;
+                    break;
 
-            case Targetting.Last:
-                int lastEnemy = 0; 
-                float farthestDistance = 0;
-                int lowestPlacement = 999;
-                for(int i = 0; i < enemy.Count; i++)
-                {
-                    if(enemy[i].placement <= lowestPlacement && enemy[i].distance > farthestDistance)
+                case Targetting.Last:
+                    int lastEnemy = 0; 
+                    float farthestDistance = 0;
+                    int lowestPlacement = 999;
+                    for(int i = 0; i < enemy.Count; i++)
                     {
-                        lastEnemy = i;
-                        farthestDistance = enemy[i].distance;
-                        lowestPlacement = enemy[i].placement;
+                        if(enemy[i].placement < lowestPlacement)
+                        {
+                            lastEnemy = i;
+                            farthestDistance = enemy[i].distance;
+                            lowestPlacement = enemy[i].placement;
+                        }
+                        if(enemy[i].placement == lowestPlacement && enemy[i].distance > farthestDistance)
+                        {
+                            lastEnemy = i;
+                            farthestDistance = enemy[i].distance;
+                            lowestPlacement = enemy[i].placement;
+                        }
                     }
-                }
 
-                lockOnEnemy = enemy[lastEnemy].enemy.gameObject;
-                indexOfEnemy = lastEnemy;
-                break;
+                    lockOnEnemy = enemy[lastEnemy].enemy.gameObject;
+                    indexOfEnemy = lastEnemy;
+                    break;
 
-            case Targetting.Strong:
-                int strongEnemy = 0; 
-                float _health = 0;
-                float _closestDistance = 999;
-                int _highestPlacement = 0;
-                for(int i = 0; i < enemy.Count; i++)
-                {
-                    if(enemy[i].health > _health)
+                case Targetting.Strong:
+                    int strongEnemy = 0; 
+                    float _health = 0;
+                    float _closestDistance = 999;
+                    int _highestPlacement = 0;
+                    for(int i = 0; i < enemy.Count; i++)
                     {
-                        strongEnemy = i;
-                        _health = enemy[i].health;
-                        _closestDistance = enemy[i].distance;
-                        _highestPlacement = enemy[i].placement;
-                    }
-                    else if(enemy[i].health == _health)
-                    {
-                        if(enemy[i].placement >= _highestPlacement && enemy[i].distance < _closestDistance)
+                        if(enemy[i].health > _health)
                         {
                             strongEnemy = i;
                             _health = enemy[i].health;
                             _closestDistance = enemy[i].distance;
                             _highestPlacement = enemy[i].placement;
                         }
+                        else if(enemy[i].health == _health)
+                        {
+                            if(enemy[i].placement >= _highestPlacement && enemy[i].distance < _closestDistance)
+                            {
+                                strongEnemy = i;
+                                _health = enemy[i].health;
+                                _closestDistance = enemy[i].distance;
+                                _highestPlacement = enemy[i].placement;
+                            }
+                        }
                     }
-                }
 
-                lockOnEnemy = enemy[strongEnemy].enemy.gameObject;
-                indexOfEnemy = strongEnemy;
-                break;
+                    lockOnEnemy = enemy[strongEnemy].enemy.gameObject;
+                    indexOfEnemy = strongEnemy;
+                    break;
 
-            case Targetting.Weak:
-                int weakEnemy = 0; 
-                float health = 999;
-                float closestDistance_ = 999;
-                int highestPlacement_ = 0;
-                for(int i = 0; i < enemy.Count; i++)
-                {
-                    if(enemy[i].health < health)
+                case Targetting.Weak:
+                    int weakEnemy = 0; 
+                    float health = 999;
+                    float closestDistance_ = 999;
+                    int highestPlacement_ = 0;
+                    for(int i = 0; i < enemy.Count; i++)
                     {
-                        weakEnemy = i;
-                        health = enemy[i].health;
-                        closestDistance_ = enemy[i].distance;
-                        highestPlacement_ = enemy[i].placement;
-                    }
-                    else if(enemy[i].health == health)
-                    {
-                        if(enemy[i].placement >= highestPlacement_ && enemy[i].distance < closestDistance_)
+                        if(enemy[i].health < health)
                         {
                             weakEnemy = i;
                             health = enemy[i].health;
                             closestDistance_ = enemy[i].distance;
                             highestPlacement_ = enemy[i].placement;
                         }
+                        else if(enemy[i].health == health)
+                        {
+                            if(enemy[i].placement >= highestPlacement_ && enemy[i].distance < closestDistance_)
+                            {
+                                weakEnemy = i;
+                                health = enemy[i].health;
+                                closestDistance_ = enemy[i].distance;
+                                highestPlacement_ = enemy[i].placement;
+                            }
+                        }
                     }
-                }
 
-                lockOnEnemy = enemy[weakEnemy].enemy.gameObject;
-                indexOfEnemy = weakEnemy;
-                break;
+                    lockOnEnemy = enemy[weakEnemy].enemy.gameObject;
+                    indexOfEnemy = weakEnemy;
+                    break;
 
-            case Targetting.Close:
-                int closeEnemy = 0;
-                float closeDistance = 999;
-                for(int i = 0; i < enemy.Count; i++)
-                {
-                    if(enemy[i].distanceToPlayer <= closeDistance)
+                case Targetting.Close:
+                    int closeEnemy = 0;
+                    float closeDistance = 999;
+                    for(int i = 0; i < enemy.Count; i++)
                     {
-                        closeEnemy = i;
-                        closeDistance = enemy[i].distanceToPlayer;
+                        if(enemy[i].distanceToPlayer <= closeDistance)
+                        {
+                            closeEnemy = i;
+                            closeDistance = enemy[i].distanceToPlayer;
+                        }
                     }
-                }
 
-                lockOnEnemy = enemy[closeEnemy].enemy.gameObject;
-                indexOfEnemy = closeEnemy;
-                break;
+                    lockOnEnemy = enemy[closeEnemy].enemy.gameObject;
+                    indexOfEnemy = closeEnemy;
+                    break;
 
+            }
         }
+        else if(towerType == TowerType.Freezer)
+        {
+            foreach(EnemyInfo script in enemy)
+            {
+                // script.enemy.speed = script.enemy.o_speed * slowPercentage;
+                float random = Random.Range(0, 100);
+                if(random <= freezeChance)
+                {
+                    script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage);
+                }
+            }
+        }
+        
     }
 
     public void UpdateRange()
@@ -358,6 +402,7 @@ public class Tower : MonoBehaviour
     {
         manager.HideOtherTowerInfo();
         upgradeManager.tower = upgrade;
+        upgradeManager.UpdateWindowPositioning();
         upgradeManager.UpdateValues();
         isSelected = true;
     }

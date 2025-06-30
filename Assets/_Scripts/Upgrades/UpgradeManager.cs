@@ -11,21 +11,45 @@ public class UpgradeManager : MonoBehaviour
     public Settings settings;
     public TowerUpgrade tower;
     public GameObject window;
-    public Transform[] windowStates;
+    public Transform[] windowStatesRight;
+    public Transform[] windowStatesLeft;
+    public float stayDistance = 0.1f;
+    public PositionChange[] positionChange;
+    private Transform[] windowStates; //Current one
     public float speedOfWindow;
     
     [Header("Visuals")]
     public GameObject upgradeButtons;
     public GameObject sell;
     public TextMeshProUGUI headerVisual;
+
     public TextMeshProUGUI damageVisual;
+
     public TextMeshProUGUI speedVisual;
     public TextMeshProUGUI reloadVisual;
     public TextMeshProUGUI rotationVisual;
     public TextMeshProUGUI rangeVisual;
+    public TextMeshProUGUI slowVisual;
+    public TextMeshProUGUI freezeVisual;
+
+    public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
     public TextMeshProUGUI sellVisual;
-    public TextMeshProUGUI targettingVisual;
+
+
+    [Header("GameObejcts")]
+    public GameObject speedObj;
+    public GameObject reloadObj;
+    public GameObject rotationObj;
+    public GameObject rangeObj;
+    public GameObject damageObj;
+    public GameObject slowObj;
+    public GameObject freezeObj;
+
+    public GameObject targettingObj;
+    public GameObject freezerObj;
+    
+
 
     [Header("Faction colors")]
     public ColorFactions[] factionColor;
@@ -42,6 +66,13 @@ public class UpgradeManager : MonoBehaviour
 
     void Start()
     {
+        windowStates = windowStatesLeft;
+        window.transform.position = windowStates[0].position;
+        foreach(PositionChange script in positionChange)
+        {
+            script.MovePlaces(0);
+        }
+
         finalPrice = 0;
         priceVisual.text = "$" + finalPrice.ToString();
         HideLevelRemovers();
@@ -51,12 +82,41 @@ public class UpgradeManager : MonoBehaviour
     {
         if(tower != null)
         {
-            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[1].position, Time.deltaTime * speedOfWindow);
+            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[1].position, Time.unscaledDeltaTime * speedOfWindow);
         }
         else
         {
-            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[0].position, Time.deltaTime * speedOfWindow);
+            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[0].position, Time.unscaledDeltaTime * speedOfWindow);
         }
+    }
+
+    public void UpdateWindowPositioning()
+    {
+        float distance = Vector2.Distance(window.transform.position, windowStates[1].position);
+        if(distance <= stayDistance)
+        {
+            return;
+        }
+
+        if(tower.transform.position.x <= 0)
+        {
+            windowStates = windowStatesRight;
+            foreach(PositionChange script in positionChange)
+            {
+                script.MovePlaces(0);
+            }
+        }
+        else
+        {
+            windowStates = windowStatesLeft;
+            foreach(PositionChange script in positionChange)
+            {
+                script.MovePlaces(1);
+            }
+        }
+
+
+        window.transform.position = windowStates[0].position;
     }
 
     public void UpdateValues()
@@ -66,11 +126,87 @@ public class UpgradeManager : MonoBehaviour
         targettingVisual.text = types[currentIndex].ToString();
 
         headerVisual.text = tower.tower.towerName;
-        damageVisual.text = tower.upgrades[tower.individualLv[0]].bulletDamage.ToString("F1");
-        speedVisual.text = tower.upgrades[tower.individualLv[1]].fireForce.ToString("F1");
-        reloadVisual.text = tower.upgrades[tower.individualLv[2]].reloadTime.ToString("F1");
-        rotationVisual.text = tower.upgrades[tower.individualLv[3]].rotationSpeed.ToString("F1");
-        rangeVisual.text = tower.upgrades[tower.individualLv[4]].range.ToString("F1");
+        if(tower.upgrades[0].bulletDamage > 0)
+        {
+            damageVisual.text = tower.upgrades[tower.individualLv[0]].bulletDamage.ToString("F1");
+            damageObj.SetActive(true);
+        }
+        else
+        {
+            damageObj.SetActive(false);
+        }
+        
+        if(tower.upgrades[0].pierce > 0)
+        {
+            speedObj.SetActive(true);
+            speedVisual.text = tower.upgrades[tower.individualLv[1]].pierce.ToString("F1");
+        }
+        else
+        {
+            speedObj.SetActive(false);
+        }
+
+        if(tower.upgrades[0].reloadTime > 0)
+        {
+            reloadObj.SetActive(true);
+            reloadVisual.text = tower.upgrades[tower.individualLv[2]].reloadTime.ToString("F1");
+        }
+        else
+        {
+            reloadObj.SetActive(false);
+        }
+
+        if(tower.upgrades[0].rotationSpeed > 0)
+        {
+            rotationObj.SetActive(true);
+            rotationVisual.text = tower.upgrades[tower.individualLv[3]].rotationSpeed.ToString("F1");
+        }
+        else
+        {
+            rotationObj.SetActive(false);
+        }
+
+        if(tower.upgrades[0].range > 0)
+        {
+            rangeObj.SetActive(true);
+            rangeVisual.text = tower.upgrades[tower.individualLv[4]].range.ToString("F1");
+        }
+        else
+        {
+            rangeObj.SetActive(false);
+        }
+
+        if(tower.upgrades[0].slowPercentage > 0)
+        {
+            slowObj.SetActive(true);
+            slowVisual.text = tower.upgrades[tower.individualLv[5]].slowPercentage.ToString("F1");
+        }
+        else
+        {
+            slowObj.SetActive(false);
+        }
+
+        if(tower.upgrades[0].freezeChance > 0)
+        {
+            freezeObj.SetActive(true);
+            freezeVisual.text = tower.upgrades[tower.individualLv[6]].freezeChance.ToString("F1");
+        }
+        else
+        {
+            freezeObj.SetActive(false);
+        }
+
+        if(tower.provideTargetting)
+        {
+            targettingObj.SetActive(true);
+            freezerObj.SetActive(false);
+        }
+        else
+        {
+            targettingObj.SetActive(false);
+            freezerObj.SetActive(true);
+        }
+
         sellVisual.text = "Sell - $" + tower.sellValue.ToString();
 
 
@@ -140,19 +276,19 @@ public class UpgradeManager : MonoBehaviour
 
         if(levels[1] > tower.individualLv[1])
         {
-            speedVisual.text =  tower.upgrades[tower.individualLv[1]].fireForce.ToString("F1") + " -> " + tower.upgrades[levels[1]].fireForce.ToString("F1");
+            speedVisual.text =  tower.upgrades[tower.individualLv[1]].pierce.ToString("F1") + " -> " + tower.upgrades[levels[1]].pierce.ToString("F1");
             int difference = levels[1] - tower.individualLv[1];
 
             prices[1] = 0;
             for(int i = tower.individualLv[1] + 1; i <= levels[1]; i++)
             {
-                prices[1] += tower.upgrades[i].firePrice;
+                prices[1] += tower.upgrades[i].piercePrice;
             } 
         }
         else
         {
             prices[1] = 0;
-            speedVisual.text = tower.upgrades[tower.individualLv[1]].fireForce.ToString("F1");
+            speedVisual.text = tower.upgrades[tower.individualLv[1]].pierce.ToString("F1");
         }
 
         if(levels[2] > tower.individualLv[2])
@@ -206,6 +342,40 @@ public class UpgradeManager : MonoBehaviour
             rangeVisual.text = tower.upgrades[tower.individualLv[4]].range.ToString("F1");
         }
 
+        if(levels[5] > tower.individualLv[5])
+        {
+            slowVisual.text =  tower.upgrades[tower.individualLv[5]].slowPercentage.ToString("F1") + " -> " + tower.upgrades[levels[5]].slowPercentage.ToString("F1");
+            int difference = levels[5] - tower.individualLv[5];
+
+            prices[5] = 0;
+            for(int i = tower.individualLv[5] + 1; i <= levels[5]; i++)
+            {
+                prices[5] += tower.upgrades[i].slowPrice;
+            } 
+        }
+        else
+        {
+            prices[5] = 0;
+            slowVisual.text = tower.upgrades[tower.individualLv[5]].slowPercentage.ToString("F1");
+        }
+        
+        if(levels[6] > tower.individualLv[6])
+        {
+            freezeVisual.text =  tower.upgrades[tower.individualLv[6]].freezeChance.ToString("F1") + " -> " + tower.upgrades[levels[6]].freezeChance.ToString("F1");
+            int difference = levels[6] - tower.individualLv[6];
+
+            prices[6] = 0;
+            for(int i = tower.individualLv[6] + 1; i <= levels[6]; i++)
+            {
+                prices[6] += tower.upgrades[i].freezePrice;
+            } 
+        }
+        else
+        {
+            prices[6] = 0;
+            freezeVisual.text = tower.upgrades[tower.individualLv[6]].freezeChance.ToString("F1");
+        }
+
         finalPrice = 0;
         foreach(int price in prices)
         {
@@ -241,7 +411,7 @@ public class UpgradeManager : MonoBehaviour
 
         levels[index]--;
         increaseButton[index].SetActive(true);
-        if(levels[index] == 0)
+        if(levels[index] == tower.individualLv[index])
         {
             decreaseButton[index].SetActive(false);
         }
@@ -264,7 +434,6 @@ public class UpgradeManager : MonoBehaviour
             {
                 tower.individualLv[i] = levels[i];
             }
-            // tower.sellValue += (int)Mathf.Round(finalPrice / settings.sellPercentage);
             tower.sellValue += Mathf.FloorToInt(finalPrice * settings.sellPercentage);
             UpdateValues();
             tower.ApplyTower();

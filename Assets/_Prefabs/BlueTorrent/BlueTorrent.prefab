@@ -111,13 +111,16 @@ MonoBehaviour:
   isDebug: 0
   targetting: 0
   bulletDamage: 1
-  bulletLifespan: 5
+  bulletLifespan: 2
   reloadTime: 0.5
   rotationSpeed: 4
+  bulletPierce: 1
   fireForce: 8
+  slowPercentage: 0.5
+  freezeChance: 10
   towerAnim: {fileID: 7053043266511533630}
   o_reloadTime: 0
-  searchDelay: 1
+  searchDelay: 0.5
   angleOffset: 10
   firePoint: {fileID: 2722329752702866636}
   bulletPrefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
@@ -144,46 +147,63 @@ MonoBehaviour:
   upgrades:
   - bulletDamage: 1
     bulletPrice: 0
-    fireForce: 8
-    firePrice: 0
+    pierce: 1
+    piercePrice: 0
     reloadTime: 0.5
     reloadPrice: 0
     rotationSpeed: 4
     rotationPrice: 0
     range: 3.5
     rangePrice: 0
+    slowPercentage: 0
+    slowPrice: 0
+    freezeChance: 0
+    freezePrice: 0
   - bulletDamage: 1.5
     bulletPrice: 20
-    fireForce: 8.5
-    firePrice: 20
+    pierce: 2
+    piercePrice: 50
     reloadTime: 0.4
     reloadPrice: 25
     rotationSpeed: 5
     rotationPrice: 20
     range: 4
     rangePrice: 20
+    slowPercentage: 0
+    slowPrice: 0
+    freezeChance: 0
+    freezePrice: 0
   - bulletDamage: 2
-    bulletPrice: 30
-    fireForce: 9
-    firePrice: 25
+    bulletPrice: 50
+    pierce: 3
+    piercePrice: 100
     reloadTime: 0.3
     reloadPrice: 60
     rotationSpeed: 6
     rotationPrice: 25
     range: 5
     rangePrice: 30
+    slowPercentage: 0
+    slowPrice: 0
+    freezeChance: 0
+    freezePrice: 0
   - bulletDamage: 3
-    bulletPrice: 45
-    fireForce: 10
-    firePrice: 35
+    bulletPrice: 75
+    pierce: 4
+    piercePrice: 175
     reloadTime: 0.2
     reloadPrice: 120
     rotationSpeed: 8
     rotationPrice: 40
     range: 6
     rangePrice: 40
+    slowPercentage: 0
+    slowPrice: 0
+    freezeChance: 0
+    freezePrice: 0
   sellValue: 0
-  individualLv: 0000000000000000000000000000000000000000
+  provideTargetting: 1
+  individualLv: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &4660212212468339451
 MonoBehaviour:
   m_ObjectHideFlags: 0
