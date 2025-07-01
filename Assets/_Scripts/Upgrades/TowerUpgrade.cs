@@ -25,6 +25,10 @@ public class Upgrades
     public float range;
     public int rangePrice;
 
+    [Header("Critical chance")]
+    public float criticalChance;
+    public int criticalPrice;
+
     [Header("Slow percentage")]
     public float slowPercentage;
     public int slowPrice;
@@ -42,7 +46,7 @@ public class TowerUpgrade : MonoBehaviour
     public bool provideTargetting = true;
 
     [Tooltip("Every index is equal to the index in the upgrades showing individual level to each upgrade")]
-    public int[] individualLv = new int[7];
+    public int[] individualLv = new int[8];
 
     public void ApplyTower()
     {
@@ -53,6 +57,7 @@ public class TowerUpgrade : MonoBehaviour
         tower.range = upgrades[individualLv[4]].range;
         tower.slowPercentage = upgrades[individualLv[5]].slowPercentage;
         tower.freezeChance = upgrades[individualLv[6]].freezeChance;
+        tower.criticalChance = upgrades[individualLv[7]].criticalChance;
         tower.UpdateRange();
     }
 }

@@ -16,8 +16,11 @@ public class TowerPrefab
 
 public class TowerManager : MonoBehaviour
 {
+    public Pool criticalPool;
     public Settings settings;
     public TowerPrefab[] towerPrefab;
+    private List<GameObject> display = new List<GameObject>();
+    private int previousIndex;
     public GameObject[] placeButtons;
     
     [Header("Tilemap")]
@@ -34,8 +37,12 @@ public class TowerManager : MonoBehaviour
     public List<Tower> tower = new List<Tower>();
     public TextMeshProUGUI priceVisual;
 
+    [Header("Keep track of TowerSlots")]
+    public TowerSlot currentSlot;
+
     [Header("Scripts for tower")]
     public UpgradeManager upgradeManager;
+    public Transform shootParent;
 
     [Header("Search for towet")]
     public float searchDelay = 0.5f;
@@ -73,6 +80,13 @@ public class TowerManager : MonoBehaviour
                 go.transform.SetParent(dotParent);
                 dots.Add(go);
             }
+        }
+
+        foreach(TowerPrefab script in towerPrefab)
+        {
+            GameObject go = Instantiate(script.display, Vector3.one, Quaternion.identity);
+            go.SetActive(false);
+            display.Add(go);
         }
 
         StartCoroutine(SearchDelay());
@@ -177,19 +191,25 @@ public class TowerManager : MonoBehaviour
         {
             Vector3 worldPos = tilemap.GetCellCenterWorld(position);
             GameObject go = Instantiate(selectedPrefab, worldPos, Quaternion.identity);
-            Tower goScript = go.GetComponent<Tower>();
-            goScript.manager = this;
-            goScript.upgradeManager = upgradeManager;
-            // goScript.upgrade.sellValue = (int)Mathf.Round(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
-            goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
-            tower.Add(goScript);
+            if(go.TryGetComponent(out Tower goScript))
+            {
+                goScript.manager = this;
+                goScript.criticalPool = criticalPool;
+                if(goScript.shootPool != null)
+                {
+                    goScript.shootPool.storageParent = shootParent;
+                }
+                goScript.upgradeManager = upgradeManager;
+                goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
+                tower.Add(goScript);
+            }
             selectedPrefab = null;
             isSelecting = false;
-            Destroy(displayPrefab);
+            displayPrefab.SetActive(false);
             isFull[index] = true;
         }
     }
-    public void UnlockSelection(int index)
+    public void UnlockSelection(int index, TowerSlot script)
     {
         foreach(GameObject obj in placeButtons)
         {
@@ -200,17 +220,19 @@ public class TowerManager : MonoBehaviour
         currentPrefabIndex = index;
         priceVisual.text = "$" + towerPrefab[index].price.ToString();
         isSelecting = true;
-        if(displayPrefab != null)
+        if(currentSlot != null)
         {
-            Destroy(displayPrefab);
+            currentSlot.isSelected = false;
         }
-        
-        displayPrefab = Instantiate(towerPrefab[index].display, Vector3.zero, Quaternion.identity);
+        currentSlot = script;
+        display[previousIndex].SetActive(false);
+        displayPrefab = display[index];
         displayPrefab.SetActive(false);
         for(int i = 0; i < dots.Count; i++)
         {
             dots[i].SetActive(isFull[i] ? false : true);
         }
+        previousIndex = index;
     }
     public void InactiveSelection()
     {
@@ -220,13 +242,14 @@ public class TowerManager : MonoBehaviour
         }
         selectedPrefab = null;
         isSelecting = false;
-        Destroy(displayPrefab);
+        currentSlot = null;
+        displayPrefab.SetActive(false);
         foreach(GameObject dot in dots)
         {
             dot.SetActive(false);
         }
     }
-
+    
     public void HideOtherTowerInfo()
     {
         foreach(Tower script in tower)

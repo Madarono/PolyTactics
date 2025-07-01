@@ -26,6 +26,11 @@ public class Enemy : MonoBehaviour
     public float maxScale = 0.95f;
     public float minScale = 0f;
 
+    [Header("Effects")]
+    public SpriteRenderer overlayEffect;
+    public SpriteRenderer criticalEffect;
+    private Color cold;
+
     [Header("Reward")]
     public int moneyReward = 5;
 
@@ -35,6 +40,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        overlayEffect.gameObject.SetActive(false);
         o_health = health;
         o_speed = speed;
         rotationSpeed = speed * rotationRatio;
@@ -90,15 +96,43 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void Freeze(float duration, float slowSpeed)
+    public void Freeze(float duration, float slowSpeed, Color cold, Color freeze)
     {
         speed = 0;
         this.slowSpeed = slowSpeed;
+        this.cold = cold;
+        overlayEffect.color = freeze;
         Invoke("ReturnToSlow", duration);
     }
 
     void ReturnToSlow()
     {
         speed = slowSpeed;
+        overlayEffect.color = cold;
+    }
+
+    public void VisualCritical(Color flashColor, float flashDuration, float fadeDuration)
+    {
+        StartCoroutine(CriticalDamage(flashColor, flashDuration, fadeDuration));
+    }
+
+    IEnumerator CriticalDamage(Color flashColor, float flashDuration, float fadeDuration)
+    {
+        Color originalColor = criticalEffect.color;
+
+        criticalEffect.color = flashColor;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        float timer = 0f;
+        while(timer < fadeDuration) //Here fades it
+        {
+            float alpha = Mathf.Lerp(1f, 0f, timer / fadeDuration);
+            criticalEffect.color = new Color(flashColor.r, flashColor.g, flashColor.b, alpha);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        criticalEffect.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
     }
 }

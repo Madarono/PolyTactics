@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public Tower tower;
     public float damage;
     public int pierce;
     
@@ -20,7 +21,12 @@ public class Bullet : MonoBehaviour
                 return;
             }
                 
-            Destroy(gameObject);
+            if(tower.activePool == gameObject)
+            {
+                tower.activePool = null;
+            }
+            
+            tower.shootPool.ReturnToPool(gameObject);
         }
     }
 }

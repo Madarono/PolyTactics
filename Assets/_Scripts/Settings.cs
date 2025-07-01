@@ -65,7 +65,7 @@ public class Settings : MonoBehaviour
 
     public void SpeedUp()
     {
-        if(enemyManager.enemyParent.childCount == 0 && enemyManager.currentWave < enemyManager.waveWeight.Length)
+        if(enemyManager.enemiesLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length)
         {
             speedIcon.sprite = icons[1];
             isSpeeding = false;

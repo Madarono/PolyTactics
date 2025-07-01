@@ -40,6 +40,8 @@ public class TowerRange : MonoBehaviour
             if(tower.towerType == TowerType.Freezer)
             {
                 enemy.speed = enemy.o_speed * tower.slowPercentage;
+                enemy.overlayEffect.gameObject.SetActive(true);
+                enemy.overlayEffect.color = tower.cold;
             }
         }
     }
@@ -51,6 +53,7 @@ public class TowerRange : MonoBehaviour
             if(tower.towerType == TowerType.Freezer)
             {
                 enemy.speed = enemy.o_speed;
+                enemy.overlayEffect.gameObject.SetActive(false);
             }
         }
     }

@@ -54,6 +54,8 @@ public class EnemyManager : MonoBehaviour
     [Header("Wave")]
     public int currentWave;
     public int[] waveWeight;
+    private int spawnLeft;
+    public int enemiesLeft;
     public DifficultyMultiplier[] multiplyer;
 
     [Header("Scaling")]
@@ -113,7 +115,10 @@ public class EnemyManager : MonoBehaviour
             if(weight >= possibleEnemies[random].weight)
             {
                 weight -= possibleEnemies[random].weight;
-                enemyWave.Add(possibleEnemies[random].enemy);
+                GameObject go = Instantiate(possibleEnemies[random].enemy, spawnPoint.position, Quaternion.identity);
+                go.transform.SetParent(enemyParent);
+                go.SetActive(false);
+                enemyWave.Add(go);
                 enemyDelay.Add(possibleEnemies[random].durationTillPut);
             }
             else
@@ -128,12 +133,16 @@ public class EnemyManager : MonoBehaviour
                     if(weight >= possibleEnemies[i].weight)
                     {
                         weight -= possibleEnemies[i].weight;
-                        enemyWave.Add(possibleEnemies[i].enemy);
+                        GameObject go = Instantiate(possibleEnemies[i].enemy, spawnPoint.position, Quaternion.identity);
+                        go.transform.SetParent(enemyParent);
+                        enemyWave.Add(go);
                         enemyDelay.Add(possibleEnemies[i].durationTillPut);
                         break;
                     }
                 }
             }
+
+            spawnLeft = enemyWave.Count;
         }
     }
 
@@ -142,6 +151,8 @@ public class EnemyManager : MonoBehaviour
         for(int i = 0; i < enemyWave.Count; i++)
         {
             SendEnemy(enemyWave[i]);
+            spawnLeft--;
+            enemiesLeft++;
             if(i + 1 != enemyWave.Count)
             {
                 yield return new WaitForSeconds(enemyDelay[i + 1]);
@@ -151,14 +162,13 @@ public class EnemyManager : MonoBehaviour
 
     public void SendEnemy(GameObject enemy)
     {
-        GameObject go = Instantiate(enemy , spawnPoint.position, Quaternion.identity);
-        go.transform.SetParent(enemyParent);
+        enemy.SetActive(true);
         List<Vector3> points = new List<Vector3>();
         foreach(Transform trans in waypoints)
         {
             points.Add(trans.position);
         }
-        if(go.TryGetComponent(out Enemy goScript))
+        if(enemy.TryGetComponent(out Enemy goScript))
         {
             goScript.SetWaypoints(points.ToArray());
             goScript.manager = this;
@@ -171,8 +181,9 @@ public class EnemyManager : MonoBehaviour
 
     public void DestroyEnemy(GameObject enemy)
     {
-        Destroy(enemy);
-        if(enemyParent.childCount == 1)
+        enemy.SetActive(false);
+        enemiesLeft--;
+        if(enemiesLeft <= 0 && spawnLeft <= 0)
         {
             currentWave++;
             settings.money += Mathf.RoundToInt(waveReward * (1 + (rewardScale * currentWave)) * coinMultipler[index].multiplyer);

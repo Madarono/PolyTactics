@@ -25,6 +25,7 @@ public enum TowerType
 {
     Basic,
     Freezer,
+    Sniper
 }
 
 public class Tower : MonoBehaviour
@@ -43,6 +44,7 @@ public class Tower : MonoBehaviour
 
     [Header("Attributes - Tower")]
     public Targetting targetting;
+    public Pool shootPool;
     public float bulletDamage = 2f;
     public float bulletLifespan = 10f;
     public float reloadTime = 0.5f;
@@ -50,10 +52,22 @@ public class Tower : MonoBehaviour
     public int bulletPierce = 1;
     public float fireForce = 4f;
 
-    [Header("Attrubutes - Freezer")]
+    [Header("Special Attirbutes - Sniper")]
+    public float criticalChance = 10f;
+    public float criticalMultiplter = 2f;
+    public Color criticalColor;
+    public float flashDuration = 0.3f;
+    public float fadeDuration = 0.5f;
+    public Pool criticalPool;
+    [HideInInspector]public GameObject activePool;
+    public float criticalVisualDuration = 1f;
+
+    [Header("Special Attrubutes - Freezer")]
     public float slowPercentage = 0.5f;
     public float freezeChance = 10f;
     public float freezeDuration = 1f;
+    public Color cold;
+    public Color freeze;
 
     [Header("Animation")]
     public Animator towerAnim;
@@ -61,8 +75,6 @@ public class Tower : MonoBehaviour
     [HideInInspector]public float o_reloadTime;
 
     [Header("Firing")]
-    // public float searchDelay = 1f;
-    // private float o_SearchDelay;
     public float angleOffset = 2f;
     public Transform firePoint;
     public GameObject bulletPrefab;
@@ -103,17 +115,6 @@ public class Tower : MonoBehaviour
             reloadTime -= Time.deltaTime;
         }
 
-        // if(searchDelay > 0)
-        // {
-        //     searchDelay -= Time.deltaTime;
-        // }
-        // else
-        // {
-        //     searchDelay = o_SearchDelay;
-        //     UpdateValues();
-        //     SelectEnemy();
-        // }
-
         if(isHovering || isSelected)
         {
             rangeRend.enabled = true;
@@ -147,18 +148,67 @@ public class Tower : MonoBehaviour
 
     void Shoot()
     {
-        GameObject go = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        go.transform.rotation = transform.rotation;
-
-        if(go.TryGetComponent(out Rigidbody2D rb) && go.TryGetComponent(out Bullet bullet))
+        if (towerType == TowerType.Basic)
         {
-            bullet.damage = bulletDamage;
-            bullet.pierce = bulletPierce;
-            Destroy(go, bulletLifespan);
-            rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
-            towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+            GameObject bulletObj = shootPool.GetFromPool();
+            bulletObj.transform.position = firePoint.position;
+            bulletObj.transform.rotation = transform.rotation;
+
+            if (bulletObj.TryGetComponent(out Rigidbody2D rb) && bulletObj.TryGetComponent(out Bullet bullet))
+            {
+                rb.velocity = Vector3.zero;
+                bullet.damage = bulletDamage;
+                bullet.pierce = bulletPierce;
+                bullet.tower = this;
+                rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
+                towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+
+                StartCoroutine(ReturnToPoolAfter(bulletObj, bulletLifespan));
+            }
+        }
+        else if (towerType == TowerType.Sniper)
+        {
+            if (lockOnEnemy.TryGetComponent(out Enemy script))
+            {
+                float randomCrit = Random.Range(0, 100f);
+                float damage = bulletDamage;
+                if (randomCrit <= criticalChance)
+                {
+                    damage *= criticalMultiplter;
+                    script.VisualCritical(criticalColor, flashDuration, fadeDuration);
+
+                    GameObject critObj = criticalPool.GetFromPool();
+                    critObj.transform.position = lockOnEnemy.transform.position + Vector3.up * 0.7f;
+
+                    StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration));
+                }
+
+                script.health -= damage;
+                script.Refresh();
+                towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+            }
         }
     }
+
+
+    IEnumerator ReturnToPoolAfter(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if(shootPool != null && shootPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(shootPool.storageParent.transform))
+        {
+            shootPool.ReturnToPool(obj);
+        }
+        else if(criticalPool != null && criticalPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(criticalPool.storageParent.transform))
+        {
+            criticalPool.ReturnToPool(obj);
+        }
+        else
+        {
+            Debug.LogWarning("ReturnToPoolAfter: Object doesn't belong to a known pool.", obj);
+        }
+    }
+
 
     public void GatherEnemy(Enemy enemyScript)
     {
@@ -208,7 +258,7 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        if(towerType == TowerType.Basic)
+        if(towerType == TowerType.Basic || towerType == TowerType.Sniper)
         {
             switch(targetting)
             {
@@ -346,7 +396,7 @@ public class Tower : MonoBehaviour
                 float random = Random.Range(0, 100);
                 if(random <= freezeChance)
                 {
-                    script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage);
+                    script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage, cold, freeze);
                 }
             }
         }

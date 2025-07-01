@@ -34,15 +34,15 @@ public class TowerSlot : MonoBehaviour
     }
 
     public void SelectTurrent()
-    {
-        if(isSelected && manager.isSelecting)
+    { 
+        if(isSelected && manager.currentSlot == this)
         {
             manager.InactiveSelection();
             isSelected = false;
         }
         else
         {
-            manager.UnlockSelection(towerIndex);
+            manager.UnlockSelection(towerIndex, this);
             isSelected = true;
         }
     }
