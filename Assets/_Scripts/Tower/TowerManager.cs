@@ -17,6 +17,7 @@ public class TowerPrefab
 public class TowerManager : MonoBehaviour
 {
     public Pool criticalPool;
+    public Pool splashPool;
     public Settings settings;
     public TowerPrefab[] towerPrefab;
     private List<GameObject> display = new List<GameObject>();
@@ -195,6 +196,7 @@ public class TowerManager : MonoBehaviour
             {
                 goScript.manager = this;
                 goScript.criticalPool = criticalPool;
+                goScript.splashPool = splashPool;
                 if(goScript.shootPool != null)
                 {
                     goScript.shootPool.storageParent = shootParent;

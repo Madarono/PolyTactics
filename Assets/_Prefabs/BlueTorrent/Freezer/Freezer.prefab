@@ -353,6 +353,9 @@ MonoBehaviour:
   rotationSpeed: 0
   bulletPierce: 0
   fireForce: 0
+  splashPool: {fileID: 0}
+  explosionRadius: 3
+  spreadTransfer: 0.5
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -370,7 +373,6 @@ MonoBehaviour:
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 0}
-  bulletPrefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   rangeObj: {fileID: 5096175696416449928}
   rangeRend: {fileID: 2230241077210792898}
   range: 3
@@ -408,6 +410,8 @@ MonoBehaviour:
     slowPrice: 0
     freezeChance: 10
     freezePrice: 0
+    splashRadius: 0
+    splashPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -424,6 +428,8 @@ MonoBehaviour:
     slowPrice: 50
     freezeChance: 15
     freezePrice: 40
+    splashRadius: 0
+    splashPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -440,6 +446,8 @@ MonoBehaviour:
     slowPrice: 100
     freezeChance: 20
     freezePrice: 70
+    splashRadius: 0
+    splashPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -456,9 +464,11 @@ MonoBehaviour:
     slowPrice: 200
     freezeChance: 25
     freezePrice: 100
+    splashRadius: 0
+    splashPrice: 0
   sellValue: 0
   provideTargetting: 0
-  individualLv: 0000000000000000000000000000000000000000000000000000000000000000
+  individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &2506680937640054141
 MonoBehaviour:
   m_ObjectHideFlags: 0

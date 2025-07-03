@@ -32,6 +32,7 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI slowVisual;
     public TextMeshProUGUI freezeVisual;
     public TextMeshProUGUI criticalVisual;
+    public TextMeshProUGUI splashVisual;
 
     public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
@@ -47,6 +48,7 @@ public class UpgradeManager : MonoBehaviour
     public GameObject slowObj;
     public GameObject freezeObj;
     public GameObject criticalObj;
+    public GameObject splashObj;
 
     public GameObject targettingObj;
     public GameObject freezerObj;
@@ -207,6 +209,18 @@ public class UpgradeManager : MonoBehaviour
         {
             criticalObj.SetActive(false);
         }
+        if(tower.upgrades[0].splashRadius > 0)
+        {
+            splashObj.SetActive(true);
+            splashVisual.text = tower.upgrades[tower.individualLv[7]].splashRadius.ToString("F1");
+        }
+        else
+        {
+            splashObj.SetActive(false);
+        }
+
+
+
 
         if(tower.provideTargetting)
         {
@@ -403,6 +417,23 @@ public class UpgradeManager : MonoBehaviour
         {
             prices[7] = 0;
             criticalVisual.text = tower.upgrades[tower.individualLv[7]].criticalChance.ToString("F1");
+        }
+
+        if(levels[8] > tower.individualLv[8])
+        {
+            splashVisual.text =  tower.upgrades[tower.individualLv[8]].splashRadius.ToString("F1") + " -> " + tower.upgrades[levels[8]].splashRadius.ToString("F1");
+            int difference = levels[8] - tower.individualLv[8];
+
+            prices[8] = 0;
+            for(int i = tower.individualLv[8] + 1; i <= levels[8]; i++)
+            {
+                prices[8] += tower.upgrades[i].splashPrice;
+            } 
+        }
+        else
+        {
+            prices[8] = 0;
+            splashVisual.text = tower.upgrades[tower.individualLv[8]].splashRadius.ToString("F1");
         }
 
         finalPrice = 0;

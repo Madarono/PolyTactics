@@ -25,7 +25,8 @@ public enum TowerType
 {
     Basic,
     Freezer,
-    Sniper
+    Sniper,
+    Splash,
 }
 
 public class Tower : MonoBehaviour
@@ -52,6 +53,11 @@ public class Tower : MonoBehaviour
     public int bulletPierce = 1;
     public float fireForce = 4f;
 
+    [Header("Attirbutes - Splash")]
+    public Pool splashPool;
+    public float explosionRadius = 3f;
+    public float spreadTransfer = 0.5f;
+
     [Header("Special Attirbutes - Sniper")]
     public float criticalChance = 10f;
     public float criticalMultiplter = 2f;
@@ -77,7 +83,6 @@ public class Tower : MonoBehaviour
     [Header("Firing")]
     public float angleOffset = 2f;
     public Transform firePoint;
-    public GameObject bulletPrefab;
 
     [Header("Range")]
     public GameObject rangeObj;
@@ -148,7 +153,7 @@ public class Tower : MonoBehaviour
 
     void Shoot()
     {
-        if (towerType == TowerType.Basic)
+        if (towerType == TowerType.Basic || towerType == TowerType.Splash)
         {
             GameObject bulletObj = shootPool.GetFromPool();
             bulletObj.transform.position = firePoint.position;
@@ -160,6 +165,13 @@ public class Tower : MonoBehaviour
                 bullet.damage = bulletDamage;
                 bullet.pierce = bulletPierce;
                 bullet.tower = this;
+                if(towerType == TowerType.Splash)
+                {
+                    bullet.isSplash = true;
+                    bullet.explosionRadius = explosionRadius;
+                    bullet.spreadTransfer = spreadTransfer;
+                    bullet.visual = splashPool;
+                }
                 rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
 
@@ -258,7 +270,7 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        if(towerType == TowerType.Basic || towerType == TowerType.Sniper)
+        if(towerType == TowerType.Basic || towerType == TowerType.Sniper || towerType == TowerType.Splash)
         {
             switch(targetting)
             {

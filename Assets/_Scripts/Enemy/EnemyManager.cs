@@ -85,6 +85,14 @@ public class EnemyManager : MonoBehaviour
 
     void SetEnemyWaves()
     {
+        if(enemyParent.childCount > 0)
+        {
+            for (int i = enemyParent.childCount - 1; i >= 0; i--)
+            {
+                Transform child = enemyParent.GetChild(i);
+                Destroy(child.gameObject);
+            }
+        }
         enemyWave.Clear();
         enemyDelay.Clear();
         StopAllCoroutines();
@@ -162,7 +170,6 @@ public class EnemyManager : MonoBehaviour
 
     public void SendEnemy(GameObject enemy)
     {
-        enemy.SetActive(true);
         List<Vector3> points = new List<Vector3>();
         foreach(Transform trans in waypoints)
         {
@@ -177,6 +184,7 @@ public class EnemyManager : MonoBehaviour
             goScript.speed += goScript.speed * (1 + (speedScale * currentWave)) * scalingMultiplyer[index].multiplyer;
             goScript.moneyReward += Mathf.RoundToInt(coinMultipler[index].multiplyer);
         }
+        enemy.SetActive(true);
     }
 
     public void DestroyEnemy(GameObject enemy)
