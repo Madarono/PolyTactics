@@ -12,6 +12,10 @@ public class Settings : MonoBehaviour
     public Factions enemyFaction;
     public Factions playerFaction;
 
+    [Header("FPS")]
+    public TextMeshProUGUI fpsVisual;
+    private float deltaTime = 0.0f;
+
 
     [Header("Money")]
     public int money;
@@ -34,6 +38,9 @@ public class Settings : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 0;
+
         speedIcon.sprite = icons[0];
         for(int i = 0; i < factionColors.Length; i++)
         {
@@ -62,6 +69,13 @@ public class Settings : MonoBehaviour
 
         }
     }
+
+    // void Update()
+    // {
+    //     deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.01f;
+    //     float fps = 1f / deltaTime;
+    //     fpsVisual.text = Mathf.Ceil(fps) + " FPS";
+    // }
 
     public void SpeedUp()
     {
