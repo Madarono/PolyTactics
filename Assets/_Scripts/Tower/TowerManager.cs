@@ -41,11 +41,8 @@ public class TowerManager : MonoBehaviour
     [Header("Keep track of TowerSlots")]
     public TowerSlot currentSlot;
 
-    [Header("Scripts for tower")]
+    [Header("Fortower")]
     public UpgradeManager upgradeManager;
-    public Transform shootParent;
-
-    [Header("Search for towet")]
     public float searchDelay = 0.5f;
 
 
@@ -197,10 +194,6 @@ public class TowerManager : MonoBehaviour
                 goScript.manager = this;
                 goScript.criticalPool = criticalPool;
                 goScript.splashPool = splashPool;
-                if(goScript.shootPool != null)
-                {
-                    goScript.shootPool.storageParent = shootParent;
-                }
                 goScript.upgradeManager = upgradeManager;
                 goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
                 tower.Add(goScript);

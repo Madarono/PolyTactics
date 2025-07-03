@@ -54,7 +54,7 @@ public class EnemyManager : MonoBehaviour
     [Header("Wave")]
     public int currentWave;
     public int[] waveWeight;
-    private int spawnLeft;
+    public int spawnLeft;
     public int enemiesLeft;
     public DifficultyMultiplier[] multiplyer;
 

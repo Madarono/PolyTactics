@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 2286615524633741734}
   - component: {fileID: 2716599850192403846}
   - component: {fileID: 7630441720051277810}
-  - component: {fileID: 3828008639072267899}
   m_Layer: 6
   m_Name: SplashRedTurrent
   m_TagString: Untagged
@@ -106,15 +105,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faction: 2
   towerType: 3
-  towerName: Basic Blue
+  towerName: 'Red Splash '
   upgrade: {fileID: 3976183099182109082}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
   isDebug: 0
   targetting: 0
-  shootPool: {fileID: 3828008639072267899}
   bulletDamage: 5
-  bulletLifespan: 1
+  bulletLifespan: 2
   reloadTime: 2
   rotationSpeed: 1
   bulletPierce: 1
@@ -127,7 +125,7 @@ MonoBehaviour:
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
   flashDuration: 0.3
   fadeDuration: 0.5
-  criticalPool: {fileID: 3828008639072267899}
+  criticalPool: {fileID: 0}
   activePool: {fileID: 0}
   criticalVisualDuration: 1
   slowPercentage: 0.5
@@ -139,6 +137,7 @@ MonoBehaviour:
   o_reloadTime: 0
   angleOffset: 4
   firePoint: {fileID: 7067190202493610572}
+  bulletPrefab: {fileID: 6721577312124110301, guid: 2538468f1956decf38e066361499d991, type: 3}
   rangeObj: {fileID: 1593989787923080698}
   rangeRend: {fileID: 295638536595642978}
   range: 3
@@ -352,21 +351,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3828008639072267899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 893333899653937781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb3ce15f450fe8aeabaa1005b393e340, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 6721577312124110301, guid: 2538468f1956decf38e066361499d991, type: 3}
-  storageParent: {fileID: 8264813126127003738}
-  initialSize: 20
 --- !u!1 &1593989787923080698
 GameObject:
   m_ObjectHideFlags: 0

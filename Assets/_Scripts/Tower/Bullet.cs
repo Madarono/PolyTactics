@@ -31,7 +31,7 @@ public class Bullet : MonoBehaviour
                 {
                     float da = Vector2.SqrMagnitude(a.transform.position - transform.position);
                     float db = Vector2.SqrMagnitude(b.transform.position - transform.position);
-                    return da.CompareTo(db); //Closest first
+                    return da.CompareTo(db);
                 });
 
                 GameObject go = visual.GetFromPool();
@@ -68,7 +68,7 @@ public class Bullet : MonoBehaviour
                 tower.activePool = null;
             }
             
-            tower.shootPool.ReturnToPool(gameObject);
+            Destroy(gameObject);
         }
     }
 }

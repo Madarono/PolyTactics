@@ -112,7 +112,6 @@ MonoBehaviour:
   manager: {fileID: 0}
   isDebug: 0
   targetting: 0
-  shootPool: {fileID: 115638401484464302}
   bulletDamage: 1
   bulletLifespan: 1
   reloadTime: 0.6
@@ -139,6 +138,7 @@ MonoBehaviour:
   o_reloadTime: 0
   angleOffset: 4
   firePoint: {fileID: 2722329752702866636}
+  bulletPrefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   rangeObj: {fileID: 6644864426509132106}
   rangeRend: {fileID: 6063842106186931515}
   range: 2.5

@@ -272,13 +272,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faction: 2
   towerType: 0
-  towerName: Basic Blue
+  towerName: Basic Red
   upgrade: {fileID: 5525222971030094811}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
   isDebug: 0
   targetting: 0
-  shootPool: {fileID: 1194191307647292063}
   bulletDamage: 2
   bulletLifespan: 2.5
   reloadTime: 1
@@ -305,6 +304,7 @@ MonoBehaviour:
   o_reloadTime: 0
   angleOffset: 4
   firePoint: {fileID: 3843527050880549786}
+  bulletPrefab: {fileID: 7298883733783111315, guid: f4348d464958ca264af8435a36b9e9e4, type: 3}
   rangeObj: {fileID: 1299301764652639141}
   rangeRend: {fileID: 6516353229531650527}
   range: 2.5

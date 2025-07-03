@@ -45,7 +45,6 @@ public class Tower : MonoBehaviour
 
     [Header("Attributes - Tower")]
     public Targetting targetting;
-    public Pool shootPool;
     public float bulletDamage = 2f;
     public float bulletLifespan = 10f;
     public float reloadTime = 0.5f;
@@ -83,6 +82,7 @@ public class Tower : MonoBehaviour
     [Header("Firing")]
     public float angleOffset = 2f;
     public Transform firePoint;
+    public GameObject bulletPrefab;
 
     [Header("Range")]
     public GameObject rangeObj;
@@ -155,7 +155,7 @@ public class Tower : MonoBehaviour
     {
         if (towerType == TowerType.Basic || towerType == TowerType.Splash)
         {
-            GameObject bulletObj = shootPool.GetFromPool();
+            GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             bulletObj.transform.position = firePoint.position;
             bulletObj.transform.rotation = transform.rotation;
 
@@ -175,7 +175,7 @@ public class Tower : MonoBehaviour
                 rb.AddForce(firePoint.transform.right * fireForce, ForceMode2D.Impulse);
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
 
-                StartCoroutine(ReturnToPoolAfter(bulletObj, bulletLifespan));
+                Destroy(bulletObj, bulletLifespan);
             }
         }
         else if (towerType == TowerType.Sniper)
@@ -206,18 +206,9 @@ public class Tower : MonoBehaviour
     IEnumerator ReturnToPoolAfter(GameObject obj, float delay)
     {
         yield return new WaitForSeconds(delay);
-
-        if(shootPool != null && shootPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(shootPool.storageParent.transform))
-        {
-            shootPool.ReturnToPool(obj);
-        }
-        else if(criticalPool != null && criticalPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(criticalPool.storageParent.transform))
+        if(criticalPool != null && criticalPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(criticalPool.storageParent.transform))
         {
             criticalPool.ReturnToPool(obj);
-        }
-        else
-        {
-            Debug.LogWarning("ReturnToPoolAfter: Object doesn't belong to a known pool.", obj);
         }
     }
 
@@ -245,6 +236,11 @@ public class Tower : MonoBehaviour
 
     public void UpdateValues()
     {
+        if(enemy.Count == 0)
+        {
+            return;
+        }
+
         foreach(EnemyInfo info in enemy)
         {
             if(info.enemy != null)
