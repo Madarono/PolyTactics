@@ -21,6 +21,9 @@ public class TowerSlot : MonoBehaviour
     public Factions faction;
     public Image image;
 
+    [Header("Modificiations")]
+    public bool isTrap;
+
     void Start()
     {
         for(int i = 0; i < colorFactions.Length; i++)
@@ -42,7 +45,7 @@ public class TowerSlot : MonoBehaviour
         }
         else
         {
-            manager.UnlockSelection(towerIndex, this);
+            manager.UnlockSelection(towerIndex, this, isTrap);
             isSelected = true;
         }
     }

@@ -27,6 +27,11 @@ public class Settings : MonoBehaviour
     public int health;
     public TextMeshProUGUI healthVisual;
     public VisualFaction heartIcon;
+
+    [Header("Wave Visual")]
+    public GameObject waveWindow;
+    public TextMeshProUGUI waveVisual;
+    public float waveAnimation = 0.5f;
     
     [Header("Speed up")]
     public bool isSpeeding;
@@ -70,12 +75,13 @@ public class Settings : MonoBehaviour
         }
     }
 
-    // void Update()
-    // {
-    //     deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.01f;
-    //     float fps = 1f / deltaTime;
-    //     fpsVisual.text = Mathf.Ceil(fps) + " FPS";
-    // }
+    IEnumerator ShowWave()
+    {
+        waveVisual.text = "Wave: " + enemyManager.currentWave.ToString();
+        waveWindow.SetActive(true);
+        yield return new WaitForSeconds(waveAnimation);
+        waveWindow.SetActive(false);
+    }
 
     public void SpeedUp()
     {
@@ -84,6 +90,7 @@ public class Settings : MonoBehaviour
             speedIcon.sprite = icons[1];
             isSpeeding = false;
             enemyManager.StartWave();
+            StartCoroutine(ShowWave());
             return;
         }
 

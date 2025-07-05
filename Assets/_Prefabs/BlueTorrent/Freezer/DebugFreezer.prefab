@@ -211,7 +211,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 1987094933, guid: 0a6933eef1c261178b0a7c06be0f04be, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -241,13 +241,15 @@ MonoBehaviour:
   manager: {fileID: 0}
   isDebug: 1
   targetting: 0
-  shootPool: {fileID: 0}
   bulletDamage: 0
   bulletLifespan: 0
   reloadTime: 0.5
   rotationSpeed: 0
   bulletPierce: 10
   fireForce: 0
+  splashPool: {fileID: 0}
+  explosionRadius: 3
+  spreadTransfer: 0.5
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}

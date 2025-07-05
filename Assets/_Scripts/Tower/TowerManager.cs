@@ -31,8 +31,17 @@ public class TowerManager : MonoBehaviour
     public List<GameObject> dots = new List<GameObject>();
     public GameObject dotPrefab;
     public Transform dotParent;
+    
+    [Header("TrapTilemap")]
+    public Tilemap trapTilemap;
+    public List<Vector3Int> trapPositions = new List<Vector3Int>();
+    public List<bool> isFull_Trap = new List<bool>();
+    public List<GameObject> trapDots = new List<GameObject>();
+    public Transform trapParent;
+    
 
     public bool isSelecting;
+    public bool isTrap;
 
     [Header("Towers")]
     public List<Tower> tower = new List<Tower>();
@@ -53,7 +62,7 @@ public class TowerManager : MonoBehaviour
     private Vector3 mouseWorldPos;
     private Vector3Int cellPos;
     private TileBase clickedTile;
-    private int cacheDotIndex;
+    private int cacheDotIndex; 
 
     void Start()
     {
@@ -77,6 +86,23 @@ public class TowerManager : MonoBehaviour
                 go.SetActive(false);
                 go.transform.SetParent(dotParent);
                 dots.Add(go);
+            }
+        }
+
+        BoundsInt trapBounds = trapTilemap.cellBounds;
+
+        foreach(Vector3Int pos in trapBounds.allPositionsWithin)
+        {
+            TileBase tile = trapTilemap.GetTile(pos);
+            Vector3 worldPos = trapTilemap.GetCellCenterWorld(pos);
+            if(tile != null)
+            {
+                trapPositions.Add(pos);
+                isFull_Trap.Add(false);
+                GameObject go = Instantiate(dotPrefab, worldPos, Quaternion.identity);
+                go.SetActive(false);
+                go.transform.SetParent(trapParent);
+                trapDots.Add(go);
             }
         }
 
@@ -106,7 +132,10 @@ public class TowerManager : MonoBehaviour
                         return;
                     }
 
-                    HandlePlacement(touch.position);
+                    Tilemap map = isTrap ? trapTilemap : tilemap;
+                    List<GameObject> displayDots = isTrap ? trapDots : dots;
+                    List<Vector3Int> positions = isTrap ? trapPositions : tilePositions; 
+                    HandlePlacement(touch.position, map, displayDots, positions);
                 }
             }
             else if (Input.GetMouseButtonDown(0))
@@ -116,7 +145,10 @@ public class TowerManager : MonoBehaviour
                     return;
                 }
 
-                HandlePlacement(Input.mousePosition);
+                Tilemap map = isTrap ? trapTilemap : tilemap;
+                List<GameObject> displayDots = isTrap ? trapDots : dots; 
+                List<Vector3Int> positions = isTrap ? trapPositions : tilePositions; 
+                HandlePlacement(Input.mousePosition, map, displayDots, positions);
             }
         }
 
@@ -145,12 +177,12 @@ public class TowerManager : MonoBehaviour
         }
     }
 
-    void HandlePlacement(Vector3 inputPosition)
+    void HandlePlacement(Vector3 inputPosition, Tilemap map, List<GameObject> dots, List<Vector3Int> positions)
     {
         mouseWorldPos = cam.ScreenToWorldPoint(inputPosition);
-        cellPos = tilemap.WorldToCell(mouseWorldPos);
-        clickedTile = tilemap.GetTile(cellPos);
-        int tileIndex = tilePositions.IndexOf(cellPos);
+        cellPos = map.WorldToCell(mouseWorldPos);
+        clickedTile = map.GetTile(cellPos);
+        int tileIndex = positions.IndexOf(cellPos);
     
         bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
     
@@ -159,7 +191,7 @@ public class TowerManager : MonoBehaviour
     
         if (validTile)
         {
-            displayPrefab.transform.position = tilemap.GetCellCenterWorld(cellPos);
+            displayPrefab.transform.position = map.GetCellCenterWorld(cellPos);
             dots[tileIndex].SetActive(false);
             cacheDotIndex = tileIndex;
         }
@@ -167,7 +199,8 @@ public class TowerManager : MonoBehaviour
 
     public void ConfirmPlaceTower()
     {
-        int tileIndex = tilePositions.IndexOf(cellPos);
+        List<Vector3Int> positions = isTrap ? trapPositions : tilePositions;
+        int tileIndex = positions.IndexOf(cellPos);
         bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
         
         if(validTile && settings.money >= towerPrefab[currentPrefabIndex].price)
@@ -187,7 +220,8 @@ public class TowerManager : MonoBehaviour
 
         if (!isFull[index])
         {
-            Vector3 worldPos = tilemap.GetCellCenterWorld(position);
+            Tilemap map = isTrap ? trapTilemap : tilemap;
+            Vector3 worldPos = map.GetCellCenterWorld(position);
             GameObject go = Instantiate(selectedPrefab, worldPos, Quaternion.identity);
             if(go.TryGetComponent(out Tower goScript))
             {
@@ -204,7 +238,7 @@ public class TowerManager : MonoBehaviour
             isFull[index] = true;
         }
     }
-    public void UnlockSelection(int index, TowerSlot script)
+    public void UnlockSelection(int index, TowerSlot script, bool isTrap)
     {
         foreach(GameObject obj in placeButtons)
         {
@@ -215,6 +249,24 @@ public class TowerManager : MonoBehaviour
         currentPrefabIndex = index;
         priceVisual.text = "$" + towerPrefab[index].price.ToString();
         isSelecting = true;
+        
+        this.isTrap = isTrap;
+        cacheDotIndex = 0;
+        if(isTrap)
+        {
+            foreach(GameObject dot in dots)
+            {
+                dot.SetActive(false);
+            }
+        }
+        else
+        {
+            foreach(GameObject dot in trapDots)
+            {
+                dot.SetActive(false);
+            }
+        }
+
         if(currentSlot != null)
         {
             currentSlot.isSelected = false;
@@ -223,9 +275,12 @@ public class TowerManager : MonoBehaviour
         display[previousIndex].SetActive(false);
         displayPrefab = display[index];
         displayPrefab.SetActive(false);
-        for(int i = 0; i < dots.Count; i++)
+
+        List<GameObject> displayDots = isTrap ? trapDots : dots;
+
+        for(int i = 0; i < displayDots.Count; i++)
         {
-            dots[i].SetActive(isFull[i] ? false : true);
+            displayDots[i].SetActive(isFull[i] ? false : true);
         }
         previousIndex = index;
     }
@@ -240,6 +295,10 @@ public class TowerManager : MonoBehaviour
         currentSlot = null;
         displayPrefab.SetActive(false);
         foreach(GameObject dot in dots)
+        {
+            dot.SetActive(false);
+        }
+        foreach(GameObject dot in trapDots)
         {
             dot.SetActive(false);
         }

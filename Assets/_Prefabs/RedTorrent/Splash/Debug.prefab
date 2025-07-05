@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: -1679902584, guid: 4943d8ef151251667b82472aac7b8766, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -107,7 +107,6 @@ MonoBehaviour:
   manager: {fileID: 0}
   isDebug: 1
   targetting: 0
-  shootPool: {fileID: 0}
   bulletDamage: 2
   bulletLifespan: 2.5
   reloadTime: 1
@@ -134,6 +133,7 @@ MonoBehaviour:
   o_reloadTime: 0
   angleOffset: 4
   firePoint: {fileID: 7067190202493610572}
+  bulletPrefab: {fileID: 0}
   rangeObj: {fileID: 1593989787923080698}
   rangeRend: {fileID: 295638536595642978}
   range: 3

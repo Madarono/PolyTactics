@@ -42,6 +42,7 @@ public class TowerRange : MonoBehaviour
                 enemy.speed = enemy.o_speed * tower.slowPercentage;
                 enemy.overlayEffect.gameObject.SetActive(true);
                 enemy.overlayEffect.color = tower.cold;
+                enemy.isSlowed = true;
             }
         }
     }
@@ -54,6 +55,7 @@ public class TowerRange : MonoBehaviour
             {
                 enemy.speed = enemy.o_speed;
                 enemy.overlayEffect.gameObject.SetActive(false);
+                enemy.isSlowed = false;
             }
         }
     }

@@ -36,6 +36,7 @@ public class Enemy : MonoBehaviour
 
 
     private float slowSpeed;
+    [HideInInspector]public bool isSlowed;
     
 
     void Start()
