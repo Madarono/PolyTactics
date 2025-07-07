@@ -8,6 +8,9 @@ public class Bullet : MonoBehaviour
     public float damage;
     public int pierce;
 
+    [Header("Immunity")]
+    public float duration = 2f;
+
     [Header("Special Attirbutes - Splash")]
     public bool isSplash;
     public Pool visual;
@@ -19,7 +22,21 @@ public class Bullet : MonoBehaviour
     {
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
-            enemy.health -= damage;
+            float multiplyer = enemy.PI_Shield;
+            if(multiplyer == 0 && enemy.immunities[enemy.cacheImmunity].immuneAgainst == tower.towerType)
+            {
+                GameObject immunity = tower.manager.immunityPool.GetFromPool();
+                immunity.transform.position = col.gameObject.transform.position;
+                tower.OutsideCallPool(immunity, duration, tower.manager.immunityPool);
+                Destroy(gameObject);
+                return;
+            }
+            else if(enemy.immunities[enemy.cacheImmunity].immuneAgainst != tower.towerType)
+            {
+                multiplyer = 1;
+            }
+
+            enemy.health -= damage * multiplyer;
             enemy.Refresh();
 
             if(isSplash)
@@ -47,10 +64,11 @@ public class Bullet : MonoBehaviour
 
                 foreach(var hit in hits)
                 {
-                    if(hit.gameObject.TryGetComponent(out Enemy hitScript) && hit != col)
+                    if(hit.gameObject.TryGetComponent(out Enemy hitScript) && hit != col && (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst != tower.towerType || 
+                    (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst == tower.towerType && hitScript.PI_Shield > 0)))
                     {
                         float decrease = 1/enemyHits;
-                        hitScript.health -= damage * spreadTransfer * decrease;
+                        hitScript.health -= damage * spreadTransfer * decrease * multiplyer;
                         hitScript.Refresh();
                         enemyHits++;
                     }
@@ -61,11 +79,6 @@ public class Bullet : MonoBehaviour
             if(pierce > 0)
             {
                 return;
-            }
-                
-            if(tower.activePool == gameObject)
-            {
-                tower.activePool = null;
             }
             
             Destroy(gameObject);

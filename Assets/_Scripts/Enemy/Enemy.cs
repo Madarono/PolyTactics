@@ -1,6 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
+[System.Serializable]
+public class Immunity
+{
+    public TowerType immuneAgainst;
+    public Color immunityColor;
+}
 
 public class Enemy : MonoBehaviour
 {
@@ -31,6 +39,16 @@ public class Enemy : MonoBehaviour
     public SpriteRenderer criticalEffect;
     private Color cold;
 
+    [Header("Immunity")]
+    public Immunity[] immunities;
+    public SpriteRenderer immunityEffect;
+    public Animator immunityAnimator;
+    public float chanceOfImmunity = 15f;
+    public float chanceOfFull = 5f;
+    public float PI_Shield = 0.4f;
+    [HideInInspector]public int cacheImmunity;
+
+
     [Header("Reward")]
     public int moneyReward = 5;
 
@@ -41,6 +59,43 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        float random = Random.Range(0, 100);
+        if(manager == null)
+        {
+            manager = GameObject.Find("UniversalScripts").GetComponent<EnemyManager>();
+        }
+        if(settings == null)
+        {
+            settings = GameObject.Find("UniversalScripts").GetComponent<Settings>();
+        }
+        if(waypoint.Count == 0)
+        {
+            SetWaypoints(manager.waypoints);
+        }
+        float chance = Mathf.Min(chanceOfImmunity * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
+        float chanceFull = Mathf.Min(chanceOfFull * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;;
+        // Debug.Log("Chance: " + chance.ToString() + ", Full Chance: " + chanceFull.ToString());
+        if(random <= chanceFull)
+        {
+            cacheImmunity = Random.Range(0, immunities.Length);
+            immunityEffect.color = immunities[cacheImmunity].immunityColor;
+            immunityEffect.gameObject.SetActive(true);
+            immunityAnimator.SetBool("Full", false);
+            PI_Shield = 0f;
+        }
+        else if(random <= chance)
+        {
+            cacheImmunity = Random.Range(0, immunities.Length);
+            immunityEffect.color = immunities[cacheImmunity].immunityColor;
+            immunityEffect.gameObject.SetActive(true);
+            immunityAnimator.SetBool("Full", true);
+            PI_Shield =  PI_Shield * manager.PI_Multiplyer[manager.index].multiplyer;
+        }
+        else
+        {
+            PI_Shield = 1f;
+            immunityEffect.gameObject.SetActive(false);
+        }
         overlayEffect.gameObject.SetActive(false);
         o_health = health;
         o_speed = speed;
@@ -48,11 +103,11 @@ public class Enemy : MonoBehaviour
         Refresh();
     }
 
-    public void SetWaypoints(Vector3[] pos)
+    public void SetWaypoints(Transform[] pos)
     {
-        foreach(Vector3 p in pos)
+        foreach(Transform p in pos)
         {
-            waypoint.Add(p);
+            waypoint.Add(p.position);
         }
     }
 

@@ -18,6 +18,7 @@ public class TowerManager : MonoBehaviour
 {
     public Pool criticalPool;
     public Pool splashPool;
+    public Pool immunityPool;
     public Settings settings;
     public TowerPrefab[] towerPrefab;
     private List<GameObject> display = new List<GameObject>();
@@ -135,7 +136,8 @@ public class TowerManager : MonoBehaviour
                     Tilemap map = isTrap ? trapTilemap : tilemap;
                     List<GameObject> displayDots = isTrap ? trapDots : dots;
                     List<Vector3Int> positions = isTrap ? trapPositions : tilePositions; 
-                    HandlePlacement(touch.position, map, displayDots, positions);
+                    List<bool> full = isTrap ? isFull_Trap : isFull;
+                    HandlePlacement(touch.position, map, displayDots, positions, full);
                 }
             }
             else if (Input.GetMouseButtonDown(0))
@@ -148,7 +150,8 @@ public class TowerManager : MonoBehaviour
                 Tilemap map = isTrap ? trapTilemap : tilemap;
                 List<GameObject> displayDots = isTrap ? trapDots : dots; 
                 List<Vector3Int> positions = isTrap ? trapPositions : tilePositions; 
-                HandlePlacement(Input.mousePosition, map, displayDots, positions);
+                List<bool> full = isTrap ? isFull_Trap : isFull;
+                HandlePlacement(Input.mousePosition, map, displayDots, positions, full);
             }
         }
 
@@ -177,14 +180,14 @@ public class TowerManager : MonoBehaviour
         }
     }
 
-    void HandlePlacement(Vector3 inputPosition, Tilemap map, List<GameObject> dots, List<Vector3Int> positions)
+    void HandlePlacement(Vector3 inputPosition, Tilemap map, List<GameObject> dots, List<Vector3Int> positions, List<bool> full)
     {
         mouseWorldPos = cam.ScreenToWorldPoint(inputPosition);
         cellPos = map.WorldToCell(mouseWorldPos);
         clickedTile = map.GetTile(cellPos);
         int tileIndex = positions.IndexOf(cellPos);
     
-        bool validTile = clickedTile != null && tileIndex != -1 && !isFull[tileIndex];
+        bool validTile = clickedTile != null && tileIndex != -1 && !full[tileIndex];
     
         displayPrefab.SetActive(validTile);
         dots[cacheDotIndex].SetActive(true);
@@ -207,18 +210,18 @@ public class TowerManager : MonoBehaviour
         {
             settings.money -= towerPrefab[currentPrefabIndex].price;
             settings.UpdateVisual();
-            PlaceTower(cellPos, tileIndex);
+            PlaceTower(cellPos, tileIndex, isTrap ? isFull_Trap : isFull); // I got lazy
             InactiveSelection();
         }
     }
-    void PlaceTower(Vector3Int position, int index)
+    void PlaceTower(Vector3Int position, int index, List<bool> full)
     {
         if (selectedPrefab == null)
         {
             return;
         }
 
-        if (!isFull[index])
+        if (!full[index])
         {
             Tilemap map = isTrap ? trapTilemap : tilemap;
             Vector3 worldPos = map.GetCellCenterWorld(position);
@@ -232,10 +235,14 @@ public class TowerManager : MonoBehaviour
                 goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
                 tower.Add(goScript);
             }
+            else if(go.TryGetComponent(out Trap trap))
+            {
+                trap.towerManager = this;
+            }
             selectedPrefab = null;
             isSelecting = false;
             displayPrefab.SetActive(false);
-            isFull[index] = true;
+            full[index] = true;
         }
     }
     public void UnlockSelection(int index, TowerSlot script, bool isTrap)
@@ -277,10 +284,11 @@ public class TowerManager : MonoBehaviour
         displayPrefab.SetActive(false);
 
         List<GameObject> displayDots = isTrap ? trapDots : dots;
+        List<bool> full = isTrap ? isFull_Trap : isFull;
 
         for(int i = 0; i < displayDots.Count; i++)
         {
-            displayDots[i].SetActive(isFull[i] ? false : true);
+            displayDots[i].SetActive(!full[i]);
         }
         previousIndex = index;
     }

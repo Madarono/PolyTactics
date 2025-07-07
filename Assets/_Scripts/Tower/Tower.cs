@@ -27,6 +27,7 @@ public enum TowerType
     Freezer,
     Sniper,
     Splash,
+    Trap
 }
 
 public class Tower : MonoBehaviour
@@ -83,6 +84,7 @@ public class Tower : MonoBehaviour
     public float angleOffset = 2f;
     public Transform firePoint;
     public GameObject bulletPrefab;
+    public float immunityDuration = 2f;
 
     [Header("Range")]
     public GameObject rangeObj;
@@ -182,6 +184,22 @@ public class Tower : MonoBehaviour
         {
             if (lockOnEnemy.TryGetComponent(out Enemy script))
             {
+                float multiplyer = script.PI_Shield;
+                if(multiplyer == 0 && script.immunities[script.cacheImmunity].immuneAgainst == towerType)
+                {
+                    GameObject immunity = manager.immunityPool.GetFromPool();
+                    immunity.transform.position = lockOnEnemy.transform.position;
+                    OutsideCallPool(immunity, immunityDuration, manager.immunityPool);
+                    towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+                    return;
+                }
+                else if(script.immunities[script.cacheImmunity].immuneAgainst != towerType)
+                {
+                    multiplyer = 1;
+                }
+                //If all is false then this partial immunity is for us
+
+
                 float randomCrit = Random.Range(0, 100f);
                 float damage = bulletDamage;
                 if (randomCrit <= criticalChance)
@@ -192,23 +210,28 @@ public class Tower : MonoBehaviour
                     GameObject critObj = criticalPool.GetFromPool();
                     critObj.transform.position = lockOnEnemy.transform.position + Vector3.up * 0.7f;
 
-                    StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration));
+                    StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration, criticalPool));
                 }
 
-                script.health -= damage;
+                script.health -= damage * multiplyer;
                 script.Refresh();
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
             }
         }
     }
 
+    public void OutsideCallPool(GameObject obj, float delay, Pool pool)
+    {
+        StartCoroutine(ReturnToPoolAfter(obj, delay, pool));
+    }
 
-    IEnumerator ReturnToPoolAfter(GameObject obj, float delay)
+
+    IEnumerator ReturnToPoolAfter(GameObject obj, float delay, Pool pool)
     {
         yield return new WaitForSeconds(delay);
-        if(criticalPool != null && criticalPool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(criticalPool.storageParent.transform))
+        if(pool != null && pool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(pool.storageParent.transform))
         {
-            criticalPool.ReturnToPool(obj);
+            pool.ReturnToPool(obj);
         }
     }
 
@@ -246,7 +269,7 @@ public class Tower : MonoBehaviour
             if(info.enemy != null)
             {
                 info.placement = info.enemy.waypointIndex;
-                info.distance = Vector2.Distance(info.enemy.transform.position, info.enemy.waypoint[info.placement]);
+                info.distance = Vector2.Distance(info.enemy.transform.position, info.enemy.waypoint[info.enemy.waypointIndex]);
                 info.distanceToPlayer = Vector2.Distance(info.enemy.transform.position, transform.position);
                 info.health = info.enemy.health;
             }
@@ -400,9 +423,8 @@ public class Tower : MonoBehaviour
         {
             foreach(EnemyInfo script in enemy)
             {
-                // script.enemy.speed = script.enemy.o_speed * slowPercentage;
                 float random = Random.Range(0, 100);
-                if(random <= freezeChance)
+                if(random <= freezeChance && script.enemy.immunities[script.enemy.cacheImmunity].immuneAgainst != towerType)
                 {
                     script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage, cold, freeze);
                 }

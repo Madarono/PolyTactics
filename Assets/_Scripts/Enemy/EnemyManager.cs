@@ -48,7 +48,8 @@ public class EnemyManager : MonoBehaviour
 {
     public Settings settings;
     public EnemyFaction[] enemy;
-    private int index;
+    public int index;
+    public int enemyIndex;
 
     
     [Header("Wave")]
@@ -63,6 +64,11 @@ public class EnemyManager : MonoBehaviour
     public DifficultyMultiplier[] coinMultipler;
     public float speedScale = 0.1f;
     public float healthScale = 0.1f;
+    public float immunityScale = 0.2f;
+
+    [Header("Immunity")]
+    public DifficultyMultiplier[] immunityMultipler;
+    public DifficultyMultiplier[] PI_Multiplyer;
 
     [Header("End of wave reward")]
     public int waveReward = 100;
@@ -76,6 +82,26 @@ public class EnemyManager : MonoBehaviour
     public Transform[] waypoints;
     public Transform spawnPoint;
     public Transform enemyParent;
+
+    void Start()
+    {
+        for(int i = 0; i < multiplyer.Length; i++)
+        {
+            if(settings.difficulty == multiplyer[i].difficulty)
+            {
+                index = i;
+                break;
+            }
+        }
+        for(int i = 0; i < enemy.Length; i++)
+        {
+            if(settings.enemyFaction == enemy[i].faction)
+            {
+                enemyIndex = i;
+                break;
+            }
+        }
+    }
 
     public void StartWave()
     {
@@ -109,7 +135,7 @@ public class EnemyManager : MonoBehaviour
         }
 
         List<EnemyWeight> possibleEnemies = new List<EnemyWeight>();
-        foreach(EnemyWeight enemyWeight in enemy[index].enemy)
+        foreach(EnemyWeight enemyWeight in enemy[enemyIndex].enemy)
         {
             if(currentWave >= enemyWeight.requiredWave)
             {
@@ -170,18 +196,13 @@ public class EnemyManager : MonoBehaviour
 
     public void SendEnemy(GameObject enemy)
     {
-        List<Vector3> points = new List<Vector3>();
-        foreach(Transform trans in waypoints)
-        {
-            points.Add(trans.position);
-        }
         if(enemy.TryGetComponent(out Enemy goScript))
         {
-            goScript.SetWaypoints(points.ToArray());
+            goScript.SetWaypoints(waypoints);
             goScript.manager = this;
             goScript.settings = settings;
-            goScript.health += goScript.health * (1 + (healthScale * currentWave)) * scalingMultiplyer[index].multiplyer;
-            goScript.speed += goScript.speed * (1 + (speedScale * currentWave)) * scalingMultiplyer[index].multiplyer;
+            goScript.health = goScript.health * (1 + (healthScale * currentWave)) * scalingMultiplyer[index].multiplyer;
+            goScript.speed = goScript.speed * (1 + (speedScale * currentWave)) * scalingMultiplyer[index].multiplyer;
             goScript.moneyReward += Mathf.RoundToInt(coinMultipler[index].multiplyer);
         }
         enemy.SetActive(true);

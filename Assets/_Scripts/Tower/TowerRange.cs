@@ -39,7 +39,12 @@ public class TowerRange : MonoBehaviour
             tower.GatherEnemy(enemy);
             if(tower.towerType == TowerType.Freezer)
             {
-                enemy.speed = enemy.o_speed * tower.slowPercentage;
+                float PI_Multipler = 1f; //PI -> Partial Immunity
+                if(tower.towerType == enemy.immunities[enemy.cacheImmunity].immuneAgainst)
+                {
+                    PI_Multipler = enemy.PI_Shield;
+                }
+                enemy.speed = Mathf.Lerp(enemy.o_speed, enemy.o_speed * tower.slowPercentage, PI_Multipler);
                 enemy.overlayEffect.gameObject.SetActive(true);
                 enemy.overlayEffect.color = tower.cold;
                 enemy.isSlowed = true;

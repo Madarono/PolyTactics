@@ -203,6 +203,7 @@ Transform:
   m_Children:
   - {fileID: 2116559409377847385}
   - {fileID: 7093148184956825544}
+  - {fileID: 4633154238080808969}
   - {fileID: 5925966407319552395}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -330,7 +331,25 @@ MonoBehaviour:
   minScale: 0
   overlayEffect: {fileID: 190371281057823382}
   criticalEffect: {fileID: 3314684061030342227}
+  immunities:
+  - immuneAgainst: 0
+    immunityColor: {r: 0.8235294, g: 0.39215687, b: 0.44313726, a: 0.78431374}
+  - immuneAgainst: 1
+    immunityColor: {r: 0.4862745, g: 0.7529412, b: 0.7411765, a: 0.78431374}
+  - immuneAgainst: 2
+    immunityColor: {r: 0.89411765, g: 0.5803922, b: 0.22745098, a: 0.78431374}
+  - immuneAgainst: 3
+    immunityColor: {r: 0.39215687, g: 0.49019608, b: 0.20392157, a: 0.78431374}
+  - immuneAgainst: 4
+    immunityColor: {r: 0.4392157, g: 0.21568628, b: 0.49803922, a: 0.78431374}
+  immunityEffect: {fileID: 4366988164888251876}
+  immunityAnimator: {fileID: 6933358753216407475}
+  chanceOfImmunity: 15
+  chanceOfFull: 5
+  PI_Shield: 0.4
+  cacheImmunity: 0
   moneyReward: 7
+  isSlowed: 0
 --- !u!50 &-1311400240113429232
 Rigidbody2D:
   serializedVersion: 4
@@ -358,6 +377,112 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &6951106078089630087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4633154238080808969}
+  - component: {fileID: 4366988164888251876}
+  - component: {fileID: 6933358753216407475}
+  m_Layer: 0
+  m_Name: ImmunityEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4633154238080808969
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6951106078089630087}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5293038978791313099}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &4366988164888251876
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6951106078089630087}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 1341930809
+  m_SortingLayer: 2
+  m_SortingOrder: 3
+  m_Sprite: {fileID: 1952383676, guid: 2d48ae9a14815f22ea973ea86562fa0a, type: 3}
+  m_Color: {r: 0.09019608, g: 0.2627451, b: 0.29411766, a: 0.78431374}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!95 &6933358753216407475
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6951106078089630087}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b53aa2667e538fc178d4096f84d1b228, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7482141688755611839
 GameObject:
   m_ObjectHideFlags: 0
