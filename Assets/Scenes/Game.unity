@@ -1859,6 +1859,7 @@ MonoBehaviour:
   isSelecting: 0
   isTrap: 0
   tower: []
+  trapTower: []
   priceVisual: {fileID: 1620291944}
   currentSlot: {fileID: 0}
   upgradeManager: {fileID: 227009672}
@@ -2057,6 +2058,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 806af0a786653be019c7ea04ce9637fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  towerManager: {fileID: 227009667}
   enemyManager: {fileID: 227009669}
   difficulty: 1
   enemyFaction: 2

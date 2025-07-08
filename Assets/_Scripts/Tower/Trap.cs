@@ -7,6 +7,7 @@ public class Trap : MonoBehaviour
     public TowerManager towerManager;
     public TowerType type = TowerType.Trap;
     public int pierce = 5;
+    public int roundsAlive = 5;
     public int maxUses = 20;
     public List<GameObject> currentEnemies;
     public float slownessPercent = 0.5f;
@@ -64,6 +65,20 @@ public class Trap : MonoBehaviour
                 towerManager.isFull_Trap[tileIndex] = false;
                 Destroy(gameObject);
             }
+        }
+    }
+
+    public void ReduceLives()
+    {
+        roundsAlive--;
+        if(roundsAlive <= 0)
+        {
+            Vector3 towerPos = gameObject.transform.position;
+            Vector3Int cellPos = towerManager.trapTilemap.WorldToCell(towerPos);
+            int tileIndex = towerManager.trapPositions.IndexOf(cellPos);
+            towerManager.isFull_Trap[tileIndex] = false;
+            towerManager.trapTower.Remove(this);
+            Destroy(gameObject);
         }
     }
 }

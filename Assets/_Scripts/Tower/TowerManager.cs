@@ -46,6 +46,7 @@ public class TowerManager : MonoBehaviour
 
     [Header("Towers")]
     public List<Tower> tower = new List<Tower>();
+    public List<Trap> trapTower = new List<Trap>(); //To directly access traps for live reduction
     public TextMeshProUGUI priceVisual;
 
     [Header("Keep track of TowerSlots")]
@@ -238,6 +239,7 @@ public class TowerManager : MonoBehaviour
             else if(go.TryGetComponent(out Trap trap))
             {
                 trap.towerManager = this;
+                trapTower.Add(trap);
             }
             selectedPrefab = null;
             isSelecting = false;

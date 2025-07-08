@@ -46,6 +46,8 @@ public enum Difficulty
 
 public class EnemyManager : MonoBehaviour
 {
+    public static EnemyManager Instance { get; private set; }
+
     public Settings settings;
     public EnemyFaction[] enemy;
     public int index;
@@ -82,6 +84,11 @@ public class EnemyManager : MonoBehaviour
     public Transform[] waypoints;
     public Transform spawnPoint;
     public Transform enemyParent;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -152,6 +159,10 @@ public class EnemyManager : MonoBehaviour
                 GameObject go = Instantiate(possibleEnemies[random].enemy, spawnPoint.position, Quaternion.identity);
                 go.transform.SetParent(enemyParent);
                 go.SetActive(false);
+                if(go.TryGetComponent(out Enemy goScript))
+                {
+                    goScript.enabled = false;
+                }
                 enemyWave.Add(go);
                 enemyDelay.Add(possibleEnemies[random].durationTillPut);
             }
@@ -169,6 +180,10 @@ public class EnemyManager : MonoBehaviour
                         weight -= possibleEnemies[i].weight;
                         GameObject go = Instantiate(possibleEnemies[i].enemy, spawnPoint.position, Quaternion.identity);
                         go.transform.SetParent(enemyParent);
+                        if(go.TryGetComponent(out Enemy goScript))
+                        {
+                            goScript.enabled = false;
+                        }
                         enemyWave.Add(go);
                         enemyDelay.Add(possibleEnemies[i].durationTillPut);
                         break;
@@ -198,6 +213,7 @@ public class EnemyManager : MonoBehaviour
     {
         if(enemy.TryGetComponent(out Enemy goScript))
         {
+            goScript.enabled = true;
             goScript.SetWaypoints(waypoints);
             goScript.manager = this;
             goScript.settings = settings;

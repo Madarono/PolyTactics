@@ -6,7 +6,10 @@ using TMPro;
 
 public class Settings : MonoBehaviour
 {
+    public static Settings Instance { get; private set; }
+
     [Header("Wave system")]
+    public TowerManager towerManager;
     public EnemyManager enemyManager;
     public Difficulty difficulty;
     public Factions enemyFaction;
@@ -40,6 +43,11 @@ public class Settings : MonoBehaviour
     public ColorFactions[] factionColors;
     public Image speedIcon;
     public Sprite[] icons;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -105,5 +113,15 @@ public class Settings : MonoBehaviour
         isSpeeding = false;
         Time.timeScale = 1f;
         speedIcon.sprite = icons[0];
+        for(int i = towerManager.trapTower.Count - 1; i >= 0; i--)
+        {
+            if(towerManager.trapTower[i] == null)
+            {
+                towerManager.trapTower.RemoveAt(i);
+                continue;
+            }
+
+            towerManager.trapTower[i].ReduceLives();
+        }
     }
 }

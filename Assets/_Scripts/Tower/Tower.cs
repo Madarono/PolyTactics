@@ -259,14 +259,16 @@ public class Tower : MonoBehaviour
 
     public void UpdateValues()
     {
-        if(enemy.Count == 0)
+        if (enemy.Count == 0)
         {
             return;
         }
 
-        foreach(EnemyInfo info in enemy)
+        for (int i = enemy.Count - 1; i >= 0; i--)
         {
-            if(info.enemy != null)
+            EnemyInfo info = enemy[i];
+
+            if (info.enemy != null)
             {
                 info.placement = info.enemy.waypointIndex;
                 info.distance = Vector2.Distance(info.enemy.transform.position, info.enemy.waypoint[info.enemy.waypointIndex]);
@@ -275,10 +277,11 @@ public class Tower : MonoBehaviour
             }
             else
             {
-                enemy.Remove(info);
+                enemy.RemoveAt(i);
             }
         }
     }
+
 
     public void SelectEnemy()
     {

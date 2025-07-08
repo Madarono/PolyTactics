@@ -60,13 +60,13 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         float random = Random.Range(0, 100);
-        if(manager == null)
+        if (manager == null)
         {
-            manager = GameObject.Find("UniversalScripts").GetComponent<EnemyManager>();
+            manager = EnemyManager.Instance;
         }
-        if(settings == null)
+        if (settings == null)
         {
-            settings = GameObject.Find("UniversalScripts").GetComponent<Settings>();
+            settings = Settings.Instance;
         }
         if(waypoint.Count == 0)
         {
@@ -121,6 +121,7 @@ public class Enemy : MonoBehaviour
             settings.money += moneyReward;
             settings.UpdateVisual();
             manager.DestroyEnemy(gameObject);
+            this.enabled = false;
         }
     }
 
