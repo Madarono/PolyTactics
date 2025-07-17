@@ -7,6 +7,7 @@ using TMPro;
 public class UpgradeManager : MonoBehaviour
 {
     [Header("Window")]
+    public SoundManager sound;
     public TowerManager towerManager;
     public Settings settings;
     public TowerUpgrade tower;
@@ -33,6 +34,8 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI freezeVisual;
     public TextMeshProUGUI criticalVisual;
     public TextMeshProUGUI splashVisual;
+    public TextMeshProUGUI passiveVisual;
+    public TextMeshProUGUI decayVisual;
 
     public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
@@ -49,6 +52,8 @@ public class UpgradeManager : MonoBehaviour
     public GameObject freezeObj;
     public GameObject criticalObj;
     public GameObject splashObj;
+    public GameObject passiveObj;
+    public GameObject decayObj;
 
     public GameObject targettingObj;
     public GameObject freezerObj;
@@ -212,11 +217,29 @@ public class UpgradeManager : MonoBehaviour
         if(tower.upgrades[0].splashRadius > 0)
         {
             splashObj.SetActive(true);
-            splashVisual.text = tower.upgrades[tower.individualLv[7]].splashRadius.ToString("F1");
+            splashVisual.text = tower.upgrades[tower.individualLv[8]].splashRadius.ToString("F1");
         }
         else
         {
             splashObj.SetActive(false);
+        }
+        if(tower.upgrades[0].passiveDmg > 0)
+        {
+            passiveObj.SetActive(true);
+            passiveVisual.text = tower.upgrades[tower.individualLv[9]].passiveDmg.ToString("F2");
+        }
+        else
+        {
+            passiveObj.SetActive(false);
+        }
+        if(tower.upgrades[0].immunityDecay > 0)
+        {
+            decayObj.SetActive(true);
+            decayVisual.text = tower.upgrades[tower.individualLv[10]].immunityDecay.ToString("F1");
+        }
+        else
+        {
+            decayObj.SetActive(false);
         }
 
 
@@ -436,6 +459,40 @@ public class UpgradeManager : MonoBehaviour
             splashVisual.text = tower.upgrades[tower.individualLv[8]].splashRadius.ToString("F1");
         }
 
+        if(levels[9] > tower.individualLv[9])
+        {
+            passiveVisual.text =  tower.upgrades[tower.individualLv[9]].passiveDmg.ToString("F2") + " -> " + tower.upgrades[levels[9]].passiveDmg.ToString("F2");
+            int difference = levels[9] - tower.individualLv[9];
+
+            prices[9] = 0;
+            for(int i = tower.individualLv[9] + 1; i <= levels[9]; i++)
+            {
+                prices[9] += tower.upgrades[i].passivePrice;
+            } 
+        }
+        else
+        {
+            prices[9] = 0;
+            passiveVisual.text = tower.upgrades[tower.individualLv[9]].passiveDmg.ToString("F2");
+        }
+
+        if(levels[10] > tower.individualLv[10])
+        {
+            decayVisual.text =  tower.upgrades[tower.individualLv[10]].immunityDecay.ToString("F1") + " -> " + tower.upgrades[levels[10]].immunityDecay.ToString("F1");
+            int difference = levels[10] - tower.individualLv[10];
+
+            prices[10] = 0;
+            for(int i = tower.individualLv[10] + 1; i <= levels[10]; i++)
+            {
+                prices[10] += tower.upgrades[i].immunityPrice;
+            } 
+        }
+        else
+        {
+            prices[10] = 0;
+            decayVisual.text = tower.upgrades[tower.individualLv[10]].immunityDecay.ToString("F1");
+        }
+
         finalPrice = 0;
         foreach(int price in prices)
         {
@@ -497,6 +554,7 @@ public class UpgradeManager : MonoBehaviour
             tower.sellValue += Mathf.FloorToInt(finalPrice * settings.sellPercentage);
             UpdateValues();
             tower.ApplyTower();
+            sound.PlayClip(sound.confirmUpgrade, 1f);
         }
     }
 

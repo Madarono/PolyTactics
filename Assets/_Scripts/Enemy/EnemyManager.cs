@@ -48,6 +48,7 @@ public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance { get; private set; }
 
+    public SoundManager soundManager;
     public Settings settings;
     public EnemyFaction[] enemy;
     public int index;
@@ -218,8 +219,9 @@ public class EnemyManager : MonoBehaviour
             goScript.manager = this;
             goScript.settings = settings;
             goScript.health = goScript.health * (1 + (healthScale * currentWave)) * scalingMultiplyer[index].multiplyer;
+            goScript.shieldHealth = goScript.shieldHealth * (1 + (healthScale * currentWave)) * scalingMultiplyer[index].multiplyer;
             goScript.speed = goScript.speed * (1 + (speedScale * currentWave)) * scalingMultiplyer[index].multiplyer;
-            goScript.moneyReward += Mathf.RoundToInt(coinMultipler[index].multiplyer);
+            goScript.moneyReward *= Mathf.RoundToInt(coinMultipler[index].multiplyer);
         }
         enemy.SetActive(true);
     }
@@ -231,6 +233,8 @@ public class EnemyManager : MonoBehaviour
         if(enemiesLeft <= 0 && spawnLeft <= 0)
         {
             currentWave++;
+            enemiesLeft = 0;
+            spawnLeft = 0;
             settings.money += Mathf.RoundToInt(waveReward * (1 + (rewardScale * currentWave)) * coinMultipler[index].multiplyer);
             settings.UpdateVisual();
             settings.SetNormalSpeed();

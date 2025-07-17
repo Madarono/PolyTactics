@@ -14,9 +14,11 @@ public class Bullet : MonoBehaviour
     [Header("Special Attirbutes - Splash")]
     public bool isSplash;
     public Pool visual;
+    public Color visualColor;
     public float durationTillDisappear = 1f;
     public float explosionRadius = 3f;
     public float spreadTransfer = 0.5f;
+
     
     void OnTriggerEnter2D(Collider2D col)
     {
@@ -28,6 +30,7 @@ public class Bullet : MonoBehaviour
                 GameObject immunity = tower.manager.immunityPool.GetFromPool();
                 immunity.transform.position = col.gameObject.transform.position;
                 tower.OutsideCallPool(immunity, duration, tower.manager.immunityPool);
+                tower.sound.PlayClip(tower.sound.immunity, 1f);
                 Destroy(gameObject);
                 return;
             }
@@ -36,11 +39,12 @@ public class Bullet : MonoBehaviour
                 multiplyer = 1;
             }
 
-            enemy.health -= damage * multiplyer;
+            enemy.HurtEnemy(damage * multiplyer);
             enemy.Refresh();
 
             if(isSplash)
             {
+                tower.sound.PlayClip(tower.sound.explosion, 1f);
                 LayerMask enemyLayer = LayerMask.GetMask("Enemy");
                 Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius, enemyLayer);
                 
@@ -54,6 +58,10 @@ public class Bullet : MonoBehaviour
                 GameObject go = visual.GetFromPool();
                 go.transform.localScale = new Vector2(explosionRadius, explosionRadius);
                 go.transform.position = transform.position;
+                if(go.TryGetComponent(out SpriteRenderer rend))
+                {
+                    rend.color = visualColor;
+                }
                 if(go.TryGetComponent(out BulletPool goScript))
                 {
                     goScript.pool = visual;
@@ -67,12 +75,17 @@ public class Bullet : MonoBehaviour
                     if(hit.gameObject.TryGetComponent(out Enemy hitScript) && hit != col && (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst != tower.towerType || 
                     (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst == tower.towerType && hitScript.PI_Shield > 0)))
                     {
-                        float decrease = 1/enemyHits;
-                        hitScript.health -= damage * spreadTransfer * decrease * multiplyer;
+                        float dist = Vector2.Distance(hit.transform.position, transform.position);
+                        float falloff = Mathf.Clamp01(1f - dist / (explosionRadius));
+                        hitScript.HurtEnemy(damage * spreadTransfer * falloff * multiplyer);
                         hitScript.Refresh();
                         enemyHits++;
                     }
                 }
+            }
+            else
+            {
+                tower.sound.PlayClip(tower.sound.enemyHit, 2f);
             }
             pierce--;
             

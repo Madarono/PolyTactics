@@ -37,17 +37,25 @@ public class TowerRange : MonoBehaviour
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
             tower.GatherEnemy(enemy);
-            if(tower.towerType == TowerType.Freezer)
+            switch(tower.towerType)
             {
-                float PI_Multipler = 1f; //PI -> Partial Immunity
-                if(tower.towerType == enemy.immunities[enemy.cacheImmunity].immuneAgainst)
-                {
-                    PI_Multipler = enemy.PI_Shield;
-                }
-                enemy.speed = Mathf.Lerp(enemy.o_speed, enemy.o_speed * tower.slowPercentage, PI_Multipler);
-                enemy.overlayEffect.gameObject.SetActive(true);
-                enemy.overlayEffect.color = tower.cold;
-                enemy.isSlowed = true;
+                case TowerType.Freezer:
+                    float PI_Multipler = 1f; //PI -> Partial Immunity
+                    if(tower.towerType == enemy.immunities[enemy.cacheImmunity].immuneAgainst)
+                    {
+                        PI_Multipler = enemy.PI_Shield;
+                    }
+                    enemy.speed = Mathf.Lerp(enemy.o_speed, enemy.o_speed * tower.slowPercentage, PI_Multipler);
+                    enemy.overlayEffect.gameObject.SetActive(true);
+                    enemy.overlayEffect.color = tower.cold;
+                    enemy.isSlowed = true;
+                    break;
+
+                case TowerType.Debuff:
+                    tower.debuffEnemies.Add(col.gameObject);
+                    enemy.StartCoroutine(enemy.TimeForRemoval(tower.timeTillRemoval, tower));
+                    break;
+
             }
         }
     }
@@ -56,11 +64,21 @@ public class TowerRange : MonoBehaviour
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
             tower.RemoveEnemy(enemy);
-            if(tower.towerType == TowerType.Freezer)
-            {
-                enemy.speed = enemy.o_speed;
-                enemy.overlayEffect.gameObject.SetActive(false);
-                enemy.isSlowed = false;
+
+            switch(tower.towerType)
+            {         
+                case TowerType.Freezer:
+                    enemy.speed = enemy.o_speed;
+                    enemy.overlayEffect.gameObject.SetActive(false);
+                    enemy.isSlowed = false;
+                    break;
+
+                case TowerType.Debuff:
+                    if(tower.debuffEnemies.Contains(col.gameObject))
+                    {
+                        tower.debuffEnemies.Remove(col.gameObject);
+                    }
+                    break;
             }
         }
     }

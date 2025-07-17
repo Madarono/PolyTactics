@@ -27,7 +27,8 @@ public enum TowerType
     Freezer,
     Sniper,
     Splash,
-    Trap
+    Trap,
+    Debuff
 }
 
 public class Tower : MonoBehaviour
@@ -40,6 +41,7 @@ public class Tower : MonoBehaviour
     public TowerUpgrade upgrade;
     [HideInInspector]public UpgradeManager upgradeManager;
     [HideInInspector]public TowerManager manager;
+    [HideInInspector]public SoundManager sound;
     
     [Tooltip("This is when you're preparing to buy the turrent, this avoids any checks and only checks for range.")]
     public bool isDebug;
@@ -53,8 +55,9 @@ public class Tower : MonoBehaviour
     public int bulletPierce = 1;
     public float fireForce = 4f;
 
-    [Header("Attirbutes - Splash")]
+    [Header("Special Attirbutes - Splash")]
     public Pool splashPool;
+    public Color splashColor;
     public float explosionRadius = 3f;
     public float spreadTransfer = 0.5f;
 
@@ -74,6 +77,11 @@ public class Tower : MonoBehaviour
     public float freezeDuration = 1f;
     public Color cold;
     public Color freeze;
+
+    [Header("Special Attriibutes - Debuff")]
+    public float passiveDamage = 0.01f;
+    public float timeTillRemoval = 1f;
+    public List<GameObject> debuffEnemies = new List<GameObject>();
 
     [Header("Animation")]
     public Animator towerAnim;
@@ -98,6 +106,8 @@ public class Tower : MonoBehaviour
     public List<EnemyInfo> enemy = new List<EnemyInfo>();
     public GameObject lockOnEnemy;
     private int indexOfEnemy;
+    public bool needsUpdate;
+
 
     void Start()
     {
@@ -132,6 +142,17 @@ public class Tower : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        if(needsUpdate)
+        {
+            UpdateValues();
+            SelectEnemy();
+            needsUpdate = false;
+        }
+    }
+
+
     void FixedUpdate()
     {
         if(lockOnEnemy == null || towerType == TowerType.Freezer)
@@ -139,19 +160,33 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        Vector3 predictedPosition = Vector3.MoveTowards(lockOnEnemy.transform.position, enemy[indexOfEnemy].enemy.waypoint[enemy[indexOfEnemy].enemy.waypointIndex], Time.deltaTime * enemy[indexOfEnemy].enemy.speed * predictionMultiplyer);
+        if(indexOfEnemy < 0 || indexOfEnemy >= enemy.Count || enemy[indexOfEnemy].enemy == null)
+        {
+            return;
+        }
 
+        Enemy trackedEnemy = enemy[indexOfEnemy].enemy;
+
+        if(trackedEnemy.waypoint == null || trackedEnemy.waypointIndex >= trackedEnemy.waypoint.Count)
+        {
+            return;
+        }
+
+        Vector3 predictedPosition = Vector3.MoveTowards(trackedEnemy.transform.position, trackedEnemy.waypoint[trackedEnemy.waypointIndex], Time.deltaTime * trackedEnemy.speed * predictionMultiplyer);
         Vector3 direction = (predictedPosition - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle);
+
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed * 100f);
+
         float difference = Quaternion.Angle(transform.rotation, targetRotation);
-        if(difference <= angleOffset && reloadTime <= 0)
+        if (difference <= angleOffset && reloadTime <= 0)
         {
             reloadTime = o_reloadTime;
             Shoot();
         }
     }
+
 
     void Shoot()
     {
@@ -170,6 +205,7 @@ public class Tower : MonoBehaviour
                 if(towerType == TowerType.Splash)
                 {
                     bullet.isSplash = true;
+                    bullet.visualColor = splashColor;
                     bullet.explosionRadius = explosionRadius;
                     bullet.spreadTransfer = spreadTransfer;
                     bullet.visual = splashPool;
@@ -178,6 +214,15 @@ public class Tower : MonoBehaviour
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
 
                 Destroy(bulletObj, bulletLifespan);
+
+                if(towerType == TowerType.Basic)
+                {
+                    sound.PlayClip(sound.basicShoot, 1f);
+                }
+                else
+                {
+                    sound.PlayClip(sound.splashShoot, 1f);
+                }
             }
         }
         else if (towerType == TowerType.Sniper)
@@ -191,6 +236,7 @@ public class Tower : MonoBehaviour
                     immunity.transform.position = lockOnEnemy.transform.position;
                     OutsideCallPool(immunity, immunityDuration, manager.immunityPool);
                     towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
+                    sound.PlayClip(sound.immunity, 1f);
                     return;
                 }
                 else if(script.immunities[script.cacheImmunity].immuneAgainst != towerType)
@@ -210,9 +256,15 @@ public class Tower : MonoBehaviour
                     GameObject critObj = criticalPool.GetFromPool();
                     critObj.transform.position = lockOnEnemy.transform.position + Vector3.up * 0.7f;
 
+                    sound.PlayClip(sound.criticalShoot, 1f);
+                    //Do screen shake here
                     StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration, criticalPool));
                 }
 
+                if(damage == bulletDamage)
+                {
+                    sound.PlayClip(sound.sniperShoot, 1f);
+                }
                 script.health -= damage * multiplyer;
                 script.Refresh();
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
@@ -245,39 +297,52 @@ public class Tower : MonoBehaviour
     }
     public void RemoveEnemy(Enemy enemyScript)
     {
-        for(int i = 0; i < enemy.Count; i++)
+        for (int i = 0; i < enemy.Count; i++)
         {
-            if(enemy[i].enemy == enemyScript)
+            if (enemy[i].enemy == enemyScript)
             {
                 enemy.RemoveAt(i);
-                UpdateValues();
-                SelectEnemy();
                 break;
             }
         }
+
+        UpdateValues();
+        SelectEnemy();
     }
+
 
     public void UpdateValues()
     {
-        if (enemy.Count == 0)
+        if (enemy.Count == 0) 
         {
             return;
         }
 
-        for (int i = enemy.Count - 1; i >= 0; i--)
+        List<EnemyInfo> safeList = new List<EnemyInfo>(enemy);
+
+        for (int i = 0; i < safeList.Count; i++)
         {
-            EnemyInfo info = enemy[i];
+            EnemyInfo info = safeList[i];
 
             if (info.enemy != null)
             {
                 info.placement = info.enemy.waypointIndex;
-                info.distance = Vector2.Distance(info.enemy.transform.position, info.enemy.waypoint[info.enemy.waypointIndex]);
+
+                if (info.enemy.waypoint != null && info.enemy.waypointIndex < info.enemy.waypoint.Count)
+                {
+                    info.distance = Vector2.Distance(info.enemy.transform.position, info.enemy.waypoint[info.enemy.waypointIndex]);
+                }
+                else
+                {
+                    info.distance = float.MaxValue;
+                }
+
                 info.distanceToPlayer = Vector2.Distance(info.enemy.transform.position, transform.position);
                 info.health = info.enemy.health;
             }
             else
             {
-                enemy.RemoveAt(i);
+                enemy.RemoveAll(e => e.enemy == null);
             }
         }
     }
@@ -424,16 +489,31 @@ public class Tower : MonoBehaviour
         }
         else if(towerType == TowerType.Freezer)
         {
+            bool hasFrozen = false;
             foreach(EnemyInfo script in enemy)
             {
                 float random = Random.Range(0, 100);
                 if(random <= freezeChance && script.enemy.immunities[script.enemy.cacheImmunity].immuneAgainst != towerType)
                 {
+                    hasFrozen = true;
                     script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage, cold, freeze);
                 }
             }
+            
+            if(hasFrozen)
+            {
+                sound.PlayClip(sound.freeze, 1f);
+            }
         }
-        
+        else if(towerType == TowerType.Debuff)
+        {
+            foreach(EnemyInfo script in new List<EnemyInfo>(enemy)) //So we don't get into errors with the refresh function thingy
+            {
+                script.enemy.HurtEnemy(script.enemy.o_health * passiveDamage * manager.searchDelay);
+                script.enemy.Refresh();
+            }
+
+        }
     }
 
     public void UpdateRange()

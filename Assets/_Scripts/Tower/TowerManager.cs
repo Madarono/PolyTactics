@@ -52,7 +52,8 @@ public class TowerManager : MonoBehaviour
     [Header("Keep track of TowerSlots")]
     public TowerSlot currentSlot;
 
-    [Header("Fortower")]
+    [Header("For Tower")]
+    public SoundManager soundManager;
     public UpgradeManager upgradeManager;
     public float searchDelay = 0.5f;
 
@@ -198,6 +199,7 @@ public class TowerManager : MonoBehaviour
             displayPrefab.transform.position = map.GetCellCenterWorld(cellPos);
             dots[tileIndex].SetActive(false);
             cacheDotIndex = tileIndex;
+            soundManager.PlayClip(soundManager.changePosition, 1f);
         }
     }
 
@@ -234,6 +236,7 @@ public class TowerManager : MonoBehaviour
                 goScript.splashPool = splashPool;
                 goScript.upgradeManager = upgradeManager;
                 goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
+                goScript.sound = soundManager;
                 tower.Add(goScript);
             }
             else if(go.TryGetComponent(out Trap trap))
@@ -245,6 +248,7 @@ public class TowerManager : MonoBehaviour
             isSelecting = false;
             displayPrefab.SetActive(false);
             full[index] = true;
+            soundManager.PlayClip(soundManager.placeTower, 1f);
         }
     }
     public void UnlockSelection(int index, TowerSlot script, bool isTrap)
@@ -334,8 +338,8 @@ public class TowerManager : MonoBehaviour
             yield return new WaitForSeconds(searchDelay);
             foreach(Tower script in tower)
             {
-                script.UpdateValues();
-                script.SelectEnemy();
+                script.needsUpdate = true;
+                // script.SelectEnemy();
             }
         }
     }

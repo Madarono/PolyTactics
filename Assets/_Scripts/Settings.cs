@@ -9,6 +9,7 @@ public class Settings : MonoBehaviour
     public static Settings Instance { get; private set; }
 
     [Header("Wave system")]
+    public SoundManager soundManager;
     public TowerManager towerManager;
     public EnemyManager enemyManager;
     public Difficulty difficulty;
@@ -93,17 +94,19 @@ public class Settings : MonoBehaviour
 
     public void SpeedUp()
     {
-        if(enemyManager.enemiesLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length)
+        if(enemyManager.enemiesLeft <= 0 && enemyManager.spawnLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length)
         {
             speedIcon.sprite = icons[1];
             isSpeeding = false;
             enemyManager.StartWave();
             StartCoroutine(ShowWave());
+            soundManager.PlayClip(soundManager.beginWave, 1f);
             return;
         }
 
         isSpeeding = !isSpeeding;
 
+        soundManager.PlayClip(soundManager.fastForward, 1f);
         Time.timeScale = isSpeeding ? speedValue : 1f;
         speedIcon.sprite = isSpeeding ? icons[2] : icons[1];
     }
@@ -111,6 +114,7 @@ public class Settings : MonoBehaviour
     public void SetNormalSpeed()
     {
         isSpeeding = false;
+        soundManager.PlayClip(soundManager.endOfRound, 1f);
         Time.timeScale = 1f;
         speedIcon.sprite = icons[0];
         for(int i = towerManager.trapTower.Count - 1; i >= 0; i--)

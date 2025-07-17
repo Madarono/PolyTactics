@@ -41,6 +41,14 @@ public class Upgrades
     [Header("Splash Radius")]
     public float splashRadius;
     public int splashPrice;
+
+    [Header("Passive Damage")]
+    public float passiveDmg;
+    public int passivePrice;
+
+    [Header("Immunity Decay")]
+    public float immunityDecay;
+    public int immunityPrice;
 }
 
 public class TowerUpgrade : MonoBehaviour
@@ -51,7 +59,12 @@ public class TowerUpgrade : MonoBehaviour
     public bool provideTargetting = true;
 
     [Tooltip("Every index is equal to the index in the upgrades showing individual level to each upgrade")]
-    public int[] individualLv = new int[9];
+    public int[] individualLv = new int[11];
+
+    void Start()
+    {
+        individualLv = new int[11];
+    }
 
     public void ApplyTower()
     {
@@ -64,6 +77,8 @@ public class TowerUpgrade : MonoBehaviour
         tower.freezeChance = upgrades[individualLv[6]].freezeChance;
         tower.criticalChance = upgrades[individualLv[7]].criticalChance;
         tower.explosionRadius = upgrades[individualLv[8]].splashRadius;
+        tower.passiveDamage = upgrades[individualLv[9]].passiveDmg;
+        tower.timeTillRemoval = upgrades[individualLv[10]].immunityDecay;
         tower.UpdateRange();
     }
 }

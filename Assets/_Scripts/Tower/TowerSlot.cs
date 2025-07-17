@@ -16,6 +16,8 @@ public class TowerSlot : MonoBehaviour
     public int towerIndex;
     public bool isSelected;
 
+    public Image iconImage;
+
     [Header("Faction Color")] 
     public ColorFactions[] colorFactions;
     public Factions faction;

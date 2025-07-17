@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour
     [HideInInspector]public float o_speed;
     public float health;
     public int damageToBase = 2;
-    private float o_health;
+    [HideInInspector]public float o_health;
 
     [Header("Rotation")]
     public float rotationRatio = 10/3;
@@ -39,6 +39,26 @@ public class Enemy : MonoBehaviour
     public SpriteRenderer criticalEffect;
     private Color cold;
 
+    [Header("Extra Enemies")]
+    public Enemy[] childEnemies;
+
+    [Header("Shield")]
+    public Transform shieldBar; 
+    public float shieldChance = 10f;
+    private bool hasShield = false;
+    private bool determinedShield = false;
+    public float shieldHealth;
+    public float shieldWait = 0.5f;
+    public float shieldIncreaser = 0.05f;
+    private float o_shieldHealth; 
+
+    [Header("Healing")]
+    public GameObject healRange;
+    public float range = 2f;
+    public float healDelay = 0.1f;
+    public float healPercentage = 0.01f / 6f;
+    public List<Enemy> enemyRange = new List<Enemy>();
+
     [Header("Immunity")]
     public Immunity[] immunities;
     public SpriteRenderer immunityEffect;
@@ -46,6 +66,7 @@ public class Enemy : MonoBehaviour
     public float chanceOfImmunity = 15f;
     public float chanceOfFull = 5f;
     public float PI_Shield = 0.4f;
+    private bool determinedImmunity;
     [HideInInspector]public int cacheImmunity;
 
 
@@ -59,7 +80,19 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        float random = Random.Range(0, 100);
+        if(!determinedShield)
+        {
+            DetermineShield();
+        }
+        if(healRange != null)
+        {
+            healRange.transform.localScale = new Vector3(range, range, healRange.transform.localScale.z);
+            StartCoroutine(HealAround());
+        }
+        if(o_shieldHealth > 0)
+        {
+            StartCoroutine(HealShield());
+        }
         if (manager == null)
         {
             manager = EnemyManager.Instance;
@@ -72,9 +105,58 @@ public class Enemy : MonoBehaviour
         {
             SetWaypoints(manager.waypoints);
         }
+        if(childEnemies.Length > 0)
+        {
+            foreach(Enemy script in childEnemies)
+            {
+                script.manager = manager;
+                script.settings = settings;
+                script.health = script.health * (1 + (manager.healthScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
+                script.shieldHealth = script.shieldHealth * (1 + (manager.healthScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
+                script.speed = script.speed * (1 + (manager.speedScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
+                script.moneyReward *= Mathf.RoundToInt(manager.coinMultipler[manager.index].multiplyer);
+                script.DetermineImmunity();
+                script.DetermineShield();
+                script.enabled = false;
+            }
+        }
+
+        if(!determinedImmunity)
+        {
+            DetermineImmunity();
+        }
+        overlayEffect.gameObject.SetActive(false);
+        o_health = health;
+        o_speed = speed;
+        rotationSpeed = speed * rotationRatio;
+        Refresh();
+    }
+
+    public void HurtEnemy(float amount)
+    {
+        float remainingAmount = amount;
+        if(hasShield)
+        {
+            shieldHealth -= amount;
+            if(shieldHealth < 0)
+            {
+                remainingAmount = Mathf.Abs(shieldHealth);
+                shieldHealth = 0;
+            }
+            else
+            {
+                remainingAmount = 0;
+            }
+        }
+
+        health -= remainingAmount;
+    } 
+
+    private void DetermineImmunity()
+    {
+        float random = Random.Range(0, 100);
         float chance = Mathf.Min(chanceOfImmunity * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
         float chanceFull = Mathf.Min(chanceOfFull * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;;
-        // Debug.Log("Chance: " + chance.ToString() + ", Full Chance: " + chanceFull.ToString());
         if(random <= chanceFull)
         {
             cacheImmunity = Random.Range(0, immunities.Length);
@@ -93,14 +175,36 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            PI_Shield = 1f;
-            immunityEffect.gameObject.SetActive(false);
+            RemoveImmunities();
         }
-        overlayEffect.gameObject.SetActive(false);
-        o_health = health;
-        o_speed = speed;
-        rotationSpeed = speed * rotationRatio;
-        Refresh();
+
+        determinedImmunity = true;
+    }
+
+    private void DetermineShield()
+    {
+        float random = Random.Range(0, 100);
+        float chance = Mathf.Min(shieldChance * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
+        if(random <= chance)
+        {
+            hasShield = true;
+            o_shieldHealth = shieldHealth;
+            shieldBar.gameObject.SetActive(true);
+        }
+        else
+        {
+            hasShield = false;
+            o_shieldHealth = 0;
+            shieldBar.gameObject.SetActive(false);
+        }
+
+        determinedShield = true;
+    }
+    
+    public void RemoveImmunities()
+    {   
+        PI_Shield = 1f;
+        immunityEffect.gameObject.SetActive(false);
     }
 
     public void SetWaypoints(Transform[] pos)
@@ -116,8 +220,28 @@ public class Enemy : MonoBehaviour
         float percentage = health / o_health;
         float newScale = Mathf.Lerp(minScale, maxScale, percentage);
         healthBar.localScale = new Vector3(newScale, healthBar.localScale.y, healthBar.localScale.z);
+        
+        if(hasShield)
+        {
+            float percentageShield = shieldHealth / o_shieldHealth; 
+            float newShieldScale = Mathf.Lerp(minScale, maxScale, percentageShield);
+            shieldBar.localScale = new Vector3(newShieldScale, shieldBar.localScale.y, shieldBar.localScale.z);
+        }
+        
         if(health <= 0)
         {
+            if(childEnemies.Length > 0)
+            {
+                foreach(Enemy script in childEnemies)
+                {
+                    script.waypoint = waypoint;
+                    script.waypointIndex = waypointIndex;
+                    script.enabled = true;
+                    script.gameObject.SetActive(true);
+                    script.transform.SetParent(manager.enemyParent);
+                    manager.enemiesLeft++;
+                }
+            }
             settings.money += moneyReward;
             settings.UpdateVisual();
             manager.DestroyEnemy(gameObject);
@@ -148,6 +272,9 @@ public class Enemy : MonoBehaviour
             {
                 settings.health -= damageToBase;
                 settings.CheckHealth();
+                int randomIndex = Random.Range(0, manager.soundManager.baseHit.Length);
+                manager.soundManager.PlayClip(manager.soundManager.baseHit[randomIndex], 1f);
+                //Shake here
                 manager.DestroyEnemy(gameObject);
             }
         }
@@ -191,5 +318,53 @@ public class Enemy : MonoBehaviour
         }
 
         criticalEffect.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
+    }
+
+    public IEnumerator TimeForRemoval(float duration, Tower tower)
+    {
+        yield return new WaitForSeconds(duration);
+        if(tower.debuffEnemies.Contains(gameObject))
+        {
+            if(PI_Shield < 1)
+            {
+                manager.soundManager.PlayClip(manager.soundManager.removeImmunity, 1f);
+            }
+            RemoveImmunities();
+        }
+    }
+
+    IEnumerator HealShield()
+    {
+        while(shieldHealth > 0)
+        {
+            shieldHealth = Mathf.Min(shieldHealth + (o_shieldHealth * shieldIncreaser), o_shieldHealth);
+            float percentageShield = shieldHealth / o_shieldHealth; 
+            float newShieldScale = Mathf.Lerp(minScale, maxScale, percentageShield);
+            shieldBar.localScale = new Vector3(newShieldScale, shieldBar.localScale.y, shieldBar.localScale.z);
+            yield return new WaitForSeconds(shieldWait);
+        }
+    }
+
+    IEnumerator HealAround()
+    {
+        bool loop = true;
+        
+        while(loop)
+        {
+            if(enemyRange.Count > 0)
+            {
+                foreach(Enemy script in new List<Enemy>(enemyRange))
+                {
+                    if(script.enabled)
+                    {
+                        script.health += script.health * healPercentage;
+                        script.health = Mathf.Min(script.health, script.o_health);
+                        script.Refresh();
+                    }
+                }
+            } 
+
+            yield return new WaitForSeconds(healDelay);
+        }
     }
 }
