@@ -11,7 +11,7 @@ public class RingFollower : MonoBehaviour
     public void FixedUpdate()
     {
         float distance = ring.transform.localScale.x - transform.localScale.x;
-        if(distance <= distanceToStop)
+        if(distance <= distanceToStop || PauseSystem.Instance.graphics == 0)
         {
             transform.localScale = ring.transform.localScale;
             return;

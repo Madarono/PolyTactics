@@ -36,6 +36,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] baseHit;
 
     [Header("Misc")]
+    public AudioClip changingSliders;
     public AudioClip endOfRound;
     public AudioClip beginWave;
     public AudioClip fastForward;

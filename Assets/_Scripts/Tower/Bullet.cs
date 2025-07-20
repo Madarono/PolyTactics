@@ -27,9 +27,12 @@ public class Bullet : MonoBehaviour
             float multiplyer = enemy.PI_Shield;
             if(multiplyer == 0 && enemy.immunities[enemy.cacheImmunity].immuneAgainst == tower.towerType)
             {
-                GameObject immunity = tower.manager.immunityPool.GetFromPool();
-                immunity.transform.position = col.gameObject.transform.position;
-                tower.OutsideCallPool(immunity, duration, tower.manager.immunityPool);
+                if(PauseSystem.Instance.graphics == 1)
+                {
+                    GameObject immunity = tower.manager.immunityPool.GetFromPool();
+                    immunity.transform.position = col.gameObject.transform.position;
+                    tower.OutsideCallPool(immunity, duration, tower.manager.immunityPool);
+                }
                 tower.sound.PlayClip(tower.sound.immunity, 1f);
                 Destroy(gameObject);
                 return;
@@ -40,7 +43,10 @@ public class Bullet : MonoBehaviour
             }
 
             enemy.HurtEnemy(damage * multiplyer);
-            enemy.Refresh();
+            if(enemy != null) //If the damage killed the enemy
+            {
+                enemy.Refresh();
+            }
 
             if(isSplash)
             {

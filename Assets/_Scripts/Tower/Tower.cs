@@ -62,6 +62,7 @@ public class Tower : MonoBehaviour
     public float spreadTransfer = 0.5f;
 
     [Header("Special Attirbutes - Sniper")]
+    public GameObject hitLine;
     public float criticalChance = 10f;
     public float criticalMultiplter = 2f;
     public Color criticalColor;
@@ -100,6 +101,10 @@ public class Tower : MonoBehaviour
     public float range = 2f;
     private bool isHovering;
     public bool isSelected;
+
+    [Header("Camera Shake")]
+    public float magnitude;
+    public float time;
 
     [Header("Enemy detection")]
     public float predictionMultiplyer = 10f;
@@ -232,9 +237,12 @@ public class Tower : MonoBehaviour
                 float multiplyer = script.PI_Shield;
                 if(multiplyer == 0 && script.immunities[script.cacheImmunity].immuneAgainst == towerType)
                 {
-                    GameObject immunity = manager.immunityPool.GetFromPool();
-                    immunity.transform.position = lockOnEnemy.transform.position;
-                    OutsideCallPool(immunity, immunityDuration, manager.immunityPool);
+                    if(PauseSystem.Instance.graphics == 1)
+                    {
+                        GameObject immunity = manager.immunityPool.GetFromPool();
+                        immunity.transform.position = lockOnEnemy.transform.position;
+                        OutsideCallPool(immunity, immunityDuration, manager.immunityPool);
+                    }
                     towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
                     sound.PlayClip(sound.immunity, 1f);
                     return;
@@ -245,6 +253,16 @@ public class Tower : MonoBehaviour
                 }
                 //If all is false then this partial immunity is for us
 
+                if(PauseSystem.Instance.graphics == 1)
+                {
+                    hitLine.transform.SetParent(null);
+                    float distance = Vector3.Distance(firePoint.transform.position, lockOnEnemy.transform.position);
+                    hitLine.SetActive(false);
+                    hitLine.transform.rotation = transform.rotation;
+                    hitLine.transform.position = firePoint.position + firePoint.transform.right * distance * 0.4f;
+                    hitLine.SetActive(true);
+                    hitLine.transform.localScale = new Vector3(distance, hitLine.transform.localScale.y, hitLine.transform.localScale.z);
+                }
 
                 float randomCrit = Random.Range(0, 100f);
                 float damage = bulletDamage;
@@ -253,12 +271,18 @@ public class Tower : MonoBehaviour
                     damage *= criticalMultiplter;
                     script.VisualCritical(criticalColor, flashDuration, fadeDuration);
 
-                    GameObject critObj = criticalPool.GetFromPool();
-                    critObj.transform.position = lockOnEnemy.transform.position + Vector3.up * 0.7f;
+                    if(PauseSystem.Instance.graphics == 1)
+                    {
+                        GameObject critObj = criticalPool.GetFromPool();
+                        critObj.transform.position = lockOnEnemy.transform.position + Vector3.up * 0.7f;
+                        StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration, criticalPool));
+                    }
 
                     sound.PlayClip(sound.criticalShoot, 1f);
-                    //Do screen shake here
-                    StartCoroutine(ReturnToPoolAfter(critObj, criticalVisualDuration, criticalPool));
+                    if(PauseSystem.Instance.screenShake)
+                    {
+                        CameraShake.Instance.Shake(time, magnitude);
+                    }
                 }
 
                 if(damage == bulletDamage)

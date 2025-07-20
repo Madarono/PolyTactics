@@ -41,6 +41,7 @@ public class Settings : MonoBehaviour
     public bool isSpeeding;
     public float speedValue = 3f;
     public Image speedBackground;
+    public Image[] backgrounds;
     public ColorFactions[] factionColors;
     public Image speedIcon;
     public Sprite[] icons;
@@ -61,6 +62,10 @@ public class Settings : MonoBehaviour
             if(playerFaction == factionColors[i].faction)
             {
                 speedBackground.color = factionColors[i].color;
+                foreach(Image img in backgrounds)
+                {
+                    img.color = factionColors[i].color;
+                }
                 heartIcon.ChangeSprite(i);
                 break;
             }

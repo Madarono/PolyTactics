@@ -69,6 +69,10 @@ public class Enemy : MonoBehaviour
     private bool determinedImmunity;
     [HideInInspector]public int cacheImmunity;
 
+    [Header("Camera shake Base")]
+    public float magnitude = 0.05f;
+    public float time = 0.1f; 
+
 
     [Header("Reward")]
     public int moneyReward = 5;
@@ -76,10 +80,16 @@ public class Enemy : MonoBehaviour
 
     private float slowSpeed;
     [HideInInspector]public bool isSlowed;
+
+    [Header("Health Bar wait")]
+    private GameObject healthBarParent;
+    public float delayTillHide = 3f;
+    Coroutine healthBarCoroutine;
     
 
     void Start()
     {
+        healthBarParent = healthBar.parent.gameObject;
         if(!determinedShield)
         {
             DetermineShield();
@@ -129,11 +139,19 @@ public class Enemy : MonoBehaviour
         o_health = health;
         o_speed = speed;
         rotationSpeed = speed * rotationRatio;
-        Refresh();
+        // Refresh();
+        healthBarParent.SetActive(false);
     }
 
     public void HurtEnemy(float amount)
     {
+        if(healthBarCoroutine != null)
+        {
+            StopCoroutine(healthBarCoroutine);
+        }
+
+        healthBarParent.SetActive(true);
+
         float remainingAmount = amount;
         if(hasShield)
         {
@@ -148,6 +166,8 @@ public class Enemy : MonoBehaviour
                 remainingAmount = 0;
             }
         }
+
+        healthBarCoroutine = StartCoroutine(HideHealthBar());
 
         health -= remainingAmount;
     } 
@@ -274,7 +294,10 @@ public class Enemy : MonoBehaviour
                 settings.CheckHealth();
                 int randomIndex = Random.Range(0, manager.soundManager.baseHit.Length);
                 manager.soundManager.PlayClip(manager.soundManager.baseHit[randomIndex], 1f);
-                //Shake here
+                if(PauseSystem.Instance.screenShake)
+                {
+                    CameraShake.Instance.Shake(time, magnitude);
+                }
                 manager.DestroyEnemy(gameObject);
             }
         }
@@ -343,6 +366,12 @@ public class Enemy : MonoBehaviour
             shieldBar.localScale = new Vector3(newShieldScale, shieldBar.localScale.y, shieldBar.localScale.z);
             yield return new WaitForSeconds(shieldWait);
         }
+    }
+
+    IEnumerator HideHealthBar()
+    {
+        yield return new WaitForSeconds(delayTillHide);
+        healthBarParent.SetActive(false);
     }
 
     IEnumerator HealAround()
