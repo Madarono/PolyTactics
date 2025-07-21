@@ -16,6 +16,7 @@ public class TowerPrefab
 
 public class TowerManager : MonoBehaviour
 {
+    public static TowerManager Instance {get; private set;} 
     public Pool criticalPool;
     public Pool splashPool;
     public Pool immunityPool;
@@ -66,6 +67,11 @@ public class TowerManager : MonoBehaviour
     private Vector3Int cellPos;
     private TileBase clickedTile;
     private int cacheDotIndex; 
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {

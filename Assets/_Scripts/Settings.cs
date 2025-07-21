@@ -53,6 +53,7 @@ public class Settings : MonoBehaviour
 
     void Start()
     {
+        ShowWave();
         Application.targetFrameRate = 60;
         QualitySettings.vSyncCount = 0;
 
@@ -89,22 +90,20 @@ public class Settings : MonoBehaviour
         }
     }
 
-    IEnumerator ShowWave()
+    public void ShowWave()
     {
-        waveVisual.text = "Wave: " + enemyManager.currentWave.ToString();
-        waveWindow.SetActive(true);
-        yield return new WaitForSeconds(waveAnimation);
-        waveWindow.SetActive(false);
+        int waveCount = WaveRandomizer.Instance.waveCount;
+        waveVisual.text = "Wave: " + enemyManager.currentWave.ToString() + "/" + waveCount.ToString();
     }
 
     public void SpeedUp()
     {
-        if(enemyManager.enemiesLeft <= 0 && enemyManager.spawnLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length)
+        if(enemyManager.enemiesLeft <= 0 && enemyManager.spawnLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length) //Starting wave
         {
             speedIcon.sprite = icons[1];
             isSpeeding = false;
             enemyManager.StartWave();
-            StartCoroutine(ShowWave());
+            ShowWave();
             soundManager.PlayClip(soundManager.beginWave, 1f);
             return;
         }

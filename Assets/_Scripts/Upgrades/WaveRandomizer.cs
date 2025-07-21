@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class WaveRandomizer : MonoBehaviour
 {
+    public static WaveRandomizer Instance {get; private set;} 
     public int waveCount = 5;
     public int maxWaveWeight = 250;
 
     [Header("For EnemyManager.cs")]
     public EnemyManager enemyManager;
     public int[] waveWeight;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {

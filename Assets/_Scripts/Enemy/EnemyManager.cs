@@ -237,7 +237,28 @@ public class EnemyManager : MonoBehaviour
             spawnLeft = 0;
             settings.money += Mathf.RoundToInt(waveReward * (1 + (rewardScale * currentWave)) * coinMultipler[index].multiplyer);
             settings.UpdateVisual();
-            settings.SetNormalSpeed();
+            TowerManager towerManager = TowerManager.Instance;
+            if(PauseSystem.Instance.autoPlay)
+            {
+                settings.ShowWave();
+                soundManager.PlayClip(soundManager.endOfRound, 1f);
+                for(int i = towerManager.trapTower.Count - 1; i >= 0; i--)
+                {
+                    if(towerManager.trapTower[i] == null)
+                    {
+                        towerManager.trapTower.RemoveAt(i);
+                        continue;
+                    }
+
+                    towerManager.trapTower[i].ReduceLives();
+                }
+
+                StartWave();
+            }
+            else
+            {
+                settings.SetNormalSpeed();
+            }
         }
     }
 

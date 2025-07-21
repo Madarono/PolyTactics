@@ -407,7 +407,7 @@ MonoBehaviour:
   speed: 0.4
   o_speed: 0
   health: 15
-  damageToBase: 5
+  damageToBase: 7
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
@@ -422,6 +422,11 @@ MonoBehaviour:
   shieldHealth: 10
   shieldWait: 1
   shieldIncreaser: 0.02
+  healRange: {fileID: 0}
+  range: 2
+  healDelay: 0.1
+  healPercentage: 0.0016666666
+  enemyRange: []
   immunities:
   - immuneAgainst: 0
     immunityColor: {r: 0.8235294, g: 0.39215687, b: 0.44313726, a: 0.78431374}
@@ -439,8 +444,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 5
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &-1311400240113429232
 Rigidbody2D:
   serializedVersion: 4

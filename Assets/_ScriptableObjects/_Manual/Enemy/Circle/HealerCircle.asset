@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b653979911e61a48add3b94b32dde35, type: 3}
+  m_Name: HealerCircle
+  m_EditorClassIdentifier: 
+  icon: {fileID: -271533540, guid: 58acb4fb60e995d78b75d9b5f845fec5, type: 3}
+  name: Healer Circle
+  info: 'Normal speed, takes 3-hp if it reaches the base. Can heal nearby enemies '

@@ -12,7 +12,8 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     [Header("Modifications")]
     public int graphics = 1;
-    public bool screenShake;
+    public bool screenShake = true;
+    public bool autoPlay = false;
     public Slider masterSlider;
     public float master;
     public Slider backgroundSlider;
@@ -29,6 +30,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public Image[] graphicButtons;
     public Color[] graphicsStates = new Color[2];
     public GameObject screenShakeTick;
+    public GameObject autoPlayTick;
     public GameObject postprocessing;
 
     [Header("Scripts")]
@@ -46,6 +48,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         this.screenShake = data.screenShake;
         this.master = data.master;
         this.background = data.background;
+        this.autoPlay = data.autoPlay;
         window.SetActive(false);
         leaveWindow.SetActive(false);
         Refresh();
@@ -57,6 +60,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         data.screenShake = this.screenShake;
         data.master = this.master;
         data.background = this.background;
+        data.autoPlay = this.autoPlay;
     }
     
     void Awake()
@@ -78,7 +82,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         StartCoroutine(AnimationCloseWindow(windowAnim, window));
     }
 
-    IEnumerator AnimationCloseWindow(Animator anim, GameObject win)
+    public IEnumerator AnimationCloseWindow(Animator anim, GameObject win)
     {
         anim.SetTrigger("Close");
         yield return new WaitForSecondsRealtime(closeDuration);
@@ -93,6 +97,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         soundManager.masterVolume = this.master;
         soundManager.backgroundVolume = this.background;
         screenShakeTick.SetActive(screenShake);
+        autoPlayTick.SetActive(autoPlay);
 
         if(graphics == 1)
         {
@@ -117,7 +122,6 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     }
 
     //Graphics
-
     public void LowGraphics()
     {
         ChangeGraphics(0);
@@ -180,6 +184,14 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         screenShake = !screenShake;
         screenShakeTick.SetActive(screenShake);
+        DataPersistenceManager.instance.SaveGame();
+    }
+
+    //Auto-Play
+    public void ChangeAutoPlay()
+    {
+        autoPlay = !autoPlay;
+        autoPlayTick.SetActive(autoPlay);
         DataPersistenceManager.instance.SaveGame();
     }
 

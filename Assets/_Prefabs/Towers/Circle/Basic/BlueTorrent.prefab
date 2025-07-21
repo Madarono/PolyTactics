@@ -110,6 +110,7 @@ MonoBehaviour:
   upgrade: {fileID: 3102680999969531181}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
+  sound: {fileID: 0}
   isDebug: 0
   targetting: 0
   bulletDamage: 1
@@ -122,6 +123,7 @@ MonoBehaviour:
   splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
   spreadTransfer: 0.5
+  hitLine: {fileID: 0}
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -148,6 +150,8 @@ MonoBehaviour:
   rangeRend: {fileID: 6063842106186931515}
   range: 2.5
   isSelected: 0
+  magnitude: 0
+  time: 0
   predictionMultiplyer: 5
   enemy: []
   lockOnEnemy: {fileID: 0}

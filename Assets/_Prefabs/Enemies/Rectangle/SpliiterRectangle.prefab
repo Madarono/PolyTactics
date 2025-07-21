@@ -323,7 +323,7 @@ MonoBehaviour:
   speed: 1
   o_speed: 0
   health: 5
-  damageToBase: 1
+  damageToBase: 3
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
@@ -360,8 +360,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 5
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &8001168984640208731
 Rigidbody2D:
   serializedVersion: 4
@@ -1074,7 +1077,7 @@ MonoBehaviour:
   speed: 0.4
   o_speed: 0
   health: 15
-  damageToBase: 5
+  damageToBase: 10
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
@@ -1113,8 +1116,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 5
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &-1311400240113429232
 Rigidbody2D:
   serializedVersion: 4
@@ -1297,7 +1303,7 @@ MonoBehaviour:
   speed: 1
   o_speed: 0
   health: 5
-  damageToBase: 1
+  damageToBase: 3
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
@@ -1334,8 +1340,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 5
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &6235160206380873369
 Rigidbody2D:
   serializedVersion: 4
