@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Settings : MonoBehaviour
+public class Settings : MonoBehaviour, IDataPersistence
 {
     public static Settings Instance { get; private set; }
 
@@ -46,14 +46,35 @@ public class Settings : MonoBehaviour
     public Image speedIcon;
     public Sprite[] icons;
 
+    [Header("For debug purposes")]
+    public bool saveToData = false;
+
     void Awake()
     {
         Instance = this;
     }
 
-    void Start()
+    public void LoadData(GameData data)
     {
-        ShowWave();
+        this.difficulty = data.difficulty;
+        this.playerFaction = data.playerFaction;
+        this.enemyFaction = data.enemyFaction;
+        enemyManager.InitiateStart();
+        InitiateStart();
+    }
+
+    public void SaveData(GameData data)
+    {
+        if(saveToData)
+        {
+            data.difficulty = this.difficulty;
+            data.playerFaction = this.playerFaction;
+            data.enemyFaction = this.enemyFaction;
+        }
+    }
+
+    void InitiateStart()
+    {
         Application.targetFrameRate = 60;
         QualitySettings.vSyncCount = 0;
 

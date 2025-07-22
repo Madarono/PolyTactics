@@ -13,12 +13,14 @@ public class Grass
 
 public class GrassRandomizer : MonoBehaviour
 {
+    public static GrassRandomizer Instance {get; private set;}
+    
     public Tilemap tilemap;
     public Grass[] grass;
 
     void Awake()
     {
-        RandomizeGrass();
+        Instance = this;
     }
 
     public void RandomizeGrass()

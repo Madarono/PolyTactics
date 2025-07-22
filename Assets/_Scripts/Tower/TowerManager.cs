@@ -73,7 +73,7 @@ public class TowerManager : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
+    public void InstantiateStart()
     {
         StopAllCoroutines();
         foreach(GameObject obj in placeButtons)

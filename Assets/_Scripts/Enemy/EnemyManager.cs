@@ -91,7 +91,7 @@ public class EnemyManager : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
+    public void InitiateStart()
     {
         for(int i = 0; i < multiplyer.Length; i++)
         {

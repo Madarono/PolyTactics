@@ -344,9 +344,9 @@ MonoBehaviour:
   upgrade: {fileID: 7866709240762452875}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
+  sound: {fileID: 0}
   isDebug: 0
   targetting: 0
-  shootPool: {fileID: 0}
   bulletDamage: 0
   bulletLifespan: 0
   reloadTime: 0
@@ -354,8 +354,10 @@ MonoBehaviour:
   bulletPierce: 0
   fireForce: 0
   splashPool: {fileID: 0}
+  splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
   spreadTransfer: 0.5
+  hitLine: {fileID: 0}
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -365,21 +367,29 @@ MonoBehaviour:
   activePool: {fileID: 0}
   criticalVisualDuration: 1
   slowPercentage: 0.7
-  freezeChance: 10
+  freezeChance: 5
   freezeDuration: 2
   cold: {r: 0.4862745, g: 0.7529412, b: 0.7411765, a: 0.19607843}
   freeze: {r: 0.20392157, g: 0.5176471, b: 0.6117647, a: 0.47058824}
+  passiveDamage: 0.01
+  timeTillRemoval: 1
+  debuffEnemies: []
   towerAnim: {fileID: 6851083926142743218}
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 0}
+  bulletPrefab: {fileID: 0}
+  immunityDuration: 2
   rangeObj: {fileID: 5096175696416449928}
   rangeRend: {fileID: 2230241077210792898}
   range: 3
   isSelected: 0
+  magnitude: 0
+  time: 0
   predictionMultiplyer: 5
   enemy: []
   lockOnEnemy: {fileID: 0}
+  needsUpdate: 0
 --- !u!114 &7866709240762452875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,10 +418,14 @@ MonoBehaviour:
     criticalPrice: 0
     slowPercentage: 0.7
     slowPrice: 0
-    freezeChance: 10
+    freezeChance: 5
     freezePrice: 0
     splashRadius: 0
     splashPrice: 0
+    passiveDmg: 0
+    passivePrice: 0
+    immunityDecay: 0
+    immunityPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -426,10 +440,14 @@ MonoBehaviour:
     criticalPrice: 0
     slowPercentage: 0.6
     slowPrice: 50
-    freezeChance: 15
-    freezePrice: 40
+    freezeChance: 10
+    freezePrice: 70
     splashRadius: 0
     splashPrice: 0
+    passiveDmg: 0
+    passivePrice: 0
+    immunityDecay: 0
+    immunityPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -444,10 +462,14 @@ MonoBehaviour:
     criticalPrice: 0
     slowPercentage: 0.5
     slowPrice: 100
-    freezeChance: 20
-    freezePrice: 70
+    freezeChance: 15
+    freezePrice: 100
     splashRadius: 0
     splashPrice: 0
+    passiveDmg: 0
+    passivePrice: 0
+    immunityDecay: 0
+    immunityPrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -462,10 +484,14 @@ MonoBehaviour:
     criticalPrice: 0
     slowPercentage: 0.4
     slowPrice: 200
-    freezeChance: 25
-    freezePrice: 100
+    freezeChance: 20
+    freezePrice: 150
     splashRadius: 0
     splashPrice: 0
+    passiveDmg: 0
+    passivePrice: 0
+    immunityDecay: 0
+    immunityPrice: 0
   sellValue: 0
   provideTargetting: 0
   individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
