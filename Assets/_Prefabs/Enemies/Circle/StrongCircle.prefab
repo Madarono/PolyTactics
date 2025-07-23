@@ -318,6 +318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 2
   waypoint: []
   waypointIndex: 0
   speed: 0.6
@@ -360,8 +361,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 7
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &-1311400240113429232
 Rigidbody2D:
   serializedVersion: 4

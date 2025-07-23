@@ -11,4 +11,8 @@ public class TowerSlotSO : ScriptableObject
 
     [Header("Modifications")]
     public bool isTrap;
+
+    [Header("Limits")]
+    public int limit;
+    public bool isFarm;
 }

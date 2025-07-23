@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
 {
     [HideInInspector]public EnemyManager manager;
     [HideInInspector]public Settings settings;
+    public int priority = 1; //This is for the Strong targetting tower
     public List<Vector3> waypoint = new List<Vector3>();
     public int waypointIndex;
     

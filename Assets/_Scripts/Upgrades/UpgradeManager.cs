@@ -20,6 +20,7 @@ public class UpgradeManager : MonoBehaviour
     public float speedOfWindow;
     
     [Header("Visuals")]
+    public GameObject debugRange;
     public GameObject upgradeButtons;
     public GameObject sell;
     public TextMeshProUGUI headerVisual;
@@ -36,13 +37,18 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI splashVisual;
     public TextMeshProUGUI passiveVisual;
     public TextMeshProUGUI decayVisual;
+    
+    public TextMeshProUGUI incomeVisual;
+    public TextMeshProUGUI clusterVisual;
+    public TextMeshProUGUI waveVisual;
+    public TextMeshProUGUI refundVisual;
 
     public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
     public TextMeshProUGUI sellVisual;
 
 
-    [Header("GameObejcts")]
+    [Header("GameObjects")]
     public GameObject speedObj;
     public GameObject reloadObj;
     public GameObject rotationObj;
@@ -54,6 +60,11 @@ public class UpgradeManager : MonoBehaviour
     public GameObject splashObj;
     public GameObject passiveObj;
     public GameObject decayObj;
+
+    public GameObject incomeObj;
+    public GameObject clusterObj;
+    public GameObject waveObj;
+    public GameObject refundObj;
 
     public GameObject targettingObj;
     public GameObject freezerObj;
@@ -241,6 +252,42 @@ public class UpgradeManager : MonoBehaviour
         {
             decayObj.SetActive(false);
         }
+        if(tower.upgrades[0].incomeGenerated > 0)
+        {
+            incomeObj.SetActive(true);
+            incomeVisual.text = tower.upgrades[tower.individualLv[11]].incomeGenerated.ToString("F1");
+        }
+        else
+        {
+            incomeObj.SetActive(false);
+        }
+        if(tower.upgrades[0].incomePercentage > 0)
+        {
+            clusterObj.SetActive(true);
+            clusterVisual.text = tower.upgrades[tower.individualLv[12]].incomePercentage.ToString("F1");
+        }
+        else
+        {
+            clusterObj.SetActive(false);
+        }
+        if(tower.upgrades[0].wavePercentage > 0)
+        {
+            waveObj.SetActive(true);
+            waveVisual.text = tower.upgrades[tower.individualLv[13]].wavePercentage.ToString("F1");
+        }
+        else
+        {
+            waveObj.SetActive(false);
+        }
+        if(tower.upgrades[0].refundPercentage > 0)
+        {
+            refundObj.SetActive(true);
+            refundVisual.text = tower.upgrades[tower.individualLv[14]].refundPercentage.ToString("F1");
+        }
+        else
+        {
+            refundObj.SetActive(false);
+        }
 
 
 
@@ -377,6 +424,10 @@ public class UpgradeManager : MonoBehaviour
         if(levels[4] > tower.individualLv[4])
         {
             rangeVisual.text =  tower.upgrades[tower.individualLv[4]].range.ToString("F1") + " -> " + tower.upgrades[levels[4]].range.ToString("F1");
+            debugRange.SetActive(true);
+            debugRange.transform.position = tower.gameObject.transform.position;
+            float diameter = tower.upgrades[levels[4]].range * 2f * tower.gameObject.transform.localScale.x;
+            debugRange.transform.localScale = new Vector3(diameter, diameter, debugRange.transform.localScale.z);
             int difference = levels[4] - tower.individualLv[4];
 
             prices[4] = 0;
@@ -387,6 +438,7 @@ public class UpgradeManager : MonoBehaviour
         }
         else
         {
+            debugRange.SetActive(false);
             prices[4] = 0;
             rangeVisual.text = tower.upgrades[tower.individualLv[4]].range.ToString("F1");
         }
@@ -493,6 +545,74 @@ public class UpgradeManager : MonoBehaviour
             decayVisual.text = tower.upgrades[tower.individualLv[10]].immunityDecay.ToString("F1");
         }
 
+        if(levels[11] > tower.individualLv[11])
+        {
+            incomeVisual.text =  tower.upgrades[tower.individualLv[11]].incomeGenerated.ToString("F1") + " -> " + tower.upgrades[levels[11]].incomeGenerated.ToString("F1");
+            int difference = levels[11] - tower.individualLv[11];
+
+            prices[11] = 0;
+            for(int i = tower.individualLv[11] + 1; i <= levels[11]; i++)
+            {
+                prices[11] += tower.upgrades[i].incomePrice;
+            } 
+        }
+        else
+        {
+            prices[11] = 0;
+            incomeVisual.text = tower.upgrades[tower.individualLv[11]].incomeGenerated.ToString("F1");
+        }
+
+        if(levels[12] > tower.individualLv[12])
+        {
+            clusterVisual.text =  tower.upgrades[tower.individualLv[12]].incomePercentage.ToString("F1") + " -> " + tower.upgrades[levels[12]].incomePercentage.ToString("F1");
+            int difference = levels[12] - tower.individualLv[12];
+
+            prices[12] = 0;
+            for(int i = tower.individualLv[12] + 1; i <= levels[12]; i++)
+            {
+                prices[12] += tower.upgrades[i].clusterPrice;
+            } 
+        }
+        else
+        {
+            prices[12] = 0;
+            clusterVisual.text = tower.upgrades[tower.individualLv[12]].incomePercentage.ToString("F1");
+        }
+
+        if(levels[13] > tower.individualLv[13])
+        {
+            waveVisual.text =  tower.upgrades[tower.individualLv[13]].wavePercentage.ToString("F1") + " -> " + tower.upgrades[levels[13]].wavePercentage.ToString("F1");
+            int difference = levels[13] - tower.individualLv[13];
+
+            prices[13] = 0;
+            for(int i = tower.individualLv[13] + 1; i <= levels[13]; i++)
+            {
+                prices[13] += tower.upgrades[i].wavePrice;
+            } 
+        }
+        else
+        {
+            prices[13] = 0;
+            waveVisual.text = tower.upgrades[tower.individualLv[13]].wavePercentage.ToString("F1");
+        }
+
+        if(levels[14] > tower.individualLv[14])
+        {
+            refundVisual.text =  tower.upgrades[tower.individualLv[14]].refundPercentage.ToString("F1") + " -> " + tower.upgrades[levels[14]].refundPercentage.ToString("F1");
+            int difference = levels[14] - tower.individualLv[14];
+
+            prices[14] = 0;
+            for(int i = tower.individualLv[14] + 1; i <= levels[14]; i++)
+            {
+                prices[14] += tower.upgrades[i].refundPrice;
+            } 
+        }
+        else
+        {
+            prices[14] = 0;
+            refundVisual.text = tower.upgrades[tower.individualLv[14]].refundPercentage.ToString("F1");
+        }
+
         finalPrice = 0;
         foreach(int price in prices)
         {
@@ -538,6 +658,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void Decline()
     {
+        debugRange.SetActive(false);
         UpdateValues();
     }
 
@@ -545,14 +666,28 @@ public class UpgradeManager : MonoBehaviour
     {
         if(settings.money >= finalPrice)
         {
+            if(tower.tower.towerType == TowerType.Farm)
+            {
+                tower.sellValue -= Mathf.FloorToInt(tower.baseValue * (tower.upgrades[tower.individualLv[14]].refundPercentage / 100f));
+            }
+
             settings.money -= finalPrice;
             settings.UpdateVisual();
             for(int i = 0; i < levels.Length; i++)
             {
                 tower.individualLv[i] = levels[i];
             }
-            tower.sellValue += Mathf.FloorToInt(finalPrice * settings.sellPercentage);
+            if(tower.tower.towerType == TowerType.Farm)
+            {
+                tower.sellValue += Mathf.FloorToInt(finalPrice * (tower.upgrades[tower.individualLv[14]].refundPercentage / 100f));
+                tower.sellValue += Mathf.FloorToInt(tower.baseValue * (tower.upgrades[tower.individualLv[14]].refundPercentage / 100f));
+            }
+            else
+            {
+                tower.sellValue += Mathf.FloorToInt(finalPrice * settings.sellPercentage);
+            }
             UpdateValues();
+            debugRange.SetActive(false);
             tower.ApplyTower();
             sound.PlayClip(sound.confirmUpgrade, 1f);
         }
@@ -569,6 +704,11 @@ public class UpgradeManager : MonoBehaviour
         Vector3Int cellPos = towerManager.tilemap.WorldToCell(towerPos);
         int tileIndex = towerManager.tilePositions.IndexOf(cellPos);
         towerManager.isFull[tileIndex] = false;
+        if(tower.tower.towerType == TowerType.Farm)
+        {
+            towerManager.farm.Remove(tower.tower);
+            towerManager.tower.Remove(tower.tower);
+        }
         settings.money += tower.sellValue;
         settings.UpdateVisual();
         Destroy(tower.gameObject);

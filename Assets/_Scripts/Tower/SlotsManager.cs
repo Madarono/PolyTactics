@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class SlotsManager : MonoBehaviour
     public bool followSettings;
 
     public TowerSlotSO[] currentSlots;
+    public TowerSlotSO[] boughtTowers;
 
     [Header("Faction Stock Slots")]
     public TowerSlotSO[] circleSlots;
@@ -58,7 +60,14 @@ public class SlotsManager : MonoBehaviour
             }
         }
 
-        foreach(TowerSlotSO slot in currentSlots)
+        List<TowerSlotSO> slots = new List<TowerSlotSO>(currentSlots);
+
+        foreach(TowerSlotSO slot in boughtTowers)
+        {
+            slots.Add(slot);
+        }
+
+        foreach(TowerSlotSO slot in slots)
         {
             GameObject go = Instantiate(slotPrefab, parent.transform.position, Quaternion.identity);
             go.transform.SetParent(parent);
@@ -69,6 +78,8 @@ public class SlotsManager : MonoBehaviour
                 goScript.iconImage.sprite = slot.icon;
                 goScript.faction = slot.faction;
                 goScript.isTrap = slot.isTrap;
+                goScript.isFarm = slot.isFarm;
+                goScript.limit = slot.limit;
                 goScript.manager = manager; 
             } 
         }

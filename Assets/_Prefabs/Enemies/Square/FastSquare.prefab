@@ -318,6 +318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 0
   waypoint: []
   waypointIndex: 0
   speed: 2.5
@@ -364,7 +365,6 @@ MonoBehaviour:
   time: 0.1
   moneyReward: 5
   isSlowed: 0
-  healthBarParent: {fileID: 7482141688755611839}
   delayTillHide: 3
 --- !u!50 &-1311400240113429232
 Rigidbody2D:

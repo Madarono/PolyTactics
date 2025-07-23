@@ -239,6 +239,7 @@ MonoBehaviour:
   upgrade: {fileID: 0}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
+  sound: {fileID: 0}
   isDebug: 1
   targetting: 0
   bulletDamage: 10
@@ -248,8 +249,10 @@ MonoBehaviour:
   bulletPierce: 0
   fireForce: 0
   splashPool: {fileID: 0}
+  splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
   spreadTransfer: 0.5
+  hitLine: {fileID: 0}
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -263,15 +266,22 @@ MonoBehaviour:
   freezeDuration: 0
   cold: {r: 0, g: 0, b: 0, a: 0}
   freeze: {r: 0, g: 0, b: 0, a: 0}
+  passiveDamage: 0.01
+  timeTillRemoval: 1
+  debuffEnemies: []
   towerAnim: {fileID: 0}
   o_reloadTime: 0
   angleOffset: 4
   firePoint: {fileID: 0}
   bulletPrefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
+  immunityDuration: 2
   rangeObj: {fileID: 4740155658132339894}
   rangeRend: {fileID: 1244574542245396449}
-  range: 4.5
+  range: 4
   isSelected: 0
+  magnitude: 0
+  time: 0
   predictionMultiplyer: 5
   enemy: []
   lockOnEnemy: {fileID: 0}
+  needsUpdate: 0

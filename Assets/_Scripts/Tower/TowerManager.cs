@@ -48,6 +48,7 @@ public class TowerManager : MonoBehaviour
     [Header("Towers")]
     public List<Tower> tower = new List<Tower>();
     public List<Trap> trapTower = new List<Trap>(); //To directly access traps for live reduction
+    public List<Tower> farm = new List<Tower>(); //To directly access farms for money
     public TextMeshProUGUI priceVisual;
 
     [Header("Keep track of TowerSlots")]
@@ -242,7 +243,13 @@ public class TowerManager : MonoBehaviour
                 goScript.splashPool = splashPool;
                 goScript.upgradeManager = upgradeManager;
                 goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
+                goScript.upgrade.baseValue = towerPrefab[currentPrefabIndex].price;
                 goScript.sound = soundManager;
+                if(goScript.towerType == TowerType.Farm)
+                {
+                    goScript.faction = settings.playerFaction;
+                    farm.Add(goScript);
+                }
                 tower.Add(goScript);
             }
             else if(go.TryGetComponent(out Trap trap))
@@ -347,6 +354,31 @@ public class TowerManager : MonoBehaviour
                 script.needsUpdate = true;
                 // script.SelectEnemy();
             }
+        }
+    }
+
+    public void EndOfRoundChecks()
+    {
+        for(int i = trapTower.Count - 1; i >= 0; i--)
+        {
+            if(trapTower[i] == null)
+            {
+                trapTower.RemoveAt(i);
+                continue;
+            }
+            
+            trapTower[i].ReduceLives();
+        }
+
+        for(int i = farm.Count - 1; i >= 0; i--)
+        {
+            if(farm[i] == null)
+            {
+                farm.RemoveAt(i);
+                continue;
+            }
+            
+            farm[i].GenerateMoney();
         }
     }
 }

@@ -318,6 +318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 0
   waypoint: []
   waypointIndex: 0
   speed: 1
@@ -1072,6 +1073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 2
   waypoint: []
   waypointIndex: 0
   speed: 0.4
@@ -1298,6 +1300,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 0
   waypoint: []
   waypointIndex: 0
   speed: 1

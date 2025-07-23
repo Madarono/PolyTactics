@@ -212,7 +212,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -453,6 +453,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   settings: {fileID: 0}
+  priority: 1
   waypoint: []
   waypointIndex: 0
   speed: 1
@@ -495,8 +496,11 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  magnitude: 0.05
+  time: 0.1
   moneyReward: 5
   isSlowed: 0
+  delayTillHide: 3
 --- !u!50 &-1311400240113429232
 Rigidbody2D:
   serializedVersion: 4

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 [System.Serializable]
 public class EnemyInfo
@@ -28,7 +29,8 @@ public enum TowerType
     Sniper,
     Splash,
     Trap,
-    Debuff
+    Debuff,
+    Farm
 }
 
 public class Tower : MonoBehaviour
@@ -54,6 +56,13 @@ public class Tower : MonoBehaviour
     public float rotationSpeed = 4.5f;
     public int bulletPierce = 1;
     public float fireForce = 4f;
+
+    [Header("Range")]
+    public GameObject rangeObj;
+    public SpriteRenderer rangeRend;
+    public float range = 2f;
+    private bool isHovering;
+    public bool isSelected;
 
     [Header("Special Attirbutes - Splash")]
     public Pool splashPool;
@@ -84,6 +93,14 @@ public class Tower : MonoBehaviour
     public float timeTillRemoval = 1f;
     public List<GameObject> debuffEnemies = new List<GameObject>();
 
+    [Header("Special Attributes - Farm")]
+    public int incomeGenerated = 50;
+    public float incomePercentage = 0;
+    public float wavePercentage = 0;
+    public float refundPercentage = 0.7f;
+    public TextMeshPro incomeVisual;
+    public float durationTillHide;
+
     [Header("Animation")]
     public Animator towerAnim;
     
@@ -94,13 +111,6 @@ public class Tower : MonoBehaviour
     public Transform firePoint;
     public GameObject bulletPrefab;
     public float immunityDuration = 2f;
-
-    [Header("Range")]
-    public GameObject rangeObj;
-    public SpriteRenderer rangeRend;
-    public float range = 2f;
-    private bool isHovering;
-    public bool isSelected;
 
     [Header("Camera Shake")]
     public float magnitude;
@@ -149,6 +159,11 @@ public class Tower : MonoBehaviour
 
     void LateUpdate()
     {
+        if(towerType == TowerType.Farm)
+        {
+            return;
+        }   
+
         if(needsUpdate)
         {
             UpdateValues();
@@ -160,6 +175,11 @@ public class Tower : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(towerType == TowerType.Farm)
+        {
+            return;
+        } 
+
         if(lockOnEnemy == null || towerType == TowerType.Freezer)
         {
             return;
@@ -289,7 +309,7 @@ public class Tower : MonoBehaviour
                 {
                     sound.PlayClip(sound.sniperShoot, 1f);
                 }
-                script.health -= damage * multiplyer;
+                script.HurtEnemy(damage * multiplyer);
                 script.Refresh();
                 towerAnim.SetTrigger(Animator.StringToHash("Shoot"));
             }
@@ -311,7 +331,7 @@ public class Tower : MonoBehaviour
         }
     }
 
-
+    //Getting enemy info
     public void GatherEnemy(Enemy enemyScript)
     {
         EnemyInfo colScript = new EnemyInfo();
@@ -333,10 +353,12 @@ public class Tower : MonoBehaviour
         UpdateValues();
         SelectEnemy();
     }
-
-
     public void UpdateValues()
     {
+        if(towerType == TowerType.Farm)
+        {
+            return;
+        }   
         if (enemy.Count == 0) 
         {
             return;
@@ -370,10 +392,12 @@ public class Tower : MonoBehaviour
             }
         }
     }
-
-
     public void SelectEnemy()
     {
+        if(towerType == TowerType.Farm)
+        {
+            return;
+        }   
         lockOnEnemy = null;
         indexOfEnemy = 0;
         if(enemy.Count == 0)
@@ -387,7 +411,7 @@ public class Tower : MonoBehaviour
             {
                 case Targetting.First:
                     int firstEnemy = 0; 
-                    float closestDistance = 999;
+                    float closestDistance = float.MaxValue;
                     int highestPlacement = 0;
                     for(int i = 0; i < enemy.Count; i++)
                     {
@@ -435,24 +459,24 @@ public class Tower : MonoBehaviour
 
                 case Targetting.Strong:
                     int strongEnemy = 0; 
-                    float _health = 0;
+                    int priority = 0;
                     float _closestDistance = 999;
                     int _highestPlacement = 0;
                     for(int i = 0; i < enemy.Count; i++)
                     {
-                        if(enemy[i].health > _health)
+                        if(enemy[i].enemy.priority > priority)
                         {
                             strongEnemy = i;
-                            _health = enemy[i].health;
+                            priority = enemy[i].enemy.priority;
                             _closestDistance = enemy[i].distance;
                             _highestPlacement = enemy[i].placement;
                         }
-                        else if(enemy[i].health == _health)
+                        else if(enemy[i].enemy.priority == priority)
                         {
-                            if(enemy[i].placement >= _highestPlacement && enemy[i].distance < _closestDistance)
+                            if(enemy[i].placement > _highestPlacement || (enemy[i].placement == _highestPlacement && enemy[i].distance < _closestDistance))
                             {
                                 strongEnemy = i;
-                                _health = enemy[i].health;
+                                priority = enemy[i].enemy.priority;
                                 _closestDistance = enemy[i].distance;
                                 _highestPlacement = enemy[i].placement;
                             }
@@ -479,7 +503,7 @@ public class Tower : MonoBehaviour
                         }
                         else if(enemy[i].health == health)
                         {
-                            if(enemy[i].placement >= highestPlacement_ && enemy[i].distance < closestDistance_)
+                            if(enemy[i].placement >= highestPlacement_ || (enemy[i].placement == highestPlacement_ && enemy[i].distance < closestDistance_))
                             {
                                 weakEnemy = i;
                                 health = enemy[i].health;
@@ -538,6 +562,35 @@ public class Tower : MonoBehaviour
             }
 
         }
+    }
+
+    //Farm specific
+    public void GenerateMoney()
+    {
+        EnemyManager enemyManager = EnemyManager.Instance;
+        if(wavePercentage < 0.01)
+        {
+            wavePercentage = 0;
+        }
+        if(incomePercentage < 0.01)
+        {
+            incomePercentage = 0;
+        }
+
+        float waveMoney = Mathf.RoundToInt(enemyManager.waveReward * (1 + (enemyManager.rewardScale * enemyManager.currentWave)) * enemyManager.coinMultipler[enemyManager.index].multiplyer);
+        int finalMoney = Mathf.RoundToInt(incomeGenerated + (waveMoney * wavePercentage) + ((manager.farm.Count - 1) * incomeGenerated * incomePercentage));
+        Debug.Log(finalMoney);
+        Settings.Instance.money += finalMoney;
+        Settings.Instance.UpdateVisual();
+        incomeVisual.text = "$" + finalMoney.ToString();
+        StartCoroutine(HideVisual(incomeVisual.gameObject, durationTillHide));
+    }
+
+    IEnumerator HideVisual(GameObject obj, float duration)
+    {
+        obj.SetActive(true);
+        yield return new WaitForSeconds(duration);
+        obj.SetActive(false);
     }
 
     public void UpdateRange()

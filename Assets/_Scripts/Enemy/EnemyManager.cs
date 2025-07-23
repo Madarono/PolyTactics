@@ -8,7 +8,8 @@ public enum Factions
     Square,
     Circle,
     Rectangle,
-    Triangle
+    Triangle,
+    Universal
 }
 
 [System.Serializable]
@@ -242,16 +243,7 @@ public class EnemyManager : MonoBehaviour
             {
                 settings.ShowWave();
                 soundManager.PlayClip(soundManager.endOfRound, 1f);
-                for(int i = towerManager.trapTower.Count - 1; i >= 0; i--)
-                {
-                    if(towerManager.trapTower[i] == null)
-                    {
-                        towerManager.trapTower.RemoveAt(i);
-                        continue;
-                    }
-
-                    towerManager.trapTower[i].ReduceLives();
-                }
+                towerManager.EndOfRoundChecks();
 
                 StartWave();
             }

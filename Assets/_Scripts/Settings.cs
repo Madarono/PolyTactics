@@ -142,15 +142,6 @@ public class Settings : MonoBehaviour, IDataPersistence
         soundManager.PlayClip(soundManager.endOfRound, 1f);
         Time.timeScale = 1f;
         speedIcon.sprite = icons[0];
-        for(int i = towerManager.trapTower.Count - 1; i >= 0; i--)
-        {
-            if(towerManager.trapTower[i] == null)
-            {
-                towerManager.trapTower.RemoveAt(i);
-                continue;
-            }
-
-            towerManager.trapTower[i].ReduceLives();
-        }
+        towerManager.EndOfRoundChecks();
     }
 }

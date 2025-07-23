@@ -26,8 +26,24 @@ public class TowerSlot : MonoBehaviour
     [Header("Modificiations")]
     public bool isTrap;
 
+    [Header("Limits")]
+    public int limit;
+    public bool isFarm;
+
     void Start()
     {
+        if(faction == Factions.Universal)
+        {
+            for(int i = 0; i < colorFactions.Length; i++)
+            {
+                if(Settings.Instance.playerFaction == colorFactions[i].faction)
+                {
+                    image.color = colorFactions[i].color;
+                    break;
+                }
+            }
+        }
+
         for(int i = 0; i < colorFactions.Length; i++)
         {
             if(faction == colorFactions[i].faction)
@@ -40,6 +56,11 @@ public class TowerSlot : MonoBehaviour
 
     public void SelectTurrent()
     { 
+        if(isFarm && manager.farm.Count >= limit)
+        {
+            return;
+        }
+
         if(isSelected && manager.currentSlot == this)
         {
             manager.InactiveSelection();
