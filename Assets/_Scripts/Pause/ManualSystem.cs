@@ -29,13 +29,19 @@ public class Tabs
 
 public class ManualSystem : MonoBehaviour
 {
+    public static ManualSystem Instance {get; private set;}
     public GameObject manualWindow;
     public Animator manualAnim;
     public Tabs[] tabs;
     public Color[] bgColors;
     public GameObject itemPrefab;
 
-    void Start()
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    public void InitiateStart()
     {
         manualWindow.SetActive(false);
         MakeManual();

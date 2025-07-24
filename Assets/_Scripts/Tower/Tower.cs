@@ -13,6 +13,13 @@ public class EnemyInfo
     public int placement;
 }
 
+[System.Serializable]
+public class RequirementInt
+{
+    public int requirement;
+    public int rewardValue;
+}
+
 public enum Targetting
 {
     First,
@@ -30,7 +37,8 @@ public enum TowerType
     Splash,
     Trap,
     Debuff,
-    Farm
+    Farm,
+    Minigun
 }
 
 public class Tower : MonoBehaviour
@@ -101,6 +109,21 @@ public class Tower : MonoBehaviour
     public TextMeshPro incomeVisual;
     public float durationTillHide;
 
+    [Header("Special Attributes - Minigun")]
+    public float chargingTime = 2f;
+    public int shotsTillHeated = 100;
+    public int currentShots = 0;
+    public float timeTillCooldown = 5f;
+    private float o_timeTillCooldown;
+
+    public RequirementInt[] passiveUpgrade;
+
+    public Sprite idleSprite;
+    public Color idleColor;
+    public Sprite coolingSprite;
+    public Color coolingColor;
+    public SpriteRenderer rend;
+
     [Header("Animation")]
     public Animator towerAnim;
     
@@ -123,6 +146,7 @@ public class Tower : MonoBehaviour
     private int indexOfEnemy;
     public bool needsUpdate;
 
+    private bool canShoot = true;
 
     void Start()
     {
@@ -138,13 +162,29 @@ public class Tower : MonoBehaviour
             rangeObj.SetActive(true);
             this.enabled = false;
         }
+        
+        if(towerType == TowerType.Minigun)
+        {
+            canShoot = false;
+            o_timeTillCooldown = timeTillCooldown;
+        }
     }
 
     void Update()
     {
-        if(reloadTime > 0)
+        if(reloadTime > 0 && canShoot)
         {
             reloadTime -= Time.deltaTime;
+        }
+
+        if(EnemyManager.Instance.enemiesLeft > 0 && timeTillCooldown > 0 && canShoot && towerType == TowerType.Minigun && currentShots > 0)
+        {
+            timeTillCooldown -= Time.deltaTime;
+        }
+        else if(timeTillCooldown <= 0 && canShoot && towerType == TowerType.Minigun)
+        {
+            StartCoroutine(CoolingDown());
+            timeTillCooldown = o_timeTillCooldown;
         }
 
         if(isHovering || isSelected)
@@ -209,13 +249,22 @@ public class Tower : MonoBehaviour
         {
             reloadTime = o_reloadTime;
             Shoot();
+            if(towerType == TowerType.Minigun)
+            {
+                currentShots++;
+                timeTillCooldown = o_timeTillCooldown;
+                if(currentShots >= shotsTillHeated)
+                {
+                    StartCoroutine(CoolingDown());
+                }
+            }
         }
     }
 
 
     void Shoot()
     {
-        if (towerType == TowerType.Basic || towerType == TowerType.Splash)
+        if (towerType == TowerType.Basic || towerType == TowerType.Splash || towerType == TowerType.Minigun)
         {
             GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             bulletObj.transform.position = firePoint.position;
@@ -405,7 +454,7 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        if(towerType == TowerType.Basic || towerType == TowerType.Sniper || towerType == TowerType.Splash)
+        if(towerType == TowerType.Basic || towerType == TowerType.Sniper || towerType == TowerType.Splash || towerType == TowerType.Minigun)
         {
             switch(targetting)
             {
@@ -555,6 +604,11 @@ public class Tower : MonoBehaviour
         }
         else if(towerType == TowerType.Debuff)
         {
+            if(passiveDamage <= 0)
+            {
+                return;
+            }
+
             foreach(EnemyInfo script in new List<EnemyInfo>(enemy)) //So we don't get into errors with the refresh function thingy
             {
                 script.enemy.HurtEnemy(script.enemy.o_health * passiveDamage * manager.searchDelay);
@@ -562,9 +616,14 @@ public class Tower : MonoBehaviour
             }
 
         }
+
+        if(towerType == TowerType.Minigun && lockOnEnemy != null && !canShoot)
+        {
+            StartCoroutine(CoolingDown());
+        }
     }
 
-    //Farm specific
+    //Farm Specific
     public void GenerateMoney()
     {
         EnemyManager enemyManager = EnemyManager.Instance;
@@ -584,6 +643,21 @@ public class Tower : MonoBehaviour
         Settings.Instance.UpdateVisual();
         incomeVisual.text = "$" + finalMoney.ToString();
         StartCoroutine(HideVisual(incomeVisual.gameObject, durationTillHide));
+    }
+
+    //Minigun Specific
+    IEnumerator CoolingDown()
+    {
+        canShoot = false;
+        // rend.sprite = coolingSprite;
+        reloadTime = o_reloadTime;
+        rend.color = coolingColor;
+        yield return new WaitForSeconds(chargingTime);
+        canShoot = true;
+        // rend.sprite = idleSprite;
+        rend.color = idleColor;
+        currentShots = 0;
+        timeTillCooldown = o_timeTillCooldown;
     }
 
     IEnumerator HideVisual(GameObject obj, float duration)

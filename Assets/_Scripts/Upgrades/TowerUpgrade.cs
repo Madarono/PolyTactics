@@ -103,6 +103,27 @@ public class TowerUpgrade : MonoBehaviour
         tower.incomePercentage = upgrades[individualLv[12]].incomePercentage / 100f;
         tower.wavePercentage = upgrades[individualLv[13]].wavePercentage / 100f;
         tower.refundPercentage = upgrades[individualLv[14]].refundPercentage / 100f;
+
+        if(tower.passiveUpgrade.Length > 0)
+        {
+            int totalLvl = 0;
+            foreach(int lvl in individualLv)
+            {
+                totalLvl += lvl;
+            }
+
+            for(int i = tower.passiveUpgrade.Length - 1; i >= 0; i--)
+            {
+                if(totalLvl >= tower.passiveUpgrade[i].requirement)
+                {
+                    if(tower.towerType == TowerType.Minigun)
+                    {
+                        tower.shotsTillHeated = tower.passiveUpgrade[i].rewardValue;
+                    }
+                    break;
+                }
+            }
+        }
         tower.UpdateRange();
     }
 }

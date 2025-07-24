@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class SlotsManager : MonoBehaviour
 {
+    public static SlotsManager Instance {get; private set;}
     public Settings settings;
     public bool followSettings;
 
@@ -22,7 +23,12 @@ public class SlotsManager : MonoBehaviour
     public GameObject slotPrefab;
     public Transform parent;
 
-    public void Start()
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    public void InitiateStart()
     {
         if(followSettings)
         {

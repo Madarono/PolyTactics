@@ -25,7 +25,13 @@ public class Bullet : MonoBehaviour
         if(col.TryGetComponent<Enemy>(out Enemy enemy))
         {
             float multiplyer = enemy.PI_Shield;
-            if(multiplyer == 0 && enemy.immunities[enemy.cacheImmunity].immuneAgainst == tower.towerType)
+            TowerType type = tower.towerType;
+            if(type == TowerType.Minigun)
+            {
+                type = TowerType.Basic;
+            }
+
+            if(multiplyer == 0 && enemy.immunities[enemy.cacheImmunity].immuneAgainst == type)
             {
                 if(PauseSystem.Instance.graphics == 1)
                 {
@@ -37,7 +43,7 @@ public class Bullet : MonoBehaviour
                 Destroy(gameObject);
                 return;
             }
-            else if(enemy.immunities[enemy.cacheImmunity].immuneAgainst != tower.towerType)
+            else if(enemy.immunities[enemy.cacheImmunity].immuneAgainst != type)
             {
                 multiplyer = 1;
             }
@@ -78,8 +84,8 @@ public class Bullet : MonoBehaviour
 
                 foreach(var hit in hits)
                 {
-                    if(hit.gameObject.TryGetComponent(out Enemy hitScript) && hit != col && (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst != tower.towerType || 
-                    (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst == tower.towerType && hitScript.PI_Shield > 0)))
+                    if(hit.gameObject.TryGetComponent(out Enemy hitScript) && hit != col && (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst != type || 
+                    (hitScript.immunities[hitScript.cacheImmunity].immuneAgainst == type && hitScript.PI_Shield > 0)))
                     {
                         float dist = Vector2.Distance(hit.transform.position, transform.position);
                         float falloff = Mathf.Clamp01(1f - dist / (explosionRadius));

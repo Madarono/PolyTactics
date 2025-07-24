@@ -326,6 +326,11 @@ public class Enemy : MonoBehaviour
 
     IEnumerator CriticalDamage(Color flashColor, float flashDuration, float fadeDuration)
     {
+        if(!gameObject.activeInHierarchy)
+        {
+            yield break;
+        }
+
         Color originalColor = criticalEffect.color;
 
         criticalEffect.color = flashColor;

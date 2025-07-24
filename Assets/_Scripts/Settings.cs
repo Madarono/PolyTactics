@@ -60,6 +60,8 @@ public class Settings : MonoBehaviour, IDataPersistence
         this.playerFaction = data.playerFaction;
         this.enemyFaction = data.enemyFaction;
         enemyManager.InitiateStart();
+        SlotsManager.Instance.InitiateStart();
+        ManualSystem.Instance.InitiateStart();
         InitiateStart();
     }
 
@@ -123,6 +125,7 @@ public class Settings : MonoBehaviour, IDataPersistence
         {
             speedIcon.sprite = icons[1];
             isSpeeding = false;
+            enemyManager.enemiesLeft = 0;
             enemyManager.StartWave();
             ShowWave();
             soundManager.PlayClip(soundManager.beginWave, 1f);
