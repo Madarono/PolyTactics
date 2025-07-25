@@ -44,11 +44,13 @@ public class TowerManager : MonoBehaviour
 
     public bool isSelecting;
     public bool isTrap;
+    public bool isUniversal;
 
     [Header("Towers")]
     public List<Tower> tower = new List<Tower>();
     public List<Trap> trapTower = new List<Trap>(); //To directly access traps for live reduction
     public List<Tower> farm = new List<Tower>(); //To directly access farms for money
+    public List<Tower> villages = new List<Tower>(); //To directly access villages
     public TextMeshProUGUI priceVisual;
 
     [Header("Keep track of TowerSlots")]
@@ -245,10 +247,20 @@ public class TowerManager : MonoBehaviour
                 goScript.upgrade.sellValue = Mathf.FloorToInt(towerPrefab[currentPrefabIndex].price * settings.sellPercentage);
                 goScript.upgrade.baseValue = towerPrefab[currentPrefabIndex].price;
                 goScript.sound = soundManager;
-                if(goScript.towerType == TowerType.Farm)
+                if(isUniversal)
                 {
                     goScript.faction = settings.playerFaction;
-                    farm.Add(goScript);
+                }
+
+                switch(goScript.towerType)
+                {
+                    case TowerType.Farm:
+                        farm.Add(goScript);
+                        break;
+
+                    case TowerType.Village:
+                        villages.Add(goScript);
+                        break;
                 }
                 tower.Add(goScript);
             }
@@ -262,6 +274,11 @@ public class TowerManager : MonoBehaviour
             displayPrefab.SetActive(false);
             full[index] = true;
             soundManager.PlayClip(soundManager.placeTower, 1f);
+            isUniversal = false;
+            foreach(Tower village in villages)
+            {
+                village.CheckTowers();
+            }
         }
     }
     public void UnlockSelection(int index, TowerSlot script, bool isTrap)
@@ -277,6 +294,7 @@ public class TowerManager : MonoBehaviour
         isSelecting = true;
         
         this.isTrap = isTrap;
+        this.isUniversal = script.isUniversal; 
         cacheDotIndex = 0;
         if(isTrap)
         {

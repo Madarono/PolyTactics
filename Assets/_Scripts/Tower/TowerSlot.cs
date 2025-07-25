@@ -25,6 +25,7 @@ public class TowerSlot : MonoBehaviour
 
     [Header("Modificiations")]
     public bool isTrap;
+    public bool isUniversal;
 
     [Header("Limits")]
     public int limit;
@@ -42,6 +43,11 @@ public class TowerSlot : MonoBehaviour
                     break;
                 }
             }
+            isUniversal = true;
+        }
+        else
+        {
+            isUniversal = false;
         }
 
         for(int i = 0; i < colorFactions.Length; i++)

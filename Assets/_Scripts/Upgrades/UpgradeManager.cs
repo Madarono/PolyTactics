@@ -43,6 +43,12 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI waveVisual;
     public TextMeshProUGUI refundVisual;
 
+    public TextMeshProUGUI _rangeVisual;
+    public TextMeshProUGUI _damageVisual;
+    public TextMeshProUGUI _reloadVisual;
+    public TextMeshProUGUI _pierceVisual;
+
+
     public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
     public TextMeshProUGUI sellVisual;
@@ -65,6 +71,11 @@ public class UpgradeManager : MonoBehaviour
     public GameObject clusterObj;
     public GameObject waveObj;
     public GameObject refundObj;
+
+    public GameObject _rangeObj;
+    public GameObject _damageObj;
+    public GameObject _reloadObj;
+    public GameObject _pierceObj;
 
     public GameObject targettingObj;
     public GameObject freezerObj;
@@ -288,6 +299,42 @@ public class UpgradeManager : MonoBehaviour
         {
             refundObj.SetActive(false);
         }
+        if(tower.upgrades[0].rangeIncrease > 0)
+        {
+            _rangeObj.SetActive(true);
+            _rangeVisual.text = tower.upgrades[tower.individualLv[15]].rangeIncrease.ToString("F1");
+        }
+        else
+        {
+            _rangeObj.SetActive(false);
+        }
+        if(tower.upgrades[0].damageIncrease > 0)
+        {
+            _damageObj.SetActive(true);
+            _damageVisual.text = tower.upgrades[tower.individualLv[16]].damageIncrease.ToString("F1");
+        }
+        else
+        {
+            _damageObj.SetActive(false);
+        }
+        if(tower.upgrades[0].reloadDecrease > 0)
+        {
+            _reloadObj.SetActive(true);
+            _reloadVisual.text = tower.upgrades[tower.individualLv[17]].reloadDecrease.ToString("F1");
+        }
+        else
+        {
+            _reloadObj.SetActive(false);
+        }
+        if(tower.upgrades[0].pierceIncrease > 0)
+        {
+            _pierceObj.SetActive(true);
+            _pierceVisual.text = tower.upgrades[tower.individualLv[18]].pierceIncrease.ToString("F1");
+        }
+        else
+        {
+            _pierceObj.SetActive(false);
+        }
 
 
 
@@ -426,7 +473,13 @@ public class UpgradeManager : MonoBehaviour
             rangeVisual.text =  tower.upgrades[tower.individualLv[4]].range.ToString("F1") + " -> " + tower.upgrades[levels[4]].range.ToString("F1");
             debugRange.SetActive(true);
             debugRange.transform.position = tower.gameObject.transform.position;
-            float diameter = tower.upgrades[levels[4]].range * 2f * tower.gameObject.transform.localScale.x;
+            
+            float increase = 0;
+            if(tower.gameObject.TryGetComponent(out ExtraStats stats))
+            {
+                increase = stats.isUnderRange ? stats.rangeIncrease : 0;
+            }
+            float diameter = tower.upgrades[levels[4]].range * 2f * tower.gameObject.transform.localScale.x + (increase * 2f);
             debugRange.transform.localScale = new Vector3(diameter, diameter, debugRange.transform.localScale.z);
             int difference = levels[4] - tower.individualLv[4];
 
@@ -613,6 +666,74 @@ public class UpgradeManager : MonoBehaviour
             refundVisual.text = tower.upgrades[tower.individualLv[14]].refundPercentage.ToString("F1");
         }
 
+        if(levels[15] > tower.individualLv[15])
+        {
+            _rangeVisual.text =  tower.upgrades[tower.individualLv[15]].rangeIncrease.ToString("F1") + " -> " + tower.upgrades[levels[15]].rangeIncrease.ToString("F1");
+            int difference = levels[15] - tower.individualLv[15];
+
+            prices[15] = 0;
+            for(int i = tower.individualLv[15] + 1; i <= levels[15]; i++)
+            {
+                prices[15] += tower.upgrades[i]._rangePrice;
+            } 
+        }
+        else
+        {
+            prices[15] = 0;
+            _rangeVisual.text = tower.upgrades[tower.individualLv[15]].rangeIncrease.ToString("F1");
+        }
+
+        if(levels[16] > tower.individualLv[16])
+        {
+            _damageVisual.text =  tower.upgrades[tower.individualLv[16]].damageIncrease.ToString("F1") + " -> " + tower.upgrades[levels[16]].damageIncrease.ToString("F1");
+            int difference = levels[16] - tower.individualLv[16];
+
+            prices[16] = 0;
+            for(int i = tower.individualLv[16] + 1; i <= levels[16]; i++)
+            {
+                prices[16] += tower.upgrades[i]._damagePrice;
+            } 
+        }
+        else
+        {
+            prices[16] = 0;
+            _damageVisual.text = tower.upgrades[tower.individualLv[16]].damageIncrease.ToString("F1");
+        }
+
+        if(levels[17] > tower.individualLv[17])
+        {
+            _reloadVisual.text =  tower.upgrades[tower.individualLv[17]].reloadDecrease.ToString("F1") + " -> " + tower.upgrades[levels[17]].reloadDecrease.ToString("F1");
+            int difference = levels[17] - tower.individualLv[17];
+
+            prices[17] = 0;
+            for(int i = tower.individualLv[17] + 1; i <= levels[17]; i++)
+            {
+                prices[17] += tower.upgrades[i]._reloadPrice;
+            } 
+        }
+        else
+        {
+            prices[17] = 0;
+            _reloadVisual.text = tower.upgrades[tower.individualLv[17]].reloadDecrease.ToString("F1");
+        }
+
+        if(levels[18] > tower.individualLv[18])
+        {
+            _pierceVisual.text =  tower.upgrades[tower.individualLv[18]].pierceIncrease.ToString("F1") + " -> " + tower.upgrades[levels[18]].pierceIncrease.ToString("F1");
+            int difference = levels[18] - tower.individualLv[18];
+
+            prices[18] = 0;
+            for(int i = tower.individualLv[18] + 1; i <= levels[18]; i++)
+            {
+                prices[18] += tower.upgrades[i]._piercePrice;
+            } 
+        }
+        else
+        {
+            prices[18] = 0;
+            _pierceVisual.text = tower.upgrades[tower.individualLv[18]].pierceIncrease.ToString("F1");
+        }
+
         finalPrice = 0;
         foreach(int price in prices)
         {
@@ -704,10 +825,22 @@ public class UpgradeManager : MonoBehaviour
         Vector3Int cellPos = towerManager.tilemap.WorldToCell(towerPos);
         int tileIndex = towerManager.tilePositions.IndexOf(cellPos);
         towerManager.isFull[tileIndex] = false;
-        if(tower.tower.towerType == TowerType.Farm)
+        switch(tower.tower.towerType) 
         {
-            towerManager.farm.Remove(tower.tower);
-            towerManager.tower.Remove(tower.tower);
+            case TowerType.Farm:
+                towerManager.farm.Remove(tower.tower);
+                towerManager.tower.Remove(tower.tower);
+                break;
+                
+            case TowerType.Village:
+                tower.tower.DefaultTowers();
+                towerManager.villages.Remove(tower.tower);
+                towerManager.tower.Remove(tower.tower);
+                break;
+
+            default:
+                towerManager.tower.Remove(tower.tower);
+                break;
         }
         settings.money += tower.sellValue;
         settings.UpdateVisual();

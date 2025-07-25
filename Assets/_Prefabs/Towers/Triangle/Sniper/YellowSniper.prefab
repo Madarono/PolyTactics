@@ -256,6 +256,7 @@ GameObject:
   - component: {fileID: 6752578904592351285}
   - component: {fileID: 6379891632373407700}
   - component: {fileID: 5154620261807510717}
+  - component: {fileID: -1797374612919881250}
   m_Layer: 6
   m_Name: YellowSniper
   m_TagString: Untagged
@@ -360,6 +361,10 @@ MonoBehaviour:
   rotationSpeed: 3
   bulletPierce: 0
   fireForce: 0
+  rangeObj: {fileID: 5648163508666731758}
+  rangeRend: {fileID: 2368458112078027795}
+  range: 4
+  isSelected: 0
   splashPool: {fileID: 0}
   splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
@@ -381,16 +386,31 @@ MonoBehaviour:
   passiveDamage: 0.01
   timeTillRemoval: 1
   debuffEnemies: []
+  incomeGenerated: 50
+  incomePercentage: 0
+  wavePercentage: 0
+  refundPercentage: 0.7
+  incomeVisual: {fileID: 0}
+  durationTillHide: 0
+  chargingTime: 2
+  shotsTillHeated: 100
+  currentShots: 0
+  timeTillCooldown: 5
+  passiveUpgrade: []
+  idleColor: {r: 0, g: 0, b: 0, a: 0}
+  coolingColor: {r: 0, g: 0, b: 0, a: 0}
+  rend: {fileID: 0}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 5154620261807510717}
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 1121510192335935006}
   bulletPrefab: {fileID: 0}
   immunityDuration: 2
-  rangeObj: {fileID: 5648163508666731758}
-  rangeRend: {fileID: 2368458112078027795}
-  range: 4
-  isSelected: 0
   magnitude: 0
   time: 0
   predictionMultiplyer: 5
@@ -410,6 +430,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 3541431487038275982}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 1
     bulletPrice: 0
@@ -433,6 +454,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 1.5
     bulletPrice: 50
     pierce: 0
@@ -455,6 +484,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 2
     bulletPrice: 80
     pierce: 0
@@ -477,6 +514,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 3
     bulletPrice: 120
     pierce: 0
@@ -499,7 +544,16 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   sellValue: 0
+  baseValue: 0
   provideTargetting: 1
   individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &6752578904592351285
@@ -619,6 +673,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-1797374612919881250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7286287927700690378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: 3541431487038275982}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0
 --- !u!1 &8435946882800107838
 GameObject:
   m_ObjectHideFlags: 0

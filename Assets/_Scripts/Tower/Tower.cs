@@ -38,7 +38,8 @@ public enum TowerType
     Trap,
     Debuff,
     Farm,
-    Minigun
+    Minigun,
+    Village
 }
 
 public class Tower : MonoBehaviour
@@ -115,14 +116,17 @@ public class Tower : MonoBehaviour
     public int currentShots = 0;
     public float timeTillCooldown = 5f;
     private float o_timeTillCooldown;
-
     public RequirementInt[] passiveUpgrade;
-
-    public Sprite idleSprite;
     public Color idleColor;
-    public Sprite coolingSprite;
     public Color coolingColor;
     public SpriteRenderer rend;
+
+    [Header("Special Attributes - Village")]
+    public float rangeIncrease;
+    public float damageIncrease;
+    public float reloadDecrease;
+    public int pierceIncrease;
+    public List<ExtraStats> towersNear = new List<ExtraStats>();
 
     [Header("Animation")]
     public Animator towerAnim;
@@ -148,7 +152,7 @@ public class Tower : MonoBehaviour
 
     private bool canShoot = true;
 
-    void Start()
+    void Awake()
     {
         o_reloadTime = reloadTime;
         // o_SearchDelay = searchDelay;
@@ -199,7 +203,7 @@ public class Tower : MonoBehaviour
 
     void LateUpdate()
     {
-        if(towerType == TowerType.Farm)
+        if(towerType == TowerType.Farm || towerType == TowerType.Village)
         {
             return;
         }   
@@ -215,7 +219,7 @@ public class Tower : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(towerType == TowerType.Farm)
+        if(towerType == TowerType.Farm || towerType == TowerType.Village)
         {
             return;
         } 
@@ -404,7 +408,7 @@ public class Tower : MonoBehaviour
     }
     public void UpdateValues()
     {
-        if(towerType == TowerType.Farm)
+        if(towerType == TowerType.Farm || towerType == TowerType.Village)
         {
             return;
         }   
@@ -443,10 +447,11 @@ public class Tower : MonoBehaviour
     }
     public void SelectEnemy()
     {
-        if(towerType == TowerType.Farm)
+        if(towerType == TowerType.Farm || towerType == TowerType.Village)
         {
             return;
         }   
+
         lockOnEnemy = null;
         indexOfEnemy = 0;
         if(enemy.Count == 0)
@@ -649,15 +654,73 @@ public class Tower : MonoBehaviour
     IEnumerator CoolingDown()
     {
         canShoot = false;
-        // rend.sprite = coolingSprite;
         reloadTime = o_reloadTime;
         rend.color = coolingColor;
         yield return new WaitForSeconds(chargingTime);
         canShoot = true;
-        // rend.sprite = idleSprite;
         rend.color = idleColor;
         currentShots = 0;
         timeTillCooldown = o_timeTillCooldown;
+    }
+
+    //Village Specific
+    public void CheckTowers()
+    {
+        LayerMask towerLayer = LayerMask.GetMask("Tower");
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, range, towerLayer);
+
+        HashSet<ExtraStats> currentlyInRange = new HashSet<ExtraStats>();
+
+        for(int i = 0; i < hits.Length; i++)
+        {
+            if(hits[i].gameObject.TryGetComponent(out ExtraStats stats))
+            {
+                currentlyInRange.Add(stats);
+
+                if(!towersNear.Contains(stats) && !stats.isUnderRange)
+                {
+                    towersNear.Add(stats);
+                    stats.KeepTrack();
+                    stats.isUnderRange = true;
+                    stats.rangeIncrease = rangeIncrease;
+                    stats.damageIncrease = damageIncrease;
+                    stats.reloadDecrease = reloadDecrease;
+                    stats.pierceIncrease = pierceIncrease;
+                    stats.ApplyToTower();
+                }
+                else if(towersNear.Contains(stats) && stats.isUnderRange)
+                {
+                    stats.isUnderRange = true;
+                    stats.rangeIncrease = rangeIncrease;
+                    stats.damageIncrease = damageIncrease;
+                    stats.reloadDecrease = reloadDecrease;
+                    stats.pierceIncrease = pierceIncrease;
+                    stats.ApplyToTower();
+                }
+            }
+        }
+
+        for(int i = towersNear.Count - 1; i >= 0; i--)
+        {
+            ExtraStats tower = towersNear[i];
+            if (!currentlyInRange.Contains(tower) || tower == null)
+            {
+                tower?.ReturnToDefaults();
+                tower.isUnderRange = false;
+
+                towersNear.RemoveAt(i);
+            }
+        }
+    }
+
+
+    public void DefaultTowers()
+    {
+        foreach(ExtraStats stats in towersNear)
+        {
+            stats.isUnderRange = false;
+            stats.ReturnToDefaults();
+        }
     }
 
     IEnumerator HideVisual(GameObject obj, float duration)

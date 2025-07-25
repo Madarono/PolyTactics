@@ -100,6 +100,7 @@ MonoBehaviour:
   speed: 3
   distanceToStop: 0.05
   ring: {fileID: 5096175696416449928}
+  rend: {fileID: 7507250816361379250}
 --- !u!1 &5096175696416449928
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,6 +251,7 @@ GameObject:
   - component: {fileID: 2506680937640054141}
   - component: {fileID: 2969531698412044902}
   - component: {fileID: 6851083926142743218}
+  - component: {fileID: -7103893856067674984}
   m_Layer: 6
   m_Name: Freezer
   m_TagString: Untagged
@@ -353,6 +355,10 @@ MonoBehaviour:
   rotationSpeed: 0
   bulletPierce: 0
   fireForce: 0
+  rangeObj: {fileID: 5096175696416449928}
+  rangeRend: {fileID: 2230241077210792898}
+  range: 3
+  isSelected: 0
   splashPool: {fileID: 0}
   splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
@@ -374,16 +380,31 @@ MonoBehaviour:
   passiveDamage: 0.01
   timeTillRemoval: 1
   debuffEnemies: []
+  incomeGenerated: 50
+  incomePercentage: 0
+  wavePercentage: 0
+  refundPercentage: 0.7
+  incomeVisual: {fileID: 0}
+  durationTillHide: 0
+  chargingTime: 2
+  shotsTillHeated: 100
+  currentShots: 0
+  timeTillCooldown: 5
+  passiveUpgrade: []
+  idleColor: {r: 0, g: 0, b: 0, a: 0}
+  coolingColor: {r: 0, g: 0, b: 0, a: 0}
+  rend: {fileID: 0}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 6851083926142743218}
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 0}
   bulletPrefab: {fileID: 0}
   immunityDuration: 2
-  rangeObj: {fileID: 5096175696416449928}
-  rangeRend: {fileID: 2230241077210792898}
-  range: 3
-  isSelected: 0
   magnitude: 0
   time: 0
   predictionMultiplyer: 5
@@ -403,6 +424,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 5400889620817124857}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 0
     bulletPrice: 0
@@ -426,6 +448,22 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -448,6 +486,22 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -470,6 +524,22 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 0
     bulletPrice: 0
     pierce: 0
@@ -492,7 +562,24 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   sellValue: 0
+  baseValue: 0
   provideTargetting: 0
   individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &2506680937640054141
@@ -612,3 +699,26 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-7103893856067674984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9042024627957540585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: 5400889620817124857}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0

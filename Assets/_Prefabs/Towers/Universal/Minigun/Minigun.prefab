@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2643614295461187151}
   - component: {fileID: 7053043266511533630}
   - component: {fileID: 115638401484464302}
+  - component: {fileID: 2925964332332282017}
   m_Layer: 6
   m_Name: Minigun
   m_TagString: Untagged
@@ -161,11 +162,14 @@ MonoBehaviour:
     rewardValue: 50
   - requirement: 10
     rewardValue: 100
-  idleSprite: {fileID: -187409039, guid: ad2a9977b3e2ae948ac1dfa68201e349, type: 3}
   idleColor: {r: 1, g: 1, b: 1, a: 1}
-  coolingSprite: {fileID: -247894024, guid: ad2a9977b3e2ae948ac1dfa68201e349, type: 3}
   coolingColor: {r: 1, g: 0.53396225, b: 0.5890394, a: 1}
   rend: {fileID: 4114614603812917520}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 7053043266511533630}
   o_reloadTime: 0
   angleOffset: 0
@@ -191,6 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: -7882870931998279202}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 3
     bulletPrice: 0
@@ -418,6 +423,29 @@ MonoBehaviour:
   prefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   storageParent: {fileID: 8438265211573928334}
   initialSize: 20
+--- !u!114 &2925964332332282017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37780859454994820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: -7882870931998279202}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0
 --- !u!1 &790886563265552358
 GameObject:
   m_ObjectHideFlags: 0

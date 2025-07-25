@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2643614295461187151}
   - component: {fileID: 7053043266511533630}
   - component: {fileID: 115638401484464302}
+  - component: {fileID: 6707065242878501821}
   m_Layer: 6
   m_Name: BlueTorrent
   m_TagString: Untagged
@@ -119,6 +120,10 @@ MonoBehaviour:
   rotationSpeed: 5
   bulletPierce: 1
   fireForce: 8
+  rangeObj: {fileID: 6644864426509132106}
+  rangeRend: {fileID: 6063842106186931515}
+  range: 2.5
+  isSelected: 0
   splashPool: {fileID: 0}
   splashColor: {r: 0, g: 0, b: 0, a: 0}
   explosionRadius: 3
@@ -140,16 +145,31 @@ MonoBehaviour:
   passiveDamage: 0.01
   timeTillRemoval: 1
   debuffEnemies: []
+  incomeGenerated: 50
+  incomePercentage: 0
+  wavePercentage: 0
+  refundPercentage: 0.7
+  incomeVisual: {fileID: 0}
+  durationTillHide: 0
+  chargingTime: 2
+  shotsTillHeated: 100
+  currentShots: 0
+  timeTillCooldown: 5
+  passiveUpgrade: []
+  idleColor: {r: 0, g: 0, b: 0, a: 0}
+  coolingColor: {r: 0, g: 0, b: 0, a: 0}
+  rend: {fileID: 0}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 7053043266511533630}
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 2722329752702866636}
   bulletPrefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   immunityDuration: 2
-  rangeObj: {fileID: 6644864426509132106}
-  rangeRend: {fileID: 6063842106186931515}
-  range: 2.5
-  isSelected: 0
   magnitude: 0
   time: 0
   predictionMultiplyer: 5
@@ -169,6 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: -7882870931998279202}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 1
     bulletPrice: 0
@@ -192,6 +213,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 1.5
     bulletPrice: 20
     pierce: 2
@@ -214,6 +243,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 2
     bulletPrice: 50
     pierce: 3
@@ -236,6 +273,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 2.5
     bulletPrice: 100
     pierce: 4
@@ -258,7 +303,16 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   sellValue: 0
+  baseValue: 0
   provideTargetting: 1
   individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &4660212212468339451
@@ -393,6 +447,29 @@ MonoBehaviour:
   prefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   storageParent: {fileID: 8438265211573928334}
   initialSize: 20
+--- !u!114 &6707065242878501821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37780859454994820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: -7882870931998279202}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0
 --- !u!1 &790886563265552358
 GameObject:
   m_ObjectHideFlags: 0

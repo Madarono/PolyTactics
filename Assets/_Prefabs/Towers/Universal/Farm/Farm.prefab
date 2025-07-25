@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2643614295461187151}
   - component: {fileID: 7053043266511533630}
   - component: {fileID: 115638401484464302}
+  - component: {fileID: -3224680953560850565}
   m_Layer: 6
   m_Name: Farm
   m_TagString: Untagged
@@ -150,6 +151,19 @@ MonoBehaviour:
   refundPercentage: 0.7
   incomeVisual: {fileID: 8634686432284848324}
   durationTillHide: 2
+  chargingTime: 2
+  shotsTillHeated: 100
+  currentShots: 0
+  timeTillCooldown: 5
+  passiveUpgrade: []
+  idleColor: {r: 0, g: 0, b: 0, a: 0}
+  coolingColor: {r: 0, g: 0, b: 0, a: 0}
+  rend: {fileID: 0}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 7053043266511533630}
   o_reloadTime: 0
   angleOffset: 0
@@ -175,6 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: -7882870931998279202}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 0
     bulletPrice: 0
@@ -432,6 +447,29 @@ MonoBehaviour:
   prefab: {fileID: 3287632897462342635, guid: c2da603dfa083b2808805261797dd08c, type: 3}
   storageParent: {fileID: 8438265211573928334}
   initialSize: 20
+--- !u!114 &-3224680953560850565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 37780859454994820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: -7882870931998279202}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0
 --- !u!1 &704662178011460675
 GameObject:
   m_ObjectHideFlags: 0

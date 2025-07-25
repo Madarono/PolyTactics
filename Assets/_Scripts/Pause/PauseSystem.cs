@@ -14,6 +14,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public int graphics = 1;
     public bool screenShake = true;
     public bool autoPlay = false;
+    public bool showRange = true;
     public Slider masterSlider;
     public float master;
     public Slider backgroundSlider;
@@ -31,6 +32,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public Color[] graphicsStates = new Color[2];
     public GameObject screenShakeTick;
     public GameObject autoPlayTick;
+    public GameObject showRangeTick;
     public GameObject postprocessing;
 
     [Header("Scripts")]
@@ -49,6 +51,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         this.master = data.master;
         this.background = data.background;
         this.autoPlay = data.autoPlay;
+        this.showRange = data.showRange;
         window.SetActive(false);
         leaveWindow.SetActive(false);
         Refresh();
@@ -61,6 +64,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         data.master = this.master;
         data.background = this.background;
         data.autoPlay = this.autoPlay;
+        data.showRange = this.showRange;
     }
     
     void Awake()
@@ -98,6 +102,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         soundManager.backgroundVolume = this.background;
         screenShakeTick.SetActive(screenShake);
         autoPlayTick.SetActive(autoPlay);
+        showRangeTick.SetActive(showRange);
 
         if(graphics == 1)
         {
@@ -192,6 +197,14 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         autoPlay = !autoPlay;
         autoPlayTick.SetActive(autoPlay);
+        DataPersistenceManager.instance.SaveGame();
+    }
+
+    //ShowRange
+    public void ChangeShowRange()
+    {
+        showRange = !showRange;
+        showRangeTick.SetActive(showRange);
         DataPersistenceManager.instance.SaveGame();
     }
 

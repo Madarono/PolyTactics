@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2286615524633741734}
   - component: {fileID: 2716599850192403846}
   - component: {fileID: 7630441720051277810}
+  - component: {fileID: 8015202889030640900}
   m_Layer: 6
   m_Name: SplashRedTurrent
   m_TagString: Untagged
@@ -109,6 +110,7 @@ MonoBehaviour:
   upgrade: {fileID: 3976183099182109082}
   upgradeManager: {fileID: 0}
   manager: {fileID: 0}
+  sound: {fileID: 0}
   isDebug: 0
   targetting: 0
   bulletDamage: 5
@@ -117,10 +119,15 @@ MonoBehaviour:
   rotationSpeed: 1
   bulletPierce: 1
   fireForce: 4
+  rangeObj: {fileID: 1593989787923080698}
+  rangeRend: {fileID: 295638536595642978}
+  range: 3
+  isSelected: 0
   splashPool: {fileID: 0}
   splashColor: {r: 0.6156863, g: 0.1882353, b: 0.23137255, a: 0.47058824}
   explosionRadius: 3
   spreadTransfer: 0.9
+  hitLine: {fileID: 0}
   criticalChance: 10
   criticalMultiplter: 2
   criticalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -137,16 +144,33 @@ MonoBehaviour:
   passiveDamage: 0.01
   timeTillRemoval: 1
   debuffEnemies: []
+  incomeGenerated: 50
+  incomePercentage: 0
+  wavePercentage: 0
+  refundPercentage: 0.7
+  incomeVisual: {fileID: 0}
+  durationTillHide: 0
+  chargingTime: 2
+  shotsTillHeated: 100
+  currentShots: 0
+  timeTillCooldown: 5
+  passiveUpgrade: []
+  idleColor: {r: 0, g: 0, b: 0, a: 0}
+  coolingColor: {r: 0, g: 0, b: 0, a: 0}
+  rend: {fileID: 0}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  towersNear: []
   towerAnim: {fileID: 7630441720051277810}
   o_reloadTime: 0
   angleOffset: 0
   firePoint: {fileID: 7067190202493610572}
   bulletPrefab: {fileID: 6721577312124110301, guid: 2538468f1956decf38e066361499d991, type: 3}
   immunityDuration: 2
-  rangeObj: {fileID: 1593989787923080698}
-  rangeRend: {fileID: 295638536595642978}
-  range: 3
-  isSelected: 0
+  magnitude: 0
+  time: 0
   predictionMultiplyer: 5
   enemy: []
   lockOnEnemy: {fileID: 0}
@@ -164,6 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tower: {fileID: 3750927409945943480}
+  extraStats: {fileID: 0}
   upgrades:
   - bulletDamage: 5
     bulletPrice: 0
@@ -187,6 +212,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 7
     bulletPrice: 60
     pierce: 0
@@ -209,6 +242,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 10
     bulletPrice: 120
     pierce: 0
@@ -231,6 +272,14 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   - bulletDamage: 15
     bulletPrice: 200
     pierce: 0
@@ -253,7 +302,16 @@ MonoBehaviour:
     passivePrice: 0
     immunityDecay: 0
     immunityPrice: 0
+    incomeGenerated: 0
+    incomePrice: 0
+    incomePercentage: 0
+    clusterPrice: 0
+    wavePercentage: 0
+    wavePrice: 0
+    refundPercentage: 0
+    refundPrice: 0
   sellValue: 0
+  baseValue: 0
   provideTargetting: 1
   individualLv: 000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &2286615524633741734
@@ -373,6 +431,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8015202889030640900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 893333899653937781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ced10dd8c7a6c184b815d50361b35880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tower: {fileID: 3750927409945943480}
+  rangeIncrease: 0
+  damageIncrease: 0
+  reloadDecrease: 0
+  pierceIncrease: 0
+  track:
+  - 0
+  - 0
+  - 0
+  - 0
+  isUnderRange: 0
 --- !u!1 &1593989787923080698
 GameObject:
   m_ObjectHideFlags: 0

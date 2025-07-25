@@ -7,6 +7,7 @@ public class GameData
     //PauseSystem.cs
     public bool screenShake;
     public bool autoPlay;
+    public bool showRange;
     public int graphics;
     public float master;
     public float background;
@@ -29,6 +30,7 @@ public class GameData
         //PauseSystem.cs
         this.screenShake = true;
         this.autoPlay = false;
+        this.showRange = true;
         this.graphics = 1;
         this.master = 1;
         this.background = 1;
