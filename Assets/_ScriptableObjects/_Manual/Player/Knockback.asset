@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 844938633, guid: 8b621e00a3fc1cc4eb86289fa3f45777, type: 3}
   name: Knock-Back
-  info: A turrent that can shoot bullet knocking back enemies to the exit
+  info: A turrent that can shoot bullet knocking back enemies away from the exit
