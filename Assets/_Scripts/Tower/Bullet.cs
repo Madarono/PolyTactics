@@ -19,6 +19,10 @@ public class Bullet : MonoBehaviour
     public float explosionRadius = 3f;
     public float spreadTransfer = 0.5f;
 
+    [Header("Special Attributes - Knockback")]
+    public float magnitude = 0.25f;
+    public float _duration = 0.05f;
+
     
     void OnTriggerEnter2D(Collider2D col)
     {
@@ -26,7 +30,7 @@ public class Bullet : MonoBehaviour
         {
             float multiplyer = enemy.PI_Shield;
             TowerType type = tower.towerType;
-            if(type == TowerType.Minigun)
+            if(type == TowerType.Minigun || type == TowerType.Knockback)
             {
                 type = TowerType.Basic;
             }
@@ -49,6 +53,14 @@ public class Bullet : MonoBehaviour
             }
 
             enemy.HurtEnemy(damage * multiplyer);
+            if(tower.towerType == TowerType.Knockback)
+            {
+                enemy.StartCoroutine(enemy.Knockback(tower.durationBack, tower.backMultipler * multiplyer));
+                if(tower.backMultipler >= 4 && PauseSystem.Instance.screenShake)
+                {
+                    CameraShake.Instance.Shake(_duration, magnitude);
+                }
+            }
             if(enemy != null) //If the damage killed the enemy
             {
                 enemy.Refresh();

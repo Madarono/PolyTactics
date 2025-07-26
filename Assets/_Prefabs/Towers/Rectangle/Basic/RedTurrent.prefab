@@ -387,6 +387,14 @@ MonoBehaviour:
     wavePrice: 0
     refundPercentage: 0
     refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 3
     bulletPrice: 40
     pierce: 2
@@ -417,6 +425,14 @@ MonoBehaviour:
     wavePrice: 0
     refundPercentage: 0
     refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 4
     bulletPrice: 65
     pierce: 3
@@ -447,6 +463,14 @@ MonoBehaviour:
     wavePrice: 0
     refundPercentage: 0
     refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   - bulletDamage: 6
     bulletPrice: 140
     pierce: 4
@@ -477,6 +501,14 @@ MonoBehaviour:
     wavePrice: 0
     refundPercentage: 0
     refundPrice: 0
+    rangeIncrease: 0
+    _rangePrice: 0
+    damageIncrease: 0
+    _damagePrice: 0
+    reloadDecrease: 0
+    _reloadPrice: 0
+    pierceIncrease: 0
+    _piercePrice: 0
   sellValue: 0
   baseValue: 0
   provideTargetting: 1
@@ -636,3 +668,4 @@ MonoBehaviour:
   - 0
   - 0
   isUnderRange: 0
+  villageVisual: {fileID: 0}

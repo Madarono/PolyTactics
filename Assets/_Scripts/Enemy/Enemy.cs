@@ -10,6 +10,13 @@ public class Immunity
     public Color immunityColor;
 }
 
+[System.Serializable]
+public class PosRotation
+{
+    public float objRot;
+    public Transform barPos;
+}
+
 public class Enemy : MonoBehaviour
 {
     [HideInInspector]public EnemyManager manager;
@@ -29,6 +36,10 @@ public class Enemy : MonoBehaviour
     public float rotationRatio = 10/3;
     private float rotationSpeed = 2f;
     public float requirementDistance = 0.01f;
+
+    [Header("Going back")]
+    public bool reverseMovement = false;
+    public float reverseMultipler = 1f;
 
     [Header("Health bar")]
     public Transform healthBar;
@@ -86,6 +97,10 @@ public class Enemy : MonoBehaviour
     private GameObject healthBarParent;
     public float delayTillHide = 3f;
     Coroutine healthBarCoroutine;
+
+    [Header("SpriteVisual")]
+    public Transform visual;
+
     
 
     void Start()
@@ -277,18 +292,43 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        if(reverseMovement)
+        {
+            int reverseIndex = Mathf.Max(waypointIndex - 1, 0);
+            transform.position = Vector3.MoveTowards(transform.position, waypoint[reverseIndex], Time.deltaTime * speed * reverseMultipler);
+        
+            Vector3 direction1 = waypoint[reverseIndex] - transform.position;
+            float angle1 = Mathf.Atan2(direction1.y, direction1.x) * Mathf.Rad2Deg;
+            Quaternion rot1 = Quaternion.Euler(0f, 0f, angle1);
+
+            visual.rotation = Quaternion.Lerp(visual.rotation, rot1, Time.deltaTime * rotationSpeed);
+
+            float distance1 = Vector2.Distance(transform.position, waypoint[reverseIndex]);
+            if((distance1 <= requirementDistance))
+            {
+                waypointIndex = Mathf.Max(waypointIndex - 1, 0);
+            }
+            if (waypointIndex == 0 && distance1 <= requirementDistance)
+            {
+                reverseMovement = false;
+            }
+
+            return;
+        }
+
         transform.position = Vector3.MoveTowards(transform.position, waypoint[waypointIndex], Time.deltaTime * speed);
         
         Vector3 direction = waypoint[waypointIndex] - transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rot = Quaternion.Euler(0f, 0f, angle);
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * rotationSpeed);
+        visual.rotation = Quaternion.Lerp(visual.rotation, rot, Time.deltaTime * rotationSpeed);
 
         float distance = Vector2.Distance(transform.position, waypoint[waypointIndex]);
         if((distance <= requirementDistance) && waypointIndex <= waypoint.Count - 1)
         {
             waypointIndex++;
+
             if(waypointIndex == waypoint.Count)
             {
                 settings.health -= damageToBase;
@@ -360,6 +400,15 @@ public class Enemy : MonoBehaviour
             }
             RemoveImmunities();
         }
+    }
+
+    public IEnumerator Knockback(float duration, float power)
+    {
+        reverseMultipler = power;
+        reverseMovement = true;
+        yield return new WaitForSeconds(duration);
+        reverseMultipler = 1f;
+        reverseMovement = false;
     }
 
     IEnumerator HealShield()

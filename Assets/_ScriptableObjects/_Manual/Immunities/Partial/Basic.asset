@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Basic
   m_EditorClassIdentifier: 
   icon: {fileID: -1817934325, guid: 1fb3d96c8391e494da1c3b6f194d9fab, type: 3}
-  name: Partial (Basic/Minigun)
-  info: Partial immunity from (Basic/Minigun) tower type
+  name: Partial (Basic/Minigun/Knockback)
+  info: Partial immunity from (Basic/Minigun/Knockback) tower type

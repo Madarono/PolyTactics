@@ -39,7 +39,8 @@ public enum TowerType
     Debuff,
     Farm,
     Minigun,
-    Village
+    Village,
+    Knockback
 }
 
 public class Tower : MonoBehaviour
@@ -127,6 +128,10 @@ public class Tower : MonoBehaviour
     public float reloadDecrease;
     public int pierceIncrease;
     public List<ExtraStats> towersNear = new List<ExtraStats>();
+
+    [Header("Special Attributes - Knockback")]
+    public float backMultipler = 2f;
+    public float durationBack = 1f;
 
     [Header("Animation")]
     public Animator towerAnim;
@@ -268,7 +273,7 @@ public class Tower : MonoBehaviour
 
     void Shoot()
     {
-        if (towerType == TowerType.Basic || towerType == TowerType.Splash || towerType == TowerType.Minigun)
+        if (towerType == TowerType.Basic || towerType == TowerType.Splash || towerType == TowerType.Minigun || towerType == TowerType.Knockback)
         {
             GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
             bulletObj.transform.position = firePoint.position;
@@ -293,7 +298,7 @@ public class Tower : MonoBehaviour
 
                 Destroy(bulletObj, bulletLifespan);
 
-                if(towerType == TowerType.Basic)
+                if(towerType == TowerType.Basic || towerType == TowerType.Minigun)
                 {
                     sound.PlayClip(sound.basicShoot, 1f);
                 }
@@ -459,7 +464,7 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        if(towerType == TowerType.Basic || towerType == TowerType.Sniper || towerType == TowerType.Splash || towerType == TowerType.Minigun)
+        if(towerType == TowerType.Basic || towerType == TowerType.Sniper || towerType == TowerType.Splash || towerType == TowerType.Minigun || towerType == TowerType.Knockback)
         {
             switch(targetting)
             {

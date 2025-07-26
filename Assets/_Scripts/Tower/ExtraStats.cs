@@ -34,6 +34,7 @@ public class ExtraStats : MonoBehaviour
         tower.reloadTime = tower.o_reloadTime;
         tower.bulletPierce = (int)track[3] + pierceIncrease; 
         tower.UpdateRange();
+
     }
 
     public void ReturnToDefaults()

@@ -152,4 +152,4 @@ MonoBehaviour:
   slownessPercent: 0.4
   isBomb: 1
   percentOfDamage: 0.25
-  maxDamage: 50
+  maxDamage: 999

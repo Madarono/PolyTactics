@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83246e4061482615a9d7e7907420c0df, type: 3}
+  m_Name: Knockback
+  m_EditorClassIdentifier: 
+  faction: 4
+  icon: {fileID: 844938633, guid: 8b621e00a3fc1cc4eb86289fa3f45777, type: 3}
+  towerIndex: 17
+  isTrap: 0
+  limit: 0
+  isFarm: 0

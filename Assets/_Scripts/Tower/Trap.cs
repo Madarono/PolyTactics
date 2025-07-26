@@ -17,6 +17,10 @@ public class Trap : MonoBehaviour
     public float percentOfDamage;
     public float maxDamage;
 
+    [Header("Bomb - Explode")]
+    public float magnitude = 0.2f;
+    public float duration = 0.1f;
+
     private float cacheSpeed;
 
     void OnTriggerEnter2D(Collider2D col)
@@ -28,7 +32,13 @@ public class Trap : MonoBehaviour
             if(isBomb)
             {
                 float damage = Mathf.Min(enemy.o_health * percentOfDamage, maxDamage);
-                enemy.health -= damage;
+                enemy.HurtEnemy(damage);
+                SoundManager.Instance.PlayClip(SoundManager.Instance.explosion, 1f);
+                if(PauseSystem.Instance.screenShake)
+                {
+                    CameraShake.Instance.Shake(duration, magnitude);
+                }
+
                 enemy.Refresh();
             }
             else

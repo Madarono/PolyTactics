@@ -82,6 +82,10 @@ public class Upgrades
     public float pierceIncrease;
     public int _piercePrice;
 
+    [Header("Knockback - Power")]
+    public float powerMultipler;
+    public int powerPrice;
+
 }
 
 public class TowerUpgrade : MonoBehaviour
@@ -94,11 +98,11 @@ public class TowerUpgrade : MonoBehaviour
     public bool provideTargetting = true;
 
     [Tooltip("Every index is equal to the index in the upgrades showing individual level to each upgrade")]
-    public int[] individualLv = new int[19];
+    public int[] individualLv = new int[20];
 
     void Start()
     {
-        individualLv = new int[19];
+        individualLv = new int[20];
         if(extraStats == null)
         {
             extraStats = GetComponent<ExtraStats>();
@@ -130,6 +134,7 @@ public class TowerUpgrade : MonoBehaviour
         tower.damageIncrease = upgrades[individualLv[16]].damageIncrease;
         tower.reloadDecrease = upgrades[individualLv[17]].reloadDecrease;
         tower.pierceIncrease = (int)upgrades[individualLv[18]].pierceIncrease;
+        tower.backMultipler = (int)upgrades[individualLv[19]].powerMultipler;
 
         if(tower.passiveUpgrade.Length > 0)
         {

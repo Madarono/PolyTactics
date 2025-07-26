@@ -48,6 +48,9 @@ public class UpgradeManager : MonoBehaviour
     public TextMeshProUGUI _reloadVisual;
     public TextMeshProUGUI _pierceVisual;
 
+    public TextMeshProUGUI powerVisual;
+
+
 
     public TextMeshProUGUI targettingVisual;
     public TextMeshProUGUI priceVisual;
@@ -76,6 +79,8 @@ public class UpgradeManager : MonoBehaviour
     public GameObject _damageObj;
     public GameObject _reloadObj;
     public GameObject _pierceObj;
+
+    public GameObject powerObj;
 
     public GameObject targettingObj;
     public GameObject freezerObj;
@@ -334,6 +339,15 @@ public class UpgradeManager : MonoBehaviour
         else
         {
             _pierceObj.SetActive(false);
+        }
+        if(tower.upgrades[0].powerMultipler > 0)
+        {
+            powerObj.SetActive(true);
+            powerVisual.text = tower.upgrades[tower.individualLv[19]].powerMultipler.ToString("F1");
+        }
+        else
+        {
+            powerObj.SetActive(false);
         }
 
 
@@ -732,6 +746,23 @@ public class UpgradeManager : MonoBehaviour
         {
             prices[18] = 0;
             _pierceVisual.text = tower.upgrades[tower.individualLv[18]].pierceIncrease.ToString("F1");
+        }
+
+        if(levels[19] > tower.individualLv[19])
+        {
+            powerVisual.text =  tower.upgrades[tower.individualLv[19]].powerMultipler.ToString("F1") + " -> " + tower.upgrades[levels[19]].powerMultipler.ToString("F1");
+            int difference = levels[19] - tower.individualLv[19];
+
+            prices[19] = 0;
+            for(int i = tower.individualLv[19] + 1; i <= levels[19]; i++)
+            {
+                prices[19] += tower.upgrades[i].powerPrice;
+            } 
+        }
+        else
+        {
+            prices[19] = 0;
+            powerVisual.text = tower.upgrades[tower.individualLv[18]].powerMultipler.ToString("F1");
         }
 
         finalPrice = 0;
