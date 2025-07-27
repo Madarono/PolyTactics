@@ -241,7 +241,7 @@ public class EnemyManager : MonoBehaviour
             TowerManager towerManager = TowerManager.Instance;
             if(PauseSystem.Instance.autoPlay)
             {
-                settings.ShowWave();
+                settings.ShowWave(0);
                 soundManager.PlayClip(soundManager.endOfRound, 1f);
                 towerManager.EndOfRoundChecks();
 

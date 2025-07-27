@@ -113,10 +113,11 @@ public class Settings : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void ShowWave()
+    public void ShowWave(int offset)
     {
         int waveCount = WaveRandomizer.Instance.waveCount;
-        waveVisual.text = "Wave: " + enemyManager.currentWave.ToString() + "/" + waveCount.ToString();
+        int currentWave = enemyManager.currentWave + offset;
+        waveVisual.text = "Wave: " + currentWave + "/" + waveCount.ToString();
     }
 
     public void SpeedUp()
@@ -127,7 +128,7 @@ public class Settings : MonoBehaviour, IDataPersistence
             isSpeeding = false;
             enemyManager.enemiesLeft = 0;
             enemyManager.StartWave();
-            ShowWave();
+            ShowWave(1);
             soundManager.PlayClip(soundManager.beginWave, 1f);
             return;
         }

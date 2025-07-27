@@ -794,6 +794,7 @@ public class Tower : MonoBehaviour
         if(upgradeManager.tower == upgrade)
         {
             upgradeManager.tower = null;
+            upgradeManager.debugRange.SetActive(false);
         }
     }
 }

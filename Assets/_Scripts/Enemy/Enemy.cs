@@ -81,6 +81,14 @@ public class Enemy : MonoBehaviour
     private bool determinedImmunity;
     [HideInInspector]public int cacheImmunity;
 
+    [Header("Ghost")]
+    public bool isGhost = false;
+    public Collider2D col;
+    public float ghostCooldown = 2;
+    public float ghostDuration = 2; 
+    public Color ghostColor = new Color(1f,1f,1f,60f / 255f);
+    public Color normalColor = new Color(1f,1f,1f,1f);
+
     [Header("Camera shake Base")]
     public float magnitude = 0.05f;
     public float time = 0.1f; 
@@ -150,6 +158,11 @@ public class Enemy : MonoBehaviour
         if(!determinedImmunity)
         {
             DetermineImmunity();
+        }
+
+        if(isGhost)
+        {
+            StartCoroutine(Ghost());
         }
         overlayEffect.gameObject.SetActive(false);
         o_health = health;
@@ -449,6 +462,50 @@ public class Enemy : MonoBehaviour
             } 
 
             yield return new WaitForSeconds(healDelay);
+        }
+    }
+
+    IEnumerator Ghost()
+    {
+        SpriteRenderer rend = new SpriteRenderer();
+
+        if(visual.gameObject.TryGetComponent(out SpriteRenderer script))
+        {
+            rend = script;
+        }
+
+        while(true)
+        {
+            yield return new WaitForSeconds(ghostCooldown);
+            immunityEffect.enabled = false;
+            overlayEffect.enabled = false;
+            criticalEffect.enabled = false;
+            col.enabled = false;
+            //Fade to ghostColor over time
+            float _time = 0f;
+            float duration = 0.25f;
+            Color startColor = rend.color;
+
+            while (_time < 1f)
+            {
+                _time += Time.deltaTime / duration;
+                rend.color = Color.Lerp(startColor, ghostColor, _time);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(ghostDuration);
+            col.enabled = true;
+            immunityEffect.enabled = true;
+            overlayEffect.enabled = true;
+            criticalEffect.enabled = true;
+
+            _time = 0f;
+            while (_time < 1f)
+            {
+                _time += Time.deltaTime / duration;
+                rend.color = Color.Lerp(ghostColor, startColor, _time);
+                yield return null;
+            }
         }
     }
 }

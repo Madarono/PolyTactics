@@ -10,6 +10,7 @@ public class TowerPrefab
 {
     public GameObject prefab;
     public GameObject display;
+    public string name;
     public int price;
 }
 
@@ -52,6 +53,7 @@ public class TowerManager : MonoBehaviour
     public List<Tower> farm = new List<Tower>(); //To directly access farms for money
     public List<Tower> villages = new List<Tower>(); //To directly access villages
     public TextMeshProUGUI priceVisual;
+    public TextMeshProUGUI nameVisual;
 
     [Header("Keep track of TowerSlots")]
     public TowerSlot currentSlot;
@@ -289,6 +291,7 @@ public class TowerManager : MonoBehaviour
         }
         HideOtherTowerInfo();
         selectedPrefab = towerPrefab[index].prefab;
+        nameVisual.text = towerPrefab[index].name;
         currentPrefabIndex = index;
         priceVisual.text = "$" + towerPrefab[index].price.ToString();
         isSelecting = true;
