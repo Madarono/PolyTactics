@@ -45,6 +45,8 @@ public enum TowerType
 
 public class Tower : MonoBehaviour
 {
+    public bool isShocked = false;
+
     [Header("Identity")]
     public Factions faction;
     public TowerType towerType;
@@ -181,6 +183,11 @@ public class Tower : MonoBehaviour
 
     void Update()
     {
+        if(isShocked)
+        {
+            return;
+        }
+
         if(reloadTime > 0 && canShoot)
         {
             reloadTime -= Time.deltaTime;
@@ -224,7 +231,7 @@ public class Tower : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(towerType == TowerType.Farm || towerType == TowerType.Village)
+        if(towerType == TowerType.Farm || towerType == TowerType.Village || isShocked)
         {
             return;
         } 
@@ -273,6 +280,11 @@ public class Tower : MonoBehaviour
 
     void Shoot()
     {
+        if(isShocked)
+        {
+            return;
+        }
+        
         if (towerType == TowerType.Basic || towerType == TowerType.Splash || towerType == TowerType.Minigun || towerType == TowerType.Knockback)
         {
             GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);

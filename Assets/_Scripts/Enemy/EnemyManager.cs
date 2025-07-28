@@ -61,6 +61,7 @@ public class EnemyManager : MonoBehaviour
     public int[] waveWeight;
     public int spawnLeft;
     public int enemiesLeft;
+    public List<GameObject> currentEnemy = new List<GameObject>();
     public DifficultyMultiplier[] multiplyer;
 
     [Header("Scaling")]
@@ -86,6 +87,10 @@ public class EnemyManager : MonoBehaviour
     public Transform[] waypoints;
     public Transform spawnPoint;
     public Transform enemyParent;
+
+    [Header("For Enemy - Explosion")]
+    public Pool explosivePool;
+    public Color shockColor;
 
     void Awake()
     {
@@ -203,7 +208,7 @@ public class EnemyManager : MonoBehaviour
         {
             SendEnemy(enemyWave[i]);
             spawnLeft--;
-            enemiesLeft++;
+            currentEnemy.Add(enemyWave[i]);
             if(i + 1 != enemyWave.Count)
             {
                 yield return new WaitForSeconds(enemyDelay[i + 1]);
@@ -230,11 +235,11 @@ public class EnemyManager : MonoBehaviour
     public void DestroyEnemy(GameObject enemy)
     {
         enemy.SetActive(false);
-        enemiesLeft--;
-        if(enemiesLeft <= 0 && spawnLeft <= 0)
+        currentEnemy.Remove(enemy);
+        if(spawnLeft <= 0 && currentEnemy.Count == 0)
         {
+            currentEnemy.Clear();
             currentWave++;
-            enemiesLeft = 0;
             spawnLeft = 0;
             settings.money += Mathf.RoundToInt(waveReward * (1 + (rewardScale * currentWave)) * coinMultipler[index].multiplyer);
             settings.UpdateVisual();
@@ -251,6 +256,58 @@ public class EnemyManager : MonoBehaviour
             {
                 settings.SetNormalSpeed();
             }
+        }
+    }
+
+
+    //For enemy
+    public void CallExplosiveRange(float duration, float range, float shockDuration, Transform placement)
+    {
+        GameObject explosion = explosivePool.GetFromPool();
+        explosion.transform.position = placement.position;
+        explosion.transform.localScale = new Vector3(range, range, explosion.transform.localScale.z);
+
+        StartCoroutine(ReturnToPoolAfter(explosion, duration, explosivePool));
+
+        //Physics
+        LayerMask towerLayer = LayerMask.GetMask("Tower");
+        Collider2D[] hits = Physics2D.OverlapCircleAll(placement.position, range / 2, towerLayer);
+        List<Tower> towers = new List<Tower>();
+        List<SpriteRenderer> towerRend = new List<SpriteRenderer>();
+
+        foreach(Collider2D hit in hits)
+        {
+            if(hit.TryGetComponent(out Tower tower) && hit.TryGetComponent(out SpriteRenderer rend))
+            {
+                towers.Add(tower);
+                tower.isShocked = true;
+                tower.HideInfo();
+                tower.rangeRend.enabled = false;
+                rend.color = shockColor;
+                towerRend.Add(rend);
+            }
+        }
+
+        StartCoroutine(StopShock(towers, towerRend, shockDuration));
+    }
+
+    IEnumerator StopShock(List<Tower> towersList, List<SpriteRenderer> rend, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        Color white = new Color(1,1,1,1);
+        for(int i = 0; i < rend.Count; i++)
+        {
+            towersList[i].isShocked = false;
+            rend[i].color = white;
+        }
+    }
+
+    IEnumerator ReturnToPoolAfter(GameObject obj, float delay, Pool pool)
+    {
+        yield return new WaitForSeconds(delay);
+        if(pool != null && pool.storageParent.transform.childCount > 0 && obj.transform.IsChildOf(pool.storageParent.transform))
+        {
+            pool.ReturnToPool(obj);
         }
     }
 

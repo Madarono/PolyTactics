@@ -6797,6 +6797,7 @@ GameObject:
   - component: {fileID: 227009674}
   - component: {fileID: 227009675}
   - component: {fileID: 227009676}
+  - component: {fileID: 227009683}
   - component: {fileID: 227009678}
   m_Layer: 0
   m_Name: UniversalScripts
@@ -6979,6 +6980,10 @@ MonoBehaviour:
       weight: 2
       durationTillPut: 0.5
       requiredWave: 5
+    - enemy: {fileID: 3744246206394951786, guid: a2bf1d6b4300e414595edc81ca165daa, type: 3}
+      weight: 3
+      durationTillPut: 1
+      requiredWave: 6
   - faction: 1
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 2e63ad22eea3b5ff48dd919a068d5f36, type: 3}
@@ -7005,6 +7010,10 @@ MonoBehaviour:
       weight: 2
       durationTillPut: 0.5
       requiredWave: 5
+    - enemy: {fileID: 3744246206394951786, guid: e5a9e8ae866bf2a46a629c6dd98f1f56, type: 3}
+      weight: 3
+      durationTillPut: 1
+      requiredWave: 6
   - faction: 3
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 731aaf563a93f7da294a7749e70f0332, type: 3}
@@ -7031,6 +7040,10 @@ MonoBehaviour:
       weight: 2
       durationTillPut: 0.5
       requiredWave: 5
+    - enemy: {fileID: 3744246206394951786, guid: 2d3b50c7958cdfe47903199fe280762f, type: 3}
+      weight: 3
+      durationTillPut: 1
+      requiredWave: 6
   - faction: 0
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 76bff327b671f3f3984c11dd529e64f1, type: 3}
@@ -7057,12 +7070,17 @@ MonoBehaviour:
       weight: 2
       durationTillPut: 0.5
       requiredWave: 5
+    - enemy: {fileID: 3744246206394951786, guid: 19f3f1ec45dd35b4eb7f28a19d3159b4, type: 3}
+      weight: 3
+      durationTillPut: 1
+      requiredWave: 6
   index: 0
   enemyIndex: 0
   currentWave: 0
   waveWeight: 010000000100000001000000
   spawnLeft: 0
   enemiesLeft: 0
+  currentEnemy: []
   multiplyer:
   - difficulty: 0
     multiplyer: 0.5
@@ -7123,6 +7141,8 @@ MonoBehaviour:
   - {fileID: 1738690028}
   spawnPoint: {fileID: 1478220887}
   enemyParent: {fileID: 1390721553}
+  explosivePool: {fileID: 227009683}
+  shockColor: {r: 0.8867924, g: 0.7345318, b: 0.56051975, a: 1}
 --- !u!114 &227009670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7789,6 +7809,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: d461efbb0b9652240a520cae7c009013, type: 2}
     - {fileID: 11400000, guid: b1ffda6e2863e2246b845af0baa93867, type: 2}
     - {fileID: 11400000, guid: ba7ec2c7b4f56f84cb627cba89c81b1d, type: 2}
+    - {fileID: 11400000, guid: f6a5c8b49836d2f48a09de45de729529, type: 2}
     redItems:
     - {fileID: 11400000, guid: 044d0fa5f99dffa4d89fcd376774e2a3, type: 2}
     - {fileID: 11400000, guid: 36d0c0cb0eaf9d54e97ab6d29790bbb5, type: 2}
@@ -7797,6 +7818,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: f9bb39f696004c84e93a46519917ac0c, type: 2}
     - {fileID: 11400000, guid: 2d3df4ffb70eb484f9aaf893f1a213e6, type: 2}
     - {fileID: 11400000, guid: 429937c5bc4f9404fae6f704c495a8f9, type: 2}
+    - {fileID: 11400000, guid: 424f835662aa67248a68b53fe230408f, type: 2}
     greenItems:
     - {fileID: 11400000, guid: 7db3a510a777f62449c3058a9275e364, type: 2}
     - {fileID: 11400000, guid: a922c1cabc86ed049a9d287e98da8862, type: 2}
@@ -7805,6 +7827,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b96e64a9089db9643bda2b4e8a9cf446, type: 2}
     - {fileID: 11400000, guid: 6494d14828b53cf4488d3a8b6fe568ab, type: 2}
     - {fileID: 11400000, guid: 2f553f4a76ce90d4fad60a49fb322089, type: 2}
+    - {fileID: 11400000, guid: 355028ec7a71b4b44befcd298e6d8c74, type: 2}
     yellowItems:
     - {fileID: 11400000, guid: ffeae09cfad42ab45ad620281c18d447, type: 2}
     - {fileID: 11400000, guid: 6af82e580c59d97468ea2b1a97ec81af, type: 2}
@@ -7813,6 +7836,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 65b0fd22eac6d8945a5f10523d3a4aa8, type: 2}
     - {fileID: 11400000, guid: 798b5eaf21b47d345a04270300672b83, type: 2}
     - {fileID: 11400000, guid: e4e9d49b84f0f124da6f275d182cf28a, type: 2}
+    - {fileID: 11400000, guid: 9707c2b2d7d7bb644ace130d137a9871, type: 2}
   - window: {fileID: 556666406}
     spawnParent: {fileID: 1841688314}
     background: {fileID: 2034537552}
@@ -8023,6 +8047,21 @@ MonoBehaviour:
     spawnpoint: {fileID: 1660496464}
   mapIndex: 2
   randomIndex: 0
+--- !u!114 &227009683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227009666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb3ce15f450fe8aeabaa1005b393e340, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 2183374079613500071, guid: ad7f1a56b862b23d5afad08d440f3f07, type: 3}
+  storageParent: {fileID: 1617390468}
+  initialSize: 20
 --- !u!1 &228326802
 GameObject:
   m_ObjectHideFlags: 0

@@ -122,11 +122,10 @@ public class Settings : MonoBehaviour, IDataPersistence
 
     public void SpeedUp()
     {
-        if(enemyManager.enemiesLeft <= 0 && enemyManager.spawnLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length) //Starting wave
+        if(enemyManager.currentEnemy.Count <= 0 && enemyManager.spawnLeft <= 0 && enemyManager.currentWave < enemyManager.waveWeight.Length) //Starting wave
         {
             speedIcon.sprite = icons[1];
             isSpeeding = false;
-            enemyManager.enemiesLeft = 0;
             enemyManager.StartWave();
             ShowWave(1);
             soundManager.PlayClip(soundManager.beginWave, 1f);

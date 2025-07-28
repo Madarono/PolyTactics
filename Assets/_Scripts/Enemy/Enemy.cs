@@ -89,6 +89,12 @@ public class Enemy : MonoBehaviour
     public Color ghostColor = new Color(1f,1f,1f,60f / 255f);
     public Color normalColor = new Color(1f,1f,1f,1f);
 
+    [Header("Explosive")]
+    public bool isExplosive = false;
+    public float explosionRange = 3f;
+    public float explosionDuration = 0.5f;
+    public float shockDuration = 2f;
+
     [Header("Camera shake Base")]
     public float magnitude = 0.05f;
     public float time = 0.1f; 
@@ -144,6 +150,7 @@ public class Enemy : MonoBehaviour
             foreach(Enemy script in childEnemies)
             {
                 script.manager = manager;
+                manager.currentEnemy.Add(script.gameObject);
                 script.settings = settings;
                 script.health = script.health * (1 + (manager.healthScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
                 script.shieldHealth = script.shieldHealth * (1 + (manager.healthScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
@@ -290,6 +297,10 @@ public class Enemy : MonoBehaviour
                     script.transform.SetParent(manager.enemyParent);
                     manager.enemiesLeft++;
                 }
+            }
+            if(isExplosive)
+            {
+                manager.CallExplosiveRange(explosionDuration, explosionRange, shockDuration, transform);
             }
             settings.money += moneyReward;
             settings.UpdateVisual();
@@ -508,4 +519,6 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+
+    
 }
