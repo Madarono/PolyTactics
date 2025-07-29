@@ -125,6 +125,11 @@ public class EnemyManager : MonoBehaviour
 
     void SetEnemyWaves()
     {
+        if(WaveResources.Instance.finishedBattle)
+        {
+            return;
+        }
+
         if(enemyParent.childCount > 0)
         {
             for (int i = enemyParent.childCount - 1; i >= 0; i--)
@@ -240,6 +245,11 @@ public class EnemyManager : MonoBehaviour
         {
             currentEnemy.Clear();
             currentWave++;
+            if(currentWave == waveWeight.Length && settings.health > 0)
+            {
+                WaveResources.Instance.FinishedBattle(true, true);
+                return;
+            }
             spawnLeft = 0;
             settings.money += Mathf.RoundToInt(waveReward * (1 + (rewardScale * currentWave)) * coinMultipler[index].multiplyer);
             settings.UpdateVisual();

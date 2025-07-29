@@ -82,8 +82,11 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public void CloseWindow()
     {
         canSound = false;
-        Time.timeScale = settings.isSpeeding ? settings.speedValue : 1f;
         StartCoroutine(AnimationCloseWindow(windowAnim, window));
+        if(!WaveResources.Instance.finishedBattle)
+        {
+            Time.timeScale = settings.isSpeeding ? settings.speedValue : 1f;
+        }
     }
 
     public IEnumerator AnimationCloseWindow(Animator anim, GameObject win)
@@ -221,6 +224,6 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     public void ConfirmLeave()
     {
-        Debug.Log("Go to world map and lose this battle");
+        WaveResources.Instance.FinishedBattle(false, false);
     }
 }

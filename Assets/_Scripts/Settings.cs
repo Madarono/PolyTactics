@@ -109,7 +109,7 @@ public class Settings : MonoBehaviour, IDataPersistence
         healthVisual.text = health.ToString();
         if(health <= 0)
         {
-
+            WaveResources.Instance.FinishedBattle(false, true);
         }
     }
 

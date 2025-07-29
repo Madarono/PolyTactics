@@ -25,6 +25,20 @@ public class GameData
     public Factions enemyFaction;
     public Factions playerFaction;
 
+    //WaveResources.cs
+    public int coins;
+    public int grain;
+    public int steel;
+    public int oil;
+    public int uranium;
+
+    //ResourcesStorage.cs
+    public int _coins;
+    public int _grain;
+    public int _steel;
+    public int _oil;
+    public int _uranium;
+
     public GameData()
     {   
         //PauseSystem.cs
@@ -47,5 +61,19 @@ public class GameData
         this.difficulty = Difficulty.Normal;
         this.playerFaction = Factions.Circle;
         this.enemyFaction = Factions.Square;
+
+        //WaveResources.cs
+        this.coins = 0;
+        this.grain = 0;
+        this.steel = 0;
+        this.oil = 0;
+        this.uranium = 0;
+
+        //ResourcesStorage.cs
+        this._coins = 100;
+        this._grain = 0;
+        this._steel = 0;
+        this._oil = 0;
+        this._uranium = 0;
     }
 }

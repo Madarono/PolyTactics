@@ -24,7 +24,7 @@ public class CameraShake : MonoBehaviour
     {
         float elapsed = 0f;
 
-        while (elapsed < duration)
+        while (elapsed < duration && !WaveResources.Instance.finishedBattle)
         {
             float offsetX = Random.Range(-1f, 1f) * magnitude;
             float offsetY = Random.Range(-1f, 1f) * magnitude;
