@@ -1,34 +1,49 @@
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraPinch : MonoBehaviour
 {
+    public static CameraPinch Instance {get; private set;}
     public Camera cam;
     public float zoomSpeed = 0.01f;
     public float panSpeed = 0.01f;
-
     public float maxSize = 50;
     public float minSize = 0;
-
     public Vector3 islandPlace;
-    public float cooldown;
-    private float o_cooldown;
+    public float cooldown = 3f;
+    public float distanceTillReturn = 5f;
     public float cameraSpeed = 10f;
-    private bool returnToIsland;
 
     [Header("Desktop specific")]
     public float scrollSpeed = 40f;
 
     private Vector3 lastPanPosition;
-    private bool isPanning;
+    private bool isPanning = false;
 
-    void Start()
+    private Coroutine returnCoroutine;
+
+    [Header("Requirement to show Dots")]
+    public float zoomRequired;
+
+    void Awake()
     {
-        returnToIsland = false;
-        o_cooldown = cooldown;
+        Instance = this;
     }
 
     void Update()
     {
+        bool interacted = false;
+
+        if(InteractionSystem.Instance.isOpen)
+        {
+            interacted = false;
+            isPanning = false;
+            return;
+        }
+
+        //Zoom
         if (Input.touchCount == 2)
         {
             isPanning = false;
@@ -44,6 +59,26 @@ public class CameraPinch : MonoBehaviour
 
             float delta = currMag - prevMag;
             HandleZoom(delta);
+            interacted = true;
+        }
+
+        //Panning
+        if (Input.touchCount == 1)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+            {
+                lastPanPosition = cam.ScreenToWorldPoint(touch.position);
+                isPanning = true;
+                interacted = true;
+            }
+            else if (touch.phase == TouchPhase.Moved && isPanning)
+            {
+                Vector3 currentPos = cam.ScreenToWorldPoint(touch.position);
+                Vector3 diff = lastPanPosition - currentPos;
+                cam.transform.position += diff;
+                interacted = true;
+            }
         }
         else if (Input.touchCount == 0)
         {
@@ -51,88 +86,73 @@ public class CameraPinch : MonoBehaviour
             {
                 lastPanPosition = cam.ScreenToWorldPoint(Input.mousePosition);
                 isPanning = true;
+                interacted = true;
             }
             else if (Input.GetMouseButton(0) && isPanning)
             {
                 Vector3 currentPos = cam.ScreenToWorldPoint(Input.mousePosition);
                 Vector3 diff = lastPanPosition - currentPos;
                 cam.transform.position += diff;
-                returnToIsland = false;
+                interacted = true;
             }
 
             float scrollDelta = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scrollDelta) > 0f)
             {
                 HandleZoom(scrollDelta * scrollSpeed);
+                interacted = true;
             }
         }
 
-        if (Input.touchCount == 1)
+        if(interacted) //Simply restarts the coroutine
         {
-            Touch touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Began)
+            if(returnCoroutine != null)
             {
-                lastPanPosition = cam.ScreenToWorldPoint(touch.position);
-                isPanning = true;
+                StopCoroutine(returnCoroutine);
+                returnCoroutine = null;
             }
-            else if (touch.phase == TouchPhase.Moved && isPanning)
-            {
-                Vector3 currentPos = cam.ScreenToWorldPoint(touch.position);
-                Vector3 diff = lastPanPosition - currentPos;
-                cam.transform.position += diff;
-                returnToIsland = false;
-            }
-        }
 
-        if(cooldown > 0 && !returnToIsland)
-        {
-            cooldown -= Time.deltaTime;
-        }
-        else
-        {
-            cooldown = o_cooldown;
-            returnToIsland = true;
+            if(Vector3.Distance(transform.position, islandPlace) >= distanceTillReturn)
+            {
+                returnCoroutine = StartCoroutine(ReturnToIslandAfterDelay(cooldown));
+            }
         }
     }
-
-    void FixedUpdate()
-    {
-        if(!returnToIsland)
-        {
-            return;
-        }
-
-        float distance = Vector3.Distance(cam.transform.position, islandPlace);
-        if(distance < 0.1)
-        {
-            cam.transform.position = Vector3.MoveTowards(GetComponent<Camera>().transform.position, islandPlace, Time.deltaTime * cameraSpeed);
-            if(distance == 0)
-            {
-                returnToIsland = false;
-            }
-        }
-        else
-        {
-            cam.transform.position = Vector3.Lerp(GetComponent<Camera>().transform.position, islandPlace, Time.deltaTime * cameraSpeed);
-        }
-    }
-
 
     void HandleZoom(float delta)
     {
-        if(Mathf.Abs(delta) < 0.01f) 
-        {
+        if (Mathf.Abs(delta) < 0.01f)
             return;
-        }
 
         if (cam.orthographic)
         {
             cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - delta * zoomSpeed, minSize, maxSize);
+            if(cam.orthographicSize <= zoomRequired)
+            {
+                InteractionSystem.Instance.ShowDots();
+            }
+            else
+            {
+                InteractionSystem.Instance.HideDots();   
+            }
         }
         else
         {
-            cam.fieldOfView -= delta * zoomSpeed;
+            cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - delta * zoomSpeed, 15f, 100f);
         }
+    }
+
+    IEnumerator ReturnToIslandAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        while (Vector3.Distance(cam.transform.position, islandPlace) > 0.01f)
+        {
+            cam.transform.position = Vector3.Lerp(cam.transform.position, islandPlace, Time.deltaTime * cameraSpeed);
+            yield return null;
+        }
+
+        cam.transform.position = islandPlace;
+        returnCoroutine = null;
     }
 }

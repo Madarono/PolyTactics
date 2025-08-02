@@ -39,6 +39,17 @@ public class GameData
     public int _oil;
     public int _uranium;
 
+    //InteractionSystem.cs
+    public int a_coins;
+    public int a_grains;
+    public int a_steel;
+    public int a_oil;
+    public int a_uranium;
+    public float resourceMultiplyer;
+
+    //Inventory
+    public int[] towerIndex;
+
     public GameData()
     {   
         //PauseSystem.cs
@@ -54,8 +65,8 @@ public class GameData
         this.randomizeMapIndex = true;
 
         //WaveRandomizer.cs
-        this.waveCount = 7;
-        this.maxWaveWeight = 400;
+        this.waveCount = 1;
+        this.maxWaveWeight = 1;
 
         //Settings.cs
         this.difficulty = Difficulty.Normal;
@@ -75,5 +86,16 @@ public class GameData
         this._steel = 0;
         this._oil = 0;
         this._uranium = 0;
+
+        //InteractionSystem.cs
+        this.a_coins = 10;
+        this.a_grains = 5;
+        this.a_steel = 3;
+        this.a_oil = 2;
+        this.a_uranium = 1;
+        this.resourceMultiplyer = 1f;
+
+        //Inventory.cs
+        this.towerIndex = new int[0];
     }
 }

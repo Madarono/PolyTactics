@@ -133,15 +133,15 @@ public class TowerManager : MonoBehaviour
 
     void Update()
     {
-        if (isSelecting)
+        if(isSelecting)
         {
-            if (Application.isMobilePlatform && Input.touchCount > 0)
+            if(Application.isMobilePlatform && Input.touchCount > 0)
             {
                 Touch touch = Input.GetTouch(0);
 
-                if (touch.phase == TouchPhase.Began)
+                if(touch.phase == TouchPhase.Began)
                 {
-                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                    if(EventSystem.current.IsPointerOverGameObject(touch.fingerId))
                     {
                         return;
                     }
@@ -153,9 +153,9 @@ public class TowerManager : MonoBehaviour
                     HandlePlacement(touch.position, map, displayDots, positions, full);
                 }
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if(Input.GetMouseButtonDown(0))
             {
-                if (EventSystem.current.IsPointerOverGameObject())
+                if(EventSystem.current.IsPointerOverGameObject())
                 {
                     return;
                 }
@@ -168,13 +168,13 @@ public class TowerManager : MonoBehaviour
             }
         }
 
-        if (Application.isMobilePlatform && Input.touchCount > 0)
+        if(Application.isMobilePlatform && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
 
-            if (touch.phase == TouchPhase.Began)
+            if(touch.phase == TouchPhase.Began)
             {
-                if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                if(EventSystem.current.IsPointerOverGameObject(touch.fingerId))
                 {
                     return; 
                 }
@@ -182,9 +182,9 @@ public class TowerManager : MonoBehaviour
                 HideOtherTowerInfo();
             }
         }
-        else if (Input.GetMouseButtonDown(0))
+        else if(Input.GetMouseButtonDown(0))
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            if(EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }
@@ -205,7 +205,7 @@ public class TowerManager : MonoBehaviour
         displayPrefab.SetActive(validTile);
         dots[cacheDotIndex].SetActive(true);
     
-        if (validTile)
+        if(validTile)
         {
             displayPrefab.transform.position = map.GetCellCenterWorld(cellPos);
             dots[tileIndex].SetActive(false);
@@ -230,12 +230,12 @@ public class TowerManager : MonoBehaviour
     }
     void PlaceTower(Vector3Int position, int index, List<bool> full)
     {
-        if (selectedPrefab == null)
+        if(selectedPrefab == null)
         {
             return;
         }
 
-        if (!full[index])
+        if(!full[index])
         {
             Tilemap map = isTrap ? trapTilemap : tilemap;
             Vector3 worldPos = map.GetCellCenterWorld(position);

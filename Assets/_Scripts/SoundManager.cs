@@ -41,6 +41,10 @@ public class SoundManager : MonoBehaviour
     public AudioClip beginWave;
     public AudioClip fastForward;
 
+    [Header("WorldMap")]
+    public AudioClip selectDot;
+    public AudioClip deselectDot;
+
     void Awake()
     {
         Instance = this;

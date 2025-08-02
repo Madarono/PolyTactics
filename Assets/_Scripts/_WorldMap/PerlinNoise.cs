@@ -16,10 +16,12 @@ public class FactionWorldMap
 {
     public WorldFactionPosition factionPos;
     public TileBase tile;
+    public Tilemap tileMap;
 }
 
 public class PerlinNoise : MonoBehaviour
 {
+    public static PerlinNoise Instance {get; private set;}
     public CameraPinch pinch;
 
     public int width = 128;
@@ -55,7 +57,12 @@ public class PerlinNoise : MonoBehaviour
     [Header("Camera")]
     public Camera cam;
 
-    void Start()
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    public void InstantiateStart()
     {        
         if(!useSeed)
         {
@@ -115,21 +122,24 @@ public class PerlinNoise : MonoBehaviour
                     selectedFaction = WorldFactionPosition.TopLeft;
                 }
 
+                Tilemap map = ground;
                 float noise = Mathf.PerlinNoise((offsetX + x) * 0.1f, (offsetY + y) * 0.1f);
                 if(noise > 0.5f)
                 {
-                    foreach(var faction in factions)
+                    for(int i = 0; i < factions.Length; i++)
                     {
-                        if (faction.factionPos == selectedFaction)
+                        if (factions[i].factionPos == selectedFaction)
                         {
-                            tile = faction.tile;
+                            tile = factions[i].tile;
+                            map = factions[i].tileMap;
                             assignedFactions.Add(selectedFaction);
                             break;
                         }
                     }
                 }
 
-                ground.SetTile(pos, tile);
+                map.SetTile(pos, tile);
+                ground.SetTile(pos, groundTile);
                 groundShadow.SetTile(pos, shadowTile);
             }
         }
