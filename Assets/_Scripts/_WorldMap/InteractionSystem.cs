@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 [System.Serializable]
@@ -19,6 +20,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
 {
     public static InteractionSystem Instance {get; private set;}
     public Factions playerFaction;
+    public Factions enemyFaction;
     public Camera cam;
 
 
@@ -26,8 +28,8 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public Tilemap ground;
     public Tilemap blue;
     public Tilemap red;
-    public Tilemap green;
     public Tilemap yellow;
+    public Tilemap green;
     private Tilemap tilemap;
 
     [Header("Visual")]
@@ -40,6 +42,8 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public Color dotInactive;
 
     [Header("Values")]
+    public int waves;
+    public float waveWeight;
     public int coins;
     public int grains;
     public int steel;
@@ -53,10 +57,12 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public TextMeshProUGUI steelVisual;
     public TextMeshProUGUI oilVisual;
     public TextMeshProUGUI uraniumVisual;
+    public TextMeshProUGUI waveVisual;
 
     [Header("Choosing Inventory")]
     public List<TowerSlotSO> currentTowers = new List<TowerSlotSO>();
     public List<GameObject> currentTowersObj = new List<GameObject>();
+    public List<int> currentTowersIndex = new List<int>();
     
     public GameObject addButton;
     public GameObject inventoryWindow;
@@ -65,7 +71,6 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public GameObject displayPrefab;
     public Transform displayParent;
     private bool inventoryOn;
-
 
     [Header("Window")]
     public FactionTileBase[] bases;
@@ -79,6 +84,17 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     // public float zoom = 1f;
     // public float zoomSpeed = 20;
     // public float moveSpeed = 10;
+    
+    [Header("Play")]
+    public GameObject playWindow;
+    public Animator playWindowAnim;
+    public GameObject leaveTransition;
+    public float leaveDuration;
+    public float playWindowCloseDuration = 1f;
+    public bool saveLevel;
+    public int[] levelPlace = new int[3];
+    public int levelFaction;
+    public bool hasWon;
 
     private GameObject lastDot;
     private int factionIndex; //For the tilebase
@@ -88,25 +104,57 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     void Awake()
     {
         Instance = this;
+        leaveTransition.SetActive(false);
+        playWindow.SetActive(false);
     }
 
     public void LoadData(GameData data)
     {
-        this.coins = data.a_coins;
-        this.grains = data.a_grains;
-        this.steel = data.a_steel;
-        this.oil = data.a_oil;
-        this.uranium = data.a_uranium;
         this.multiplyer = data.resourceMultiplyer;
-
         this.playerFaction = data.playerFaction;
-        PerlinNoise.Instance.InstantiateStart();
-        InstantiateDots();
-        CalculateGain();
+        this.hasWon = data.hasWon;
+        this.levelPlace = data.levelPlace;
+        
+        if(hasWon)
+        {
+            this.multiplyer += multiplyerincreament;
+        }
+
+        PerlinNoise.Instance.InstantiateStart(data.seed, data.width, data.height); //Call for noice here
+        StartCoroutine(CallLater());
     }
 
     public void SaveData(GameData data)
     {
+        if(saveLevel)
+        {
+            data.a_waves = Mathf.RoundToInt(this.waves * bases[factionIndex].multiplyer * this.multiplyer);
+            data.a_waveWeight = Mathf.RoundToInt(this.waveWeight * bases[factionIndex].multiplyer * this.multiplyer);
+            data.coins = Mathf.RoundToInt(this.coins * bases[factionIndex].multiplyer * this.multiplyer);
+            data.grain = Mathf.RoundToInt(this.grains * bases[factionIndex].multiplyer * this.multiplyer);
+            data.steel = Mathf.RoundToInt(this.steel * bases[factionIndex].multiplyer * this.multiplyer);
+            data.oil = Mathf.RoundToInt(this.oil * bases[factionIndex].multiplyer * this.multiplyer);
+            data.uranium = Mathf.RoundToInt(this.uranium * bases[factionIndex].multiplyer * this.multiplyer);
+            data.resourceMultiplyer = this.multiplyer;
+            data.levelPlace = this.levelPlace;
+            data.enemyFaction = this.enemyFaction;
+            data.hasWon = false; //Change this if there are bugs later on
+            data.slotIndex = this.currentTowersIndex.ToArray();
+        }
+    }
+
+    IEnumerator CallLater()
+    {
+        yield return null;
+        Inventory.Instance.LoadTowers();
+        Inventory.Instance.LoadStockTowers();
+        CheckFaction.Instance.CheckVisuals(playerFaction);
+        if(hasWon) //This is for land
+        {
+            LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
+            LandConquerer.Instance.ApplyPlaces();
+        }
+        InstantiateDots();
     }
 
     //Gains
@@ -234,12 +282,18 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 {
                     UpdateWindow();
                     isOpen = true;
-                    SoundManager.Instance.PlayClip(SoundManager.Instance.selectDot, 1f);
+                    levelPlace[0] = intPos.x;
+                    levelPlace[1] = intPos.y;
+                    levelPlace[2] = intPos.z;
+                    SoundManager.Instance.PlayClip(SoundManager.Instance.changePosition, 1f);
                 }
                 else
                 {
+                    if(isOpen)
+                    {
+                        SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 0.6f);
+                    }
                     isOpen = false;
-                    SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 1f);
                     CloseInventoryWindow();
                 }
             }
@@ -250,6 +304,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             {
                 return;
             }
+
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             intPos = ground.WorldToCell(worldPos);
             worldPos.z = 0f;
@@ -257,13 +312,16 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             {
                 UpdateWindow();
                 isOpen = true;
+                levelPlace[0] = intPos.x;
+                levelPlace[1] = intPos.y;
+                levelPlace[2] = intPos.z;
                 SoundManager.Instance.PlayClip(SoundManager.Instance.changePosition, 1f);
             }
             else
             {
                 if(isOpen)
                 {
-                    SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 0.8f);
+                    SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 0.6f);
                 }
                 isOpen = false;
                 CloseInventoryWindow();
@@ -275,17 +333,19 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         headerVisual.text = bases[factionIndex].tileName;
         whiteSpace.color = bases[factionIndex].windowColor;
 
-        float landCoins = coins * bases[factionIndex].multiplyer;
-        float landGrains = grains * bases[factionIndex].multiplyer;
-        float landSteel = steel * bases[factionIndex].multiplyer;
-        float landOil = oil * bases[factionIndex].multiplyer;
-        float landUranium = uranium * bases[factionIndex].multiplyer;
+        int landCoins = Mathf.RoundToInt(coins * bases[factionIndex].multiplyer * multiplyer);
+        int landGrains = Mathf.RoundToInt(grains * bases[factionIndex].multiplyer * multiplyer);
+        int landSteel = Mathf.RoundToInt(steel * bases[factionIndex].multiplyer * multiplyer);
+        int landOil = Mathf.RoundToInt(oil * bases[factionIndex].multiplyer * multiplyer);
+        int landUranium = Mathf.RoundToInt(uranium * bases[factionIndex].multiplyer * multiplyer);
+        int landWaves = Mathf.RoundToInt(waves * bases[factionIndex].multiplyer * multiplyer);
 
         coinsVisual.text = landCoins.ToString();
         grainVisual.text = landGrains.ToString();
         steelVisual.text = landSteel.ToString();
         oilVisual.text = landOil.ToString();
         uraniumVisual.text = landUranium.ToString();
+        waveVisual.text = "Waves : " + landWaves.ToString();
     }
     bool isSteppingOnLand(Vector3Int pos)
     {
@@ -302,30 +362,33 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             if(yellowTile != null && yellowTile == bases[i].tile)
             {
                 factionIndex = i;
+                enemyFaction = Factions.Triangle;
                 break;
             }
             else if(greenTile != null && greenTile == bases[i].tile)
             {
                 factionIndex = i;
+                enemyFaction = Factions.Square;
                 break;
             }
             else if(blueTile != null && blueTile == bases[i].tile)
             {
                 factionIndex = i;
+                enemyFaction = Factions.Circle;
                 break;
             }
             else if(redTile != null && redTile == bases[i].tile)
             {
                 factionIndex = i;
+                enemyFaction = Factions.Rectangle;
                 break;
             }
+            else
+            {
+                factionIndex = i;
+                enemyFaction = Factions.Neutral;
+            }
         }
-
-        if(factionIndex == -1)
-        {
-            factionIndex = bases.Length - 1;
-        }
-
         for(int i = 0; i < dots.Count; i++)
         {
             if(tilePos == dots[i].transform.position)
@@ -403,7 +466,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             }
         }
 
-        foreach(TowerSlotSO tower in inventory.towers)
+        for(int i = 0; i < inventory.towers.Count; i++)
         {
             GameObject go = Instantiate(slotPrefab, slotParent.position, Quaternion.identity);
             go.transform.SetParent(slotParent);
@@ -411,20 +474,21 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             go.transform.rotation = slotParent.rotation;
             if(go.TryGetComponent(out TowerSlotInventory goScript))
             {
-                if(currentTowers.Contains(tower))
+                if(currentTowers.Contains(inventory.towers[i]))
                 {
                     if(go.TryGetComponent(out Button button))
                     {
                         button.interactable = false;
                     }
                 }
-                goScript.slot = tower;
+                goScript.slot = inventory.towers[i];
+                goScript.slotIndex = inventory.towerIndex[i];
                 goScript.Refresh();
             }
         } 
     }
 
-    public void AddToCurrentTowers(TowerSlotSO slot, Color color)
+    public void AddToCurrentTowers(TowerSlotSO slot, Color color, int index)
     {
         GameObject go = Instantiate(displayPrefab, displayParent.position, Quaternion.identity);
         go.transform.SetParent(displayParent);
@@ -435,20 +499,61 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             goScript.slot = slot;
             goScript.iconImage.sprite = slot.icon;
             goScript.image.color = color;
+            goScript.slotIndex = index;
         }
 
         currentTowers.Add(slot);
         currentTowersObj.Add(go);
+        currentTowersIndex.Add(index);
 
         CloseInventoryWindow();
         CheckAddButton();
     }
-    public void RemoveCurrentWoers(TowerSlotSO slot, GameObject obj)
+    public void RemoveCurrentTowers(TowerSlotSO slot, GameObject obj, int index)
     {
         currentTowers.Remove(slot);
         currentTowersObj.Remove(obj);
+        currentTowersIndex.Remove(index);
         Destroy(obj);
         CheckAddButton();
+    }
+
+    //Play
+    public void OpenPlayWindow()
+    {
+        if(currentTowersIndex.Count == 0)
+        {
+            //Do notificaiton for no towers
+            return;
+        }
+        playWindow.SetActive(true);
+    }
+
+    public void ClosePlayWindow()
+    {
+        StartCoroutine(CloseWindow(playWindow, playWindowAnim, playWindowCloseDuration));
+    }
+
+    public void ConfirmPlay()
+    {
+        saveLevel = true;
+        DataPersistenceManager.instance.SaveGame();
+        StartCoroutine(GoToBattle());
+    }
+
+    IEnumerator GoToBattle()
+    {
+        leaveTransition.SetActive(true);
+        yield return new WaitForSecondsRealtime(leaveDuration);
+        DataPersistenceManager.instance.SaveGame();
+        SceneManager.LoadScene("Game");
+    }
+
+    IEnumerator CloseWindow(GameObject window, Animator anim, float duration)
+    {
+        anim.SetTrigger("Close");
+        yield return new WaitForSeconds(duration);
+        window.SetActive(false);
     }
 
     void FixedUpdate()

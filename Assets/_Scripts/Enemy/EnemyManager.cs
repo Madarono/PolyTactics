@@ -9,7 +9,8 @@ public enum Factions
     Circle,
     Rectangle,
     Triangle,
-    Universal
+    Universal,
+    Neutral
 }
 
 [System.Serializable]

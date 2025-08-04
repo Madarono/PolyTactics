@@ -119,6 +119,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        shieldHealth = health / 3;
         healthBarParent = healthBar.parent.gameObject;
         if(!determinedShield)
         {
@@ -210,9 +211,15 @@ public class Enemy : MonoBehaviour
 
     private void DetermineImmunity()
     {
+        if(chanceOfImmunity == 0 && chanceOfFull == 0)
+        {
+            return;
+        }
+
         float random = Random.Range(0, 100);
         float chance = Mathf.Min(chanceOfImmunity * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;
         float chanceFull = Mathf.Min(chanceOfFull * manager.immunityMultipler[manager.index].multiplyer, 100f) * (1 + (manager.immunityScale * manager.currentWave)) * manager.scalingMultiplyer[manager.index].multiplyer;;
+
         if(random <= chanceFull)
         {
             cacheImmunity = Random.Range(0, immunities.Length);

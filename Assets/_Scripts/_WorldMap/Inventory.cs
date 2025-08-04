@@ -14,6 +14,12 @@ public class Inventory : MonoBehaviour, IDataPersistence
     [Header("Debug")]
     public int index;
 
+    [Header("StockTowers")]
+    public int[] indexBlue;
+    public int[] indexRed;
+    public int[] indexYellow;
+    public int[] indexGreen;
+
     void Awake()
     {
         Instance = this;
@@ -22,7 +28,7 @@ public class Inventory : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         towerIndex = data.towerIndex.ToList();
-        LoadTowers();
+        // LoadTowers(); - It is done by the InteractionSystem.cs
     }
 
     public void SaveData(GameData data)
@@ -38,7 +44,7 @@ public class Inventory : MonoBehaviour, IDataPersistence
         }
     }
 
-    void LoadTowers()
+    public void LoadTowers()
     {
         towers.Clear();
 
@@ -50,9 +56,47 @@ public class Inventory : MonoBehaviour, IDataPersistence
 
     void AddNewTower(int index)
     {
+        if(towerIndex.Contains(index))
+        {
+            return;
+        }
+
         towers.Add(towersList[index]);
         towerIndex.Add(index);
         DataPersistenceManager.instance.SaveGame();
+    }
+
+    public void LoadStockTowers()
+    {
+        if(towerIndex.Count > 0)
+        {
+            return;
+        }
+
+        int[] indexes = new int[3];
+        switch(InteractionSystem.Instance.playerFaction)
+        {
+            case Factions.Circle:
+                indexes = (int[])indexBlue.Clone();
+                break;
+
+            case Factions.Rectangle:
+                indexes = (int[])indexRed.Clone();
+                break;
+
+            case Factions.Triangle:
+                indexes = (int[])indexYellow.Clone();
+                break;
+
+            case Factions.Square:
+                indexes = (int[])indexGreen.Clone();
+                break;
+        }
+
+        foreach(int index in indexes)
+        {
+            AddNewTower(index);
+        }
     }
 
 

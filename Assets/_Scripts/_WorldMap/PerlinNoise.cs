@@ -19,7 +19,7 @@ public class FactionWorldMap
     public Tilemap tileMap;
 }
 
-public class PerlinNoise : MonoBehaviour
+public class PerlinNoise : MonoBehaviour, IDataPersistence
 {
     public static PerlinNoise Instance {get; private set;}
     public CameraPinch pinch;
@@ -62,8 +62,26 @@ public class PerlinNoise : MonoBehaviour
         Instance = this;
     }
 
-    public void InstantiateStart()
+    public void LoadData(GameData data)
+    {
+    }
+
+    public void SaveData(GameData data)
+    {
+        data.seed = this.seed;
+        data.width = this.width;
+        data.height = this.height;
+    }
+
+    public void InstantiateStart(int seedNumber, int width, int height)
     {        
+        seed = seedNumber;
+        this.width = width;
+        this.height = height;
+        if(seed == 0)
+        {
+            randomSeed = true;
+        }
         if(!useSeed)
         {
             GenerateLand();
@@ -72,6 +90,7 @@ public class PerlinNoise : MonoBehaviour
 
         float finalSeed = randomSeed ? Random.Range(minSeed, maxSeed) : seed;
         seed = (int)finalSeed;
+        randomSeed = false;
 
         offsetX = Mathf.PerlinNoise(finalSeed * 0.1f, 0f) * 100f;
         offsetY = Mathf.PerlinNoise(0f, finalSeed * 0.1f) * 100f;

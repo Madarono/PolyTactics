@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TowerSlotInventory : MonoBehaviour
 {
     public TowerSlotSO slot;
+    public int slotIndex;
     
     public Image iconImage;
 
@@ -41,6 +42,6 @@ public class TowerSlotInventory : MonoBehaviour
 
     public void SelectTurrent()
     { 
-        InteractionSystem.Instance.AddToCurrentTowers(slot, image.color);
+        InteractionSystem.Instance.AddToCurrentTowers(slot, image.color, slotIndex);
     }
 }

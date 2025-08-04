@@ -16,8 +16,8 @@ public class WaveRandomizer : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
-        this.waveCount = data.waveCount;
-        this.maxWaveWeight = data.maxWaveWeight;
+        this.waveCount = data.a_waves;
+        this.maxWaveWeight = data.a_waveWeight;
         SetWaves();
         Settings.Instance.ShowWave(0);
     }

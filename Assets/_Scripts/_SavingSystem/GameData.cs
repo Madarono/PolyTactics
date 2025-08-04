@@ -16,7 +16,7 @@ public class GameData
     public int mapIndex;
     public bool randomizeMapIndex;
 
-    //WaveRandomizer.cs
+    //WaveRandomizer.cs -- Save this
     public int waveCount;
     public int maxWaveWeight;
 
@@ -25,12 +25,13 @@ public class GameData
     public Factions enemyFaction;
     public Factions playerFaction;
 
-    //WaveResources.cs
+    //WaveResources.cs -- Save this
     public int coins;
     public int grain;
     public int steel;
     public int oil;
     public int uranium;
+    public bool hasWon;
 
     //ResourcesStorage.cs
     public int _coins;
@@ -40,15 +41,28 @@ public class GameData
     public int _uranium;
 
     //InteractionSystem.cs
+    public int a_waves;
+    public int a_waveWeight;
     public int a_coins;
     public int a_grains;
     public int a_steel;
     public int a_oil;
     public int a_uranium;
     public float resourceMultiplyer;
+    public int[] levelPlace = new int[3];
+    public int[] slotIndex = new int[0];
+
+    //LandConquerer.cs
+    public int[] landPlaces = new int[0];
+    public Factions[] landFaction = new Factions[0];
 
     //Inventory
     public int[] towerIndex;
+
+    //PerlinNoise.cs
+    public int seed;
+    public int width;
+    public int height;
 
     public GameData()
     {   
@@ -79,6 +93,7 @@ public class GameData
         this.steel = 0;
         this.oil = 0;
         this.uranium = 0;
+        this.hasWon = false;
 
         //ResourcesStorage.cs
         this._coins = 100;
@@ -93,9 +108,22 @@ public class GameData
         this.a_steel = 3;
         this.a_oil = 2;
         this.a_uranium = 1;
+        this.a_waves = 2;
+        this.a_waveWeight = 30;
         this.resourceMultiplyer = 1f;
+        this.levelPlace = new int[3];
+        this.slotIndex = new int[0];
+
+        //LandConquerer.cs
+        this.landPlaces = new int[0];
+        this.landFaction = new Factions[0];
 
         //Inventory.cs
         this.towerIndex = new int[0];
+
+        //PerlinNoise.cs
+        this.seed = 0; //Forces a random seed
+        this.width = 32;
+        this.height = 32;
     }
 }

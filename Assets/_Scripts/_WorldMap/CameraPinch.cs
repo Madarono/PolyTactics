@@ -76,7 +76,7 @@ public class CameraPinch : MonoBehaviour
             {
                 Vector3 currentPos = cam.ScreenToWorldPoint(touch.position);
                 Vector3 diff = lastPanPosition - currentPos;
-                cam.transform.position += diff;
+                cam.transform.position = Vector3.Lerp(cam.transform.position, cam.transform.position + diff, Time.deltaTime * cameraSpeed);
                 interacted = true;
             }
         }
@@ -91,10 +91,11 @@ public class CameraPinch : MonoBehaviour
             else if (Input.GetMouseButton(0) && isPanning)
             {
                 Vector3 currentPos = cam.ScreenToWorldPoint(Input.mousePosition);
-                Vector3 diff = lastPanPosition - currentPos;
-                cam.transform.position += diff;
+                Vector3 targetDiff = lastPanPosition - currentPos;
+                cam.transform.position = Vector3.Lerp(cam.transform.position, cam.transform.position + targetDiff, Time.deltaTime * cameraSpeed);
                 interacted = true;
             }
+
 
             float scrollDelta = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scrollDelta) > 0f)

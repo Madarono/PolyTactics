@@ -60,7 +60,6 @@ public class Settings : MonoBehaviour, IDataPersistence
         this.playerFaction = data.playerFaction;
         this.enemyFaction = data.enemyFaction;
         enemyManager.InitiateStart();
-        SlotsManager.Instance.InitiateStart();
         ManualSystem.Instance.InitiateStart();
         InitiateStart();
     }

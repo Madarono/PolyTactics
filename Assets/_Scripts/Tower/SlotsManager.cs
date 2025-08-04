@@ -9,7 +9,7 @@ public class SlotsManager : MonoBehaviour
     public Settings settings;
     public bool followSettings;
 
-    public TowerSlotSO[] currentSlots;
+    public TowerSlotSO[] currentSlots; //Modify this
     public TowerSlotSO[] boughtTowers;
 
     [Header("Faction Stock Slots")]

@@ -25,6 +25,7 @@ public class Tabs
     public ManualItem[] redItems;
     public ManualItem[] greenItems;
     public ManualItem[] yellowItems;
+    public ManualItem[] neutralItems;
 }
 
 public class ManualSystem : MonoBehaviour
@@ -99,6 +100,10 @@ public class ManualSystem : MonoBehaviour
 
                     case Factions.Triangle:
                         factionItems = (ManualItem[])tab.yellowItems.Clone();
+                        break;
+
+                    case Factions.Neutral:
+                        factionItems = (ManualItem[])tab.neutralItems.Clone();
                         break;
                 }
 

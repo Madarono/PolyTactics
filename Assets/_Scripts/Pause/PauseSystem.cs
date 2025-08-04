@@ -44,6 +44,11 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     [Header("Leaving")]
     public GameObject leaveWindow;
 
+    [Header("Extra")]
+    public bool worldMap = false;
+    public GameObject leaveTransition;
+    public float leaveDuration = 1.5f;
+
     public void LoadData(GameData data)
     {
         this.graphics = data.graphics;
@@ -54,6 +59,10 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         this.showRange = data.showRange;
         window.SetActive(false);
         leaveWindow.SetActive(false);
+        if(leaveTransition != null)
+        {
+            leaveTransition.SetActive(false);
+        }
         Refresh();
     }
 
@@ -83,6 +92,12 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         canSound = false;
         StartCoroutine(AnimationCloseWindow(windowAnim, window));
+        if(worldMap)
+        {
+            Time.timeScale = 1f;
+            return;
+        }
+
         if(!WaveResources.Instance.finishedBattle)
         {
             Time.timeScale = settings.isSpeeding ? settings.speedValue : 1f;
@@ -224,6 +239,20 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     public void ConfirmLeave()
     {
+        if(worldMap)
+        {
+            StartCoroutine(LeaveGame());
+            return;
+        }
+
         WaveResources.Instance.FinishedBattle(false, false);
+    }
+
+    IEnumerator LeaveGame()
+    {
+        leaveTransition.SetActive(true);
+        yield return new WaitForSecondsRealtime(leaveDuration);
+        DataPersistenceManager.instance.SaveGame();
+        Application.Quit();
     }
 }

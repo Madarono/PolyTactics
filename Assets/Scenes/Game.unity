@@ -7055,6 +7055,7 @@ GameObject:
   - component: {fileID: 227009679}
   - component: {fileID: 227009667}
   - component: {fileID: 227009677}
+  - component: {fileID: 227009685}
   - component: {fileID: 227009682}
   - component: {fileID: 227009669}
   - component: {fileID: 227009672}
@@ -7343,6 +7344,20 @@ MonoBehaviour:
       weight: 3
       durationTillPut: 1
       requiredWave: 6
+  - faction: 5
+    enemy:
+    - enemy: {fileID: 3744246206394951786, guid: 11d6ef1021471054181af46950773094, type: 3}
+      weight: 1
+      durationTillPut: 2
+      requiredWave: 0
+    - enemy: {fileID: 3744246206394951786, guid: 3e1b2d16ede86f24e857674429d92061, type: 3}
+      weight: 1
+      durationTillPut: 1
+      requiredWave: 2
+    - enemy: {fileID: 3744246206394951786, guid: 699dd09c211617d46b28a64d5536da0e, type: 3}
+      weight: 2
+      durationTillPut: 3
+      requiredWave: 1
   index: 0
   enemyIndex: 0
   currentWave: 0
@@ -7844,15 +7859,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 227009671}
-  followSettings: 1
+  followSettings: 0
   currentSlots: []
-  boughtTowers:
-  - {fileID: 11400000, guid: c2ba7e720def5bf489d67e2fee7d739f, type: 2}
-  - {fileID: 11400000, guid: 99b793a57bfb64c4faddd47771e3c720, type: 2}
-  - {fileID: 11400000, guid: d1fd716bd48fd774daf0efb15dfb0443, type: 2}
-  - {fileID: 11400000, guid: 256a175ab2e02cf45bcaa7713b921ec9, type: 2}
-  - {fileID: 11400000, guid: 10c6ff4167222fc46ade9005a0f4b7d7, type: 2}
-  - {fileID: 11400000, guid: 12e827d89b484504cba7dc9a14c65ff5, type: 2}
+  boughtTowers: []
   circleSlots:
   - {fileID: 11400000, guid: 46427a884f21cdfef821237b41be58d0, type: 2}
   - {fileID: 11400000, guid: 4b6e4b4e81d5ae40c90acdf2ada4bd3b, type: 2}
@@ -8009,6 +8018,8 @@ MonoBehaviour:
   endOfRound: {fileID: 8300000, guid: 30dd649753938ddad95d58469f6dfc75, type: 3}
   beginWave: {fileID: 8300000, guid: 8915d3f366313a612b45c5ec7687b7d8, type: 3}
   fastForward: {fileID: 8300000, guid: 6c7be28176433547d88263e3ca947671, type: 3}
+  selectDot: {fileID: 0}
+  deselectDot: {fileID: 0}
 --- !u!114 &227009680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8106,6 +8117,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 798b5eaf21b47d345a04270300672b83, type: 2}
     - {fileID: 11400000, guid: e4e9d49b84f0f124da6f275d182cf28a, type: 2}
     - {fileID: 11400000, guid: 9707c2b2d7d7bb644ace130d137a9871, type: 2}
+    neutralItems:
+    - {fileID: 11400000, guid: 10ba350a1cbe3f14ab04611890a3f7ee, type: 2}
+    - {fileID: 11400000, guid: cf2fd470263e73646930c5a3ad62f6ea, type: 2}
+    - {fileID: 11400000, guid: 061ad2bdeb507ff4e858920a5466b6b5, type: 2}
   - window: {fileID: 556666406}
     spawnParent: {fileID: 1841688314}
     background: {fileID: 2034537552}
@@ -8137,6 +8152,7 @@ MonoBehaviour:
     redItems: []
     greenItems: []
     yellowItems: []
+    neutralItems: []
   - window: {fileID: 1381005812}
     spawnParent: {fileID: 817902602}
     background: {fileID: 1064806298}
@@ -8160,6 +8176,7 @@ MonoBehaviour:
     redItems: []
     greenItems: []
     yellowItems: []
+    neutralItems: []
   - window: {fileID: 154006101}
     spawnParent: {fileID: 599996178}
     background: {fileID: 1353924709}
@@ -8230,6 +8247,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 5bcdc4a1b26610141a24b3f5f83e872f, type: 2}
     - {fileID: 11400000, guid: b04a857d45f3c5643afcf4a50c69fdbb, type: 2}
     - {fileID: 11400000, guid: 126e4ec20b4a7ab45bdace00bdd33676, type: 2}
+    neutralItems: []
   bgColors:
   - {r: 0.9607844, g: 0.9294118, b: 0.7294118, a: 1}
   - {r: 0.8431373, g: 0.60784316, b: 0.4901961, a: 1}
@@ -8362,6 +8380,38 @@ MonoBehaviour:
   leaveTransition: {fileID: 2044698880}
   leaveDuration: 1.5
   saveToData: 0
+--- !u!114 &227009685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227009666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39c13c258f05de84db3b3eb2cbc71d3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towers:
+  - {fileID: 11400000, guid: 46427a884f21cdfef821237b41be58d0, type: 2}
+  - {fileID: 11400000, guid: 4b6e4b4e81d5ae40c90acdf2ada4bd3b, type: 2}
+  - {fileID: 11400000, guid: d63018368a856ff858d2e439842982d7, type: 2}
+  - {fileID: 11400000, guid: 9dcd5477f583965c8bf7925a9085495f, type: 2}
+  - {fileID: 11400000, guid: ad05617f68a4f0e6da127ee9e2ae2f41, type: 2}
+  - {fileID: 11400000, guid: 243e36223abec45d19d6d5194f5d7ba6, type: 2}
+  - {fileID: 11400000, guid: 7bc6570b540ecb125adcd42e8d6774eb, type: 2}
+  - {fileID: 11400000, guid: c852efb10929eb09fa79358c17af4b75, type: 2}
+  - {fileID: 11400000, guid: 12ad80347d2d3f83fa029a1846ae7ba4, type: 2}
+  - {fileID: 11400000, guid: 545756d6dff6883aeabd4e40249f786c, type: 2}
+  - {fileID: 11400000, guid: 9a7d46c789f4aaf9896da45106a1bff6, type: 2}
+  - {fileID: 11400000, guid: 3c0bfbbb4c3989b789821e79aad87801, type: 2}
+  - {fileID: 11400000, guid: 10c6ff4167222fc46ade9005a0f4b7d7, type: 2}
+  - {fileID: 11400000, guid: c2ba7e720def5bf489d67e2fee7d739f, type: 2}
+  - {fileID: 11400000, guid: 12e827d89b484504cba7dc9a14c65ff5, type: 2}
+  - {fileID: 11400000, guid: 99b793a57bfb64c4faddd47771e3c720, type: 2}
+  - {fileID: 11400000, guid: 256a175ab2e02cf45bcaa7713b921ec9, type: 2}
+  - {fileID: 11400000, guid: d1fd716bd48fd774daf0efb15dfb0443, type: 2}
+  slotIndex: 
 --- !u!1 &228326802
 GameObject:
   m_ObjectHideFlags: 0
@@ -26778,7 +26828,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 155.50005, y: -43.58}
+  m_AnchoredPosition: {x: 155.5001, y: -43.58}
   m_SizeDelta: {x: 250, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &938025242
@@ -30190,7 +30240,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1034209526
 RectTransform:
   m_ObjectHideFlags: 0
@@ -35020,6 +35070,7 @@ GameObject:
   - component: {fileID: 1175892573}
   - component: {fileID: 1175892572}
   - component: {fileID: 1175892571}
+  - component: {fileID: 1175892574}
   m_Layer: 0
   m_Name: Leave
   m_TagString: Untagged
@@ -35142,6 +35193,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1175892569}
   m_CullTransparentMesh: 1
+--- !u!114 &1175892574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175892569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cae6accc9c8f6037bf63e73fe1856e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  overrideClip: {fileID: 0}
+  sound: {fileID: 227009679}
+  myButton: {fileID: 1175892571}
 --- !u!1 &1181133572
 GameObject:
   m_ObjectHideFlags: 0

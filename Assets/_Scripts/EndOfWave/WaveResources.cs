@@ -18,6 +18,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
     public bool hasWon;
     public bool finishedBattle;
     bool hasSaved = false;
+    bool showUI = false;
 
     [Header("Visuals")]
     public GameObject window;
@@ -59,14 +60,20 @@ public class WaveResources : MonoBehaviour, IDataPersistence
 
     public void SaveData(GameData data)
     {
-        if(finishedBattle && !hasSaved)
+        if(finishedBattle && !hasSaved && showUI)
         {
             data._coins += this.coins;
             data._grain += this.grain;
             data._steel += this.steel;
             data._oil += this.oil;
             data._uranium += this.uranium;
+            data.hasWon = this.hasWon;
             hasSaved = true; //To only save once after winning
+        }
+        else if(finishedBattle && !hasSaved && !showUI)
+        {
+            data.hasWon = false;
+            hasSaved = true;
         }
 
         if(saveToData)
@@ -84,7 +91,8 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         Time.timeScale = 0f;
         hasWon = won;
         finishedBattle = true;
-        if(!showUI)
+        this.showUI = showUI;
+        if(!this.showUI)
         {
             ReturnToWorldMap();    
             return;
@@ -145,6 +153,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         leaveTransition.SetActive(true);
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
+        Time.timeScale = 1f;
         SceneManager.LoadScene("WorldMap");
     }
 
