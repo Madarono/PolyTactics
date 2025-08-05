@@ -32,6 +32,7 @@ public class GameData
     public int oil;
     public int uranium;
     public bool hasWon;
+    public bool makeWarsHappen;
 
     //ResourcesStorage.cs
     public int _coins;
@@ -64,6 +65,12 @@ public class GameData
     public int width;
     public int height;
 
+    //Relationships.cs
+    public int[] circleRelationPoints;
+    public int[] rectangleRelationPoints;
+    public int[] triangleRelationPoints;
+    public int[] squareRelationPoints;
+
     public GameData()
     {   
         //PauseSystem.cs
@@ -94,6 +101,7 @@ public class GameData
         this.oil = 0;
         this.uranium = 0;
         this.hasWon = false;
+        this.makeWarsHappen = false;
 
         //ResourcesStorage.cs
         this._coins = 100;
@@ -125,5 +133,11 @@ public class GameData
         this.seed = 0; //Forces a random seed
         this.width = 32;
         this.height = 32;
+
+        //Relationships.cs
+        this.circleRelationPoints = new int[3] {85,10,60}; //Rectangle, Triangle, Square
+        this.rectangleRelationPoints = new int[3] {85,10,85}; //Circle, Triangle, Square
+        this.triangleRelationPoints = new int[3] {10,60,10}; //Circle, Rectangle, Square
+        this.squareRelationPoints = new int[3] {60,85,10}; //Circle, Rectangle, Triangle
     }
 }

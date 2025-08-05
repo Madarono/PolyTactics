@@ -11,14 +11,15 @@ public class Inventory : MonoBehaviour, IDataPersistence
     public List<TowerSlotSO> towers = new List<TowerSlotSO>();
     public List<int> towerIndex = new List<int>();
 
-    [Header("Debug")]
-    public int index;
-
     [Header("StockTowers")]
     public int[] indexBlue;
     public int[] indexRed;
     public int[] indexYellow;
     public int[] indexGreen;
+
+    [Header("Debug")]
+    public int index;
+    public bool debug = false;
 
     void Awake()
     {
@@ -38,6 +39,11 @@ public class Inventory : MonoBehaviour, IDataPersistence
 
     void Update()
     {
+        if(!debug)
+        {
+            return;
+        }
+
         if(Input.GetKeyDown(KeyCode.O))
         {
             AddNewTower(index);

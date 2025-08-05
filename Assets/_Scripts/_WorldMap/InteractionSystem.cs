@@ -95,6 +95,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public int[] levelPlace = new int[3];
     public int levelFaction;
     public bool hasWon;
+    private bool makeWarsHappen = false;
 
     private GameObject lastDot;
     private int factionIndex; //For the tilebase
@@ -114,6 +115,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         this.playerFaction = data.playerFaction;
         this.hasWon = data.hasWon;
         this.levelPlace = data.levelPlace;
+        this.makeWarsHappen = data.makeWarsHappen;
         
         if(hasWon)
         {
@@ -121,11 +123,14 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         }
 
         PerlinNoise.Instance.InstantiateStart(data.seed, data.width, data.height); //Call for noice here
+        FactionConquer.Instance.playerFaction = this.playerFaction;
+        
         StartCoroutine(CallLater());
     }
 
     public void SaveData(GameData data)
     {
+        data.makeWarsHappen = this.makeWarsHappen;
         if(saveLevel)
         {
             data.a_waves = Mathf.RoundToInt(this.waves * bases[factionIndex].multiplyer * this.multiplyer);
@@ -152,9 +157,17 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         if(hasWon) //This is for land
         {
             LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
-            LandConquerer.Instance.ApplyPlaces();
         }
+        if(makeWarsHappen)
+        {
+            FactionConquer.Instance.ConquerForAll();
+            makeWarsHappen = false;
+        }
+        LandConquerer.Instance.ApplyPlaces();
+        
         InstantiateDots();
+        saveLevel = false;
+        DataPersistenceManager.instance.SaveGame();
     }
 
     //Gains

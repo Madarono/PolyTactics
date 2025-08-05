@@ -6184,6 +6184,8 @@ GameObject:
   - component: {fileID: 726329457}
   - component: {fileID: 726329458}
   - component: {fileID: 726329461}
+  - component: {fileID: 726329463}
+  - component: {fileID: 726329464}
   m_Layer: 0
   m_Name: UniversalScripts
   m_TagString: Untagged
@@ -6252,16 +6254,16 @@ MonoBehaviour:
   whiteTile: {fileID: 11400000, guid: e7e671a4d4caf6d4898694606dd33817, type: 2}
   factions:
   - factionPos: 0
-    tile: {fileID: 11400000, guid: f3bbba99d8d3bc1448c38c366608772d, type: 2}
+    tile: {fileID: 11400000, guid: a6794821b1667b648909a63553ec04cd, type: 2}
     tileMap: {fileID: 967936901}
   - factionPos: 1
-    tile: {fileID: 11400000, guid: 41a6d1c6ded0aad4ca7ef59d4e37dcc5, type: 2}
+    tile: {fileID: 11400000, guid: d76bbee5549dd2641a10921e9e59168e, type: 2}
     tileMap: {fileID: 659362122}
   - factionPos: 3
-    tile: {fileID: 11400000, guid: b8c91818de34a274986a7559d972b06b, type: 2}
+    tile: {fileID: 11400000, guid: a09f21ba3e9ea4349956420c05648f33, type: 2}
     tileMap: {fileID: 689678849}
   - factionPos: 2
-    tile: {fileID: 11400000, guid: 6cf7d00f618445e439c8ae98a83bad6b, type: 2}
+    tile: {fileID: 11400000, guid: 692b9c4d7c4c6184fb62a8ecaa68b7a0, type: 2}
     tileMap: {fileID: 1410285116}
   falloffStrength: 1
   seed: 124378
@@ -6322,19 +6324,19 @@ MonoBehaviour:
   displayPrefab: {fileID: 2888043298927283413, guid: 427d0c2ee9721af4b9e158471c750691, type: 3}
   displayParent: {fileID: 219138031}
   bases:
-  - tile: {fileID: 11400000, guid: b8c91818de34a274986a7559d972b06b, type: 2}
+  - tile: {fileID: 11400000, guid: a09f21ba3e9ea4349956420c05648f33, type: 2}
     tileName: '[ Square ]'
     windowColor: {r: 0.75294125, g: 0.7803922, b: 0.25490198, a: 1}
     multiplyer: 2
-  - tile: {fileID: 11400000, guid: 41a6d1c6ded0aad4ca7ef59d4e37dcc5, type: 2}
+  - tile: {fileID: 11400000, guid: d76bbee5549dd2641a10921e9e59168e, type: 2}
     tileName: '[ Rectangle ]'
     windowColor: {r: 0.6156863, g: 0.18823531, b: 0.23137257, a: 1}
     multiplyer: 2
-  - tile: {fileID: 11400000, guid: f3bbba99d8d3bc1448c38c366608772d, type: 2}
+  - tile: {fileID: 11400000, guid: a6794821b1667b648909a63553ec04cd, type: 2}
     tileName: '[ Triangle ]'
     windowColor: {r: 0.8941177, g: 0.5803922, b: 0.227451, a: 1}
     multiplyer: 2
-  - tile: {fileID: 11400000, guid: 6cf7d00f618445e439c8ae98a83bad6b, type: 2}
+  - tile: {fileID: 11400000, guid: 692b9c4d7c4c6184fb62a8ecaa68b7a0, type: 2}
     tileName: '[ Circle ]'
     windowColor: {r: 0.49411768, g: 0.7686275, b: 0.7568628, a: 1}
     multiplyer: 2
@@ -6406,11 +6408,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d1fd716bd48fd774daf0efb15dfb0443, type: 2}
   towers: []
   towerIndex: 
-  index: 0
   indexBlue: 000000000100000002000000
   indexRed: 030000000400000005000000
   indexYellow: 060000000700000008000000
   indexGreen: 090000000a0000000b000000
+  index: 0
+  debug: 0
 --- !u!82 &726329458
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6565,13 +6568,13 @@ MonoBehaviour:
   landPlaces: 
   landFaction: 
   blue: {fileID: 1410285116}
-  blueTile: {fileID: 11400000, guid: 6cf7d00f618445e439c8ae98a83bad6b, type: 2}
+  blueTile: {fileID: 11400000, guid: 692b9c4d7c4c6184fb62a8ecaa68b7a0, type: 2}
   red: {fileID: 659362122}
-  redTile: {fileID: 11400000, guid: 41a6d1c6ded0aad4ca7ef59d4e37dcc5, type: 2}
+  redTile: {fileID: 11400000, guid: d76bbee5549dd2641a10921e9e59168e, type: 2}
   yellow: {fileID: 967936901}
-  yellowTile: {fileID: 11400000, guid: f3bbba99d8d3bc1448c38c366608772d, type: 2}
+  yellowTile: {fileID: 11400000, guid: a6794821b1667b648909a63553ec04cd, type: 2}
   green: {fileID: 689678849}
-  greenTile: {fileID: 11400000, guid: b8c91818de34a274986a7559d972b06b, type: 2}
+  greenTile: {fileID: 11400000, guid: a09f21ba3e9ea4349956420c05648f33, type: 2}
   tilemaps:
   - {fileID: 1410285116}
   - {fileID: 659362122}
@@ -6643,6 +6646,102 @@ MonoBehaviour:
     color: {r: 0.7529412, g: 0.78039217, b: 0.25490198, a: 1}
   imgToCheck:
   - {fileID: 1511528423}
+--- !u!114 &726329463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726329451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6f156766031e594c930e2a04efb9475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  req:
+  - relation: 0
+    requirement: 0
+  - relation: 1
+    requirement: 50
+  - relation: 2
+    requirement: 80
+  - relation: 2
+    requirement: 101
+  circleRelation:
+  - faction: 2
+    relation: 2
+    relationPoints: 60
+  - faction: 3
+    relation: 0
+    relationPoints: 10
+  - faction: 0
+    relation: 1
+    relationPoints: 60
+  rectangleRelation:
+  - faction: 1
+    relation: 2
+    relationPoints: 60
+  - faction: 3
+    relation: 0
+    relationPoints: 10
+  - faction: 0
+    relation: 2
+    relationPoints: 60
+  triangleRelation:
+  - faction: 1
+    relation: 0
+    relationPoints: 10
+  - faction: 2
+    relation: 1
+    relationPoints: 60
+  - faction: 0
+    relation: 0
+    relationPoints: 10
+  squareRelation:
+  - faction: 1
+    relation: 1
+    relationPoints: 60
+  - faction: 2
+    relation: 2
+    relationPoints: 60
+  - faction: 3
+    relation: 0
+    relationPoints: 10
+  circleRelationPoints: 000000000000000000000000
+  rectangleRelationPoints: 000000000000000000000000
+  triangleRelationPoints: 000000000000000000000000
+  squareRelationPoints: 000000000000000000000000
+  faction: 0
+  factionAffected: 1
+  amount: 10
+  debug: 0
+--- !u!114 &726329464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 726329451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61ec134cb57f0d5428a21ba41a274dca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerFaction: 0
+  groundChance: 25
+  factionChanceHate: 40
+  factionChanceNeutral: 10
+  ground: {fileID: 76037172}
+  blue: {fileID: 1410285116}
+  red: {fileID: 659362122}
+  yellow: {fileID: 967936901}
+  green: {fileID: 689678849}
+  blueTile: {fileID: 11400000, guid: 692b9c4d7c4c6184fb62a8ecaa68b7a0, type: 2}
+  redTile: {fileID: 11400000, guid: d76bbee5549dd2641a10921e9e59168e, type: 2}
+  yellowTile: {fileID: 11400000, guid: a6794821b1667b648909a63553ec04cd, type: 2}
+  greenTile: {fileID: 11400000, guid: a09f21ba3e9ea4349956420c05648f33, type: 2}
+  pointDeduction: 10
+  debug: 1
 --- !u!1 &737003144
 GameObject:
   m_ObjectHideFlags: 0

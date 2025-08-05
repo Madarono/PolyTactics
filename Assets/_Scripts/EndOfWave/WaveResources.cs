@@ -68,11 +68,13 @@ public class WaveResources : MonoBehaviour, IDataPersistence
             data._oil += this.oil;
             data._uranium += this.uranium;
             data.hasWon = this.hasWon;
+            data.makeWarsHappen = true; 
             hasSaved = true; //To only save once after winning
         }
         else if(finishedBattle && !hasSaved && !showUI)
         {
             data.hasWon = false;
+            data.makeWarsHappen = true; 
             hasSaved = true;
         }
 
