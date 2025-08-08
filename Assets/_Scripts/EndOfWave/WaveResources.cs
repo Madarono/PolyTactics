@@ -35,6 +35,9 @@ public class WaveResources : MonoBehaviour, IDataPersistence
     public GameObject leaveTransition;
     public float leaveDuration = 1.5f;
 
+    [Header("Sound")]
+    public AudioSource source;
+
     [Header("Debug")]
     public bool saveToData = false;
 
@@ -102,6 +105,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
 
         window.SetActive(true);
         header.text = hasWon ? "Battle Won!" : "Battle Lost..";
+        SoundManager.Instance.PlayMusicClip(SoundManager.Instance.musicEndOfRound, 3f);
         if(hasWon)
         {
             StartCoroutine(IncreaseByTime(coins, coinsVisual));
@@ -129,15 +133,24 @@ public class WaveResources : MonoBehaviour, IDataPersistence
             currentAmount = 1;
         }
         float multipler = 0;
+        float soundCooldown = 0.15f;
+        float soundTimer = 0f;
 
         while(currentAmount < maxAmount)
         {
-            multipler += Time.unscaledDeltaTime * 10;
+            multipler += Time.unscaledDeltaTime * 15;
 
             currentAmount += Time.unscaledDeltaTime * multipler;
             int intAmount = Mathf.FloorToInt(currentAmount);
             intAmount = Mathf.Clamp(intAmount, 0, maxAmount);
             visual.text = intAmount.ToString();
+            soundTimer -= Time.unscaledDeltaTime;
+            if (soundTimer <= 0f)
+            {
+                source.pitch = Random.Range(0.95f, 1.05f);
+                source.Play();
+                soundTimer = soundCooldown;
+            }
             yield return null;
         }
 

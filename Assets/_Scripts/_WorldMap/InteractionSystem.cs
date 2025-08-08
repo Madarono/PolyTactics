@@ -99,6 +99,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
 
     private GameObject lastDot;
     private int factionIndex; //For the tilebase
+    bool checkedPlayer = false;
 
     Vector3Int intPos;
 
@@ -116,6 +117,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         this.hasWon = data.hasWon;
         this.levelPlace = data.levelPlace;
         this.makeWarsHappen = data.makeWarsHappen;
+        this.checkedPlayer = data.checkedPlayer;
         
         if(hasWon)
         {
@@ -123,14 +125,14 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         }
 
         PerlinNoise.Instance.InstantiateStart(data.seed, data.width, data.height); //Call for noice here
-        FactionConquer.Instance.playerFaction = this.playerFaction;
-        
+        FactionConquer.Instance.playerFaction = this.playerFaction;        
         StartCoroutine(CallLater());
     }
 
     public void SaveData(GameData data)
     {
         data.makeWarsHappen = this.makeWarsHappen;
+        data.checkedPlayer = this.checkedPlayer;
         if(saveLevel)
         {
             data.a_waves = Mathf.RoundToInt(this.waves * bases[factionIndex].multiplyer * this.multiplyer);
@@ -144,6 +146,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             data.levelPlace = this.levelPlace;
             data.enemyFaction = this.enemyFaction;
             data.hasWon = false; //Change this if there are bugs later on
+            data.checkedPlayer = false;
             data.slotIndex = this.currentTowersIndex.ToArray();
         }
     }
@@ -154,9 +157,17 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         Inventory.Instance.LoadTowers();
         Inventory.Instance.LoadStockTowers();
         CheckFaction.Instance.CheckVisuals(playerFaction);
+        FactionPower.Instance.CalculateStrength();
         if(hasWon) //This is for land
         {
+            Vector3Int placeVector = new Vector3Int(levelPlace[0], levelPlace[1], levelPlace[2]);
+            FactionConquer.Instance.glowPlayerPositions.Add(placeVector);
             LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
+            if(!checkedPlayer)
+            {
+                CheckFactionsPlayer(placeVector);
+                checkedPlayer = true;
+            }
         }
         if(makeWarsHappen)
         {
@@ -164,10 +175,123 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             makeWarsHappen = false;
         }
         LandConquerer.Instance.ApplyPlaces();
+        FactionConquer.Instance.ShowGlow();
         
         InstantiateDots();
         saveLevel = false;
         DataPersistenceManager.instance.SaveGame();
+    }
+
+    public void CheckFactionsPlayer(Vector3Int place)
+    {
+        //Circle attacked Square, Rectangle hated Square so Rectangle with Circle has better relation
+        Relationships relationships = Relationships.Instance; 
+        Factions otherFaction = Factions.Neutral;
+        FactionRelation[] relation = new FactionRelation[0];
+        FactionRelation[] relationOther = new FactionRelation[0];
+        FactionRelation[] relationOther2 = new FactionRelation[0];
+        FactionRelation[] relationOther3 = new FactionRelation[0];
+
+        FactionRelation[] playerRelation = new FactionRelation[0];
+
+        switch(playerFaction)
+        {
+            case Factions.Circle:
+                playerRelation = relationships.circleRelation;
+                break;
+
+            case Factions.Rectangle:
+                playerRelation = relationships.rectangleRelation;
+                break;
+
+            case Factions.Triangle:
+                playerRelation = relationships.triangleRelation;
+                break;
+
+            case Factions.Square:
+                playerRelation = relationships.squareRelation;
+                break;
+        }
+
+        if(blue.GetTile(place) != null && playerFaction != Factions.Circle)
+        {
+            otherFaction = Factions.Circle;
+            relation = relationships.circleRelation;
+            relationOther = relationships.squareRelation;
+            relationOther2 = relationships.rectangleRelation;
+            relationOther3 = relationships.triangleRelation;
+        }
+        else if(red.GetTile(place) != null && playerFaction != Factions.Rectangle)
+        {
+            otherFaction = Factions.Rectangle;
+            relation = relationships.rectangleRelation;
+            relationOther = relationships.squareRelation;
+            relationOther2 = relationships.circleRelation;
+            relationOther3 = relationships.triangleRelation;
+        }
+        else if(yellow.GetTile(place) != null && playerFaction != Factions.Triangle)
+        {
+            otherFaction = Factions.Triangle;
+            relation = relationships.triangleRelation;
+            relationOther = relationships.squareRelation;
+            relationOther2 = relationships.rectangleRelation;
+            relationOther3 = relationships.circleRelation;
+        }
+        else if(green.GetTile(place) != null && playerFaction != Factions.Square)
+        {
+            otherFaction = Factions.Square;
+            relation = relationships.squareRelation;
+            relationOther = relationships.circleRelation;
+            relationOther2 = relationships.rectangleRelation;
+            relationOther3 = relationships.triangleRelation;
+        }
+
+        //So now we have the relation and the faction of the enemy
+
+        for(int i = 0; i < relation.Length; i++) //Hate from other, both have same element indexes
+        {
+            if(playerFaction == relation[i].faction)
+            {
+                relation[i].relationPoints -= FactionConquer.Instance.pointDeduction;
+            }
+            if(otherFaction == playerRelation[i].faction)
+            {
+                playerRelation[i].relationPoints -= FactionConquer.Instance.pointDeduction;
+            }
+        }
+
+        int indexPlayer = -1;
+        int indexPlayer2 = -1;
+        int indexPlayer3 = -1;
+        for(int i = 0; i < relationOther.Length; i++)
+        {
+            if(playerFaction == relationOther[i].faction && indexPlayer == -1)
+            {
+                indexPlayer = i;
+            }
+            if(otherFaction == relationOther[i].faction && relationOther[i].relation == Relation.Hate && indexPlayer > -1)
+            {
+                relationOther[indexPlayer].relationPoints += FactionConquer.Instance.playerGain;
+            }
+
+            if(playerFaction == relationOther2[i].faction && indexPlayer2 == -1)
+            {
+                indexPlayer2 = i;
+            }
+            if(otherFaction == relationOther2[i].faction && relationOther2[i].relation == Relation.Hate && indexPlayer2 > -1)
+            {
+                relationOther2[indexPlayer2].relationPoints += FactionConquer.Instance.playerGain;
+            }
+
+            if(playerFaction == relationOther3[i].faction && indexPlayer3 == -1)
+            {
+                indexPlayer3 = i;
+            }
+            if(otherFaction == relationOther3[i].faction && relationOther3[i].relation == Relation.Hate && indexPlayer3 > -1)
+            {
+                relationOther3[indexPlayer3].relationPoints += FactionConquer.Instance.playerGain;
+            }
+        }
     }
 
     //Gains
@@ -536,7 +660,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     {
         if(currentTowersIndex.Count == 0)
         {
-            //Do notificaiton for no towers
+            Notification.Instance.PutNotification("You need atleast 1 tower for battle.");
             return;
         }
         playWindow.SetActive(true);

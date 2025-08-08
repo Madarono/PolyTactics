@@ -236,8 +236,15 @@ public class Tower : MonoBehaviour
             return;
         } 
 
-        if(lockOnEnemy == null || towerType == TowerType.Freezer)
+        if (lockOnEnemy == null || !lockOnEnemy.activeInHierarchy || towerType == TowerType.Freezer)
         {
+            // SelectEnemy();
+            return;
+        }
+
+        if (lockOnEnemy.TryGetComponent(out Enemy e) && e.health <= 0)
+        {
+            // SelectEnemy();
             return;
         }
 
@@ -261,7 +268,7 @@ public class Tower : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed * 100f);
 
         float difference = Quaternion.Angle(transform.rotation, targetRotation);
-        if (difference <= angleOffset && reloadTime <= 0)
+        if(difference <= angleOffset && reloadTime <= 0)
         {
             reloadTime = o_reloadTime;
             Shoot();
@@ -280,6 +287,12 @@ public class Tower : MonoBehaviour
 
     void Shoot()
     {
+        if (lockOnEnemy == null || !lockOnEnemy.activeInHierarchy || lockOnEnemy.TryGetComponent<Enemy>(out var target) && target.health <= 0)
+        {
+            // SelectEnemy();
+            return;
+        }
+
         if(isShocked)
         {
             return;
@@ -411,13 +424,18 @@ public class Tower : MonoBehaviour
     }
     public void RemoveEnemy(Enemy enemyScript)
     {
-        for (int i = 0; i < enemy.Count; i++)
+        for(int i = 0; i < enemy.Count; i++)
         {
-            if (enemy[i].enemy == enemyScript)
+            if(enemy[i].enemy == enemyScript)
             {
                 enemy.RemoveAt(i);
                 break;
             }
+        }
+
+        if(lockOnEnemy == enemyScript.gameObject)
+        {
+            lockOnEnemy = null;
         }
 
         UpdateValues();
@@ -458,7 +476,7 @@ public class Tower : MonoBehaviour
             }
             else
             {
-                enemy.RemoveAll(e => e.enemy == null);
+                enemy.RemoveAll(e => e.enemy == null || !e.enemy.gameObject.activeInHierarchy || e.enemy.health <= 0f);
             }
         }
     }
@@ -612,7 +630,7 @@ public class Tower : MonoBehaviour
             foreach(EnemyInfo script in enemy)
             {
                 float random = Random.Range(0, 100);
-                if(random <= freezeChance && script.enemy.immunities[script.enemy.cacheImmunity].immuneAgainst != towerType)
+                if(random <= freezeChance && script.enemy.immunities[script.enemy.cacheImmunity].immuneAgainst != towerType && script.enemy.gameObject.activeInHierarchy && script.enemy.overlayEffect.color != freeze)
                 {
                     hasFrozen = true;
                     script.enemy.Freeze(freezeDuration, script.enemy.o_speed * slowPercentage, cold, freeze);
@@ -633,8 +651,11 @@ public class Tower : MonoBehaviour
 
             foreach(EnemyInfo script in new List<EnemyInfo>(enemy)) //So we don't get into errors with the refresh function thingy
             {
-                script.enemy.HurtEnemy(script.enemy.o_health * passiveDamage * manager.searchDelay);
-                script.enemy.Refresh();
+                if(script.enemy.gameObject.activeInHierarchy)
+                {
+                    script.enemy.HurtEnemy(script.enemy.o_health * passiveDamage * manager.searchDelay);
+                    script.enemy.Refresh();
+                }
             }
 
         }
@@ -795,6 +816,7 @@ public class Tower : MonoBehaviour
     public void ShowInfo()
     {
         manager.HideOtherTowerInfo();
+        sound.PlayClip(sound.selectTowerUpgrade, 0.8f);
         upgradeManager.tower = upgrade;
         upgradeManager.UpdateWindowPositioning();
         upgradeManager.UpdateValues();
@@ -807,6 +829,16 @@ public class Tower : MonoBehaviour
         {
             upgradeManager.tower = null;
             upgradeManager.debugRange.SetActive(false);
+            StartCoroutine(WaitForSound());
+        }
+    }
+
+    IEnumerator WaitForSound()
+    {
+        yield return null;
+        if(upgradeManager.tower == null)
+        {
+            sound.PlayClip(sound.deselectTowerUpgrade, 1f);
         }
     }
 }

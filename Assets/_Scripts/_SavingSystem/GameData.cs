@@ -52,6 +52,7 @@ public class GameData
     public float resourceMultiplyer;
     public int[] levelPlace = new int[3];
     public int[] slotIndex = new int[0];
+    public bool checkedPlayer;
 
     //LandConquerer.cs
     public int[] landPlaces = new int[0];
@@ -70,6 +71,12 @@ public class GameData
     public int[] rectangleRelationPoints;
     public int[] triangleRelationPoints;
     public int[] squareRelationPoints;
+
+    //FactionConquer.cs
+    public int[] glowInt;
+
+    //FactionPower.cs
+    public int[] strength;
 
     public GameData()
     {   
@@ -121,6 +128,7 @@ public class GameData
         this.resourceMultiplyer = 1f;
         this.levelPlace = new int[3];
         this.slotIndex = new int[0];
+        this.checkedPlayer = false;
 
         //LandConquerer.cs
         this.landPlaces = new int[0];
@@ -139,5 +147,11 @@ public class GameData
         this.rectangleRelationPoints = new int[3] {85,10,85}; //Circle, Triangle, Square
         this.triangleRelationPoints = new int[3] {10,60,10}; //Circle, Rectangle, Square
         this.squareRelationPoints = new int[3] {60,85,10}; //Circle, Rectangle, Triangle
+
+        //FactionConquer.cs
+        this.glowInt = new int[0];
+
+        //FactionPower.cs
+        this.strength = new int[4];
     }
 }

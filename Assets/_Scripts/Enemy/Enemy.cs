@@ -203,10 +203,12 @@ public class Enemy : MonoBehaviour
                 remainingAmount = 0;
             }
         }
-
-        healthBarCoroutine = StartCoroutine(HideHealthBar());
-
         health -= remainingAmount;
+
+        if(health > 0)
+        {
+            healthBarCoroutine = StartCoroutine(HideHealthBar());
+        }
     } 
 
     private void DetermineImmunity()
@@ -392,7 +394,10 @@ public class Enemy : MonoBehaviour
 
     public void VisualCritical(Color flashColor, float flashDuration, float fadeDuration)
     {
-        StartCoroutine(CriticalDamage(flashColor, flashDuration, fadeDuration));
+        if(gameObject.activeInHierarchy)
+        {
+            StartCoroutine(CriticalDamage(flashColor, flashDuration, fadeDuration));
+        }
     }
 
     IEnumerator CriticalDamage(Color flashColor, float flashDuration, float fadeDuration)

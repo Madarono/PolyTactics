@@ -17,6 +17,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip subUpgrade;
 
     [Header("Tower")]
+    public AudioClip selectTowerUpgrade;
+    public AudioClip deselectTowerUpgrade;
     public AudioClip basicShoot;
     public AudioClip sniperShoot;
     public AudioClip splashShoot;
@@ -38,6 +40,7 @@ public class SoundManager : MonoBehaviour
     [Header("Misc")]
     public AudioClip changingSliders;
     public AudioClip endOfRound;
+    public AudioClip musicEndOfRound;
     public AudioClip beginWave;
     public AudioClip fastForward;
 
@@ -53,5 +56,10 @@ public class SoundManager : MonoBehaviour
     public void PlayClip(AudioClip clip, float amplifier)
     {
         source.PlayOneShot(clip, masterVolume * amplifier);
+    }
+
+    public void PlayMusicClip(AudioClip clip, float amplifier)
+    {
+        source.PlayOneShot(clip, backgroundVolume * amplifier);
     }
 }

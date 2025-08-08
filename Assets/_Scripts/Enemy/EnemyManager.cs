@@ -245,7 +245,7 @@ public class EnemyManager : MonoBehaviour
         if(spawnLeft <= 0 && currentEnemy.Count == 0)
         {
             currentEnemy.Clear();
-            currentWave++;
+            currentWave = Mathf.Min(currentWave + 1, waveWeight.Length);
             if(currentWave == waveWeight.Length && settings.health > 0)
             {
                 WaveResources.Instance.FinishedBattle(true, true);
@@ -257,10 +257,9 @@ public class EnemyManager : MonoBehaviour
             TowerManager towerManager = TowerManager.Instance;
             if(PauseSystem.Instance.autoPlay)
             {
-                settings.ShowWave(0);
+                settings.ShowWave(1);
                 soundManager.PlayClip(soundManager.endOfRound, 1f);
                 towerManager.EndOfRoundChecks();
-
                 StartWave();
             }
             else
