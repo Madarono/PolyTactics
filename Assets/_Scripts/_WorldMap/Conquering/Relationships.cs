@@ -161,6 +161,7 @@ public class Relationships : MonoBehaviour, IDataPersistence
     {
         foreach(FactionRelation relation in factionRelation)
         {
+            relation.relationPoints = Mathf.Clamp(relation.relationPoints, 0, 100);
             for(int i = 0; i < req.Length - 1; i++)
             {
                 if(relation.relationPoints >= req[i].requirement && relation.relationPoints < req[i + 1].requirement)

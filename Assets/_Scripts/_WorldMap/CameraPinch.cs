@@ -34,6 +34,11 @@ public class CameraPinch : MonoBehaviour
 
     void Update()
     {
+        if(Time.timeScale == 0)
+        {
+            return;
+        }
+        
         bool interacted = false;
 
         if(InteractionSystem.Instance.isOpen)

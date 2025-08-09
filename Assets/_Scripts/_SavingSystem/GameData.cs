@@ -78,6 +78,16 @@ public class GameData
     //FactionPower.cs
     public int[] strength;
 
+    //Trust.cs
+    public int circleTrust;
+    public int rectangleTrust;
+    public int triangleTrust;
+    public int squareTrust;
+
+    //Trading.cs
+    public int reqIndex;
+    public int inviteChance;
+
     public GameData()
     {   
         //PauseSystem.cs
@@ -153,5 +163,15 @@ public class GameData
 
         //FactionPower.cs
         this.strength = new int[4];
+
+        //Trust.cs
+        this.circleTrust = 40;
+        this.rectangleTrust = 40;
+        this.triangleTrust = 40;
+        this.squareTrust = 40;
+
+        //Trading.cs
+        this.reqIndex = -1;
+        this.inviteChance = 0;
     }
 }

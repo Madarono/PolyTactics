@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class ResourcesStorage : MonoBehaviour, IDataPersistence
 {
+    public static ResourcesStorage Instance {get; private set;}
     public int coins;
     public int grain;
     public int steel;
     public int oil;
     public int uranium;
+
+    void Awake()
+    {
+        Instance = this;
+    }
     
     public void LoadData(GameData data)
     {

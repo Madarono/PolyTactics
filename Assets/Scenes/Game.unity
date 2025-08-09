@@ -7255,6 +7255,14 @@ MonoBehaviour:
       weight: 3
       durationTillPut: 1
       requiredWave: 6
+    - enemy: {fileID: 3744246206394951786, guid: 8822f2a0ac31f7c4abadb9124dbddee2, type: 3}
+      weight: 4
+      durationTillPut: 0.5
+      requiredWave: 8
+    - enemy: {fileID: 3744246206394951786, guid: 497b05c367f47424cb0fb0e0f2ef6aad, type: 3}
+      weight: 6
+      durationTillPut: 2
+      requiredWave: 9
   - faction: 1
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 2e63ad22eea3b5ff48dd919a068d5f36, type: 3}
@@ -7285,6 +7293,14 @@ MonoBehaviour:
       weight: 3
       durationTillPut: 1
       requiredWave: 6
+    - enemy: {fileID: 3744246206394951786, guid: 0dc7c003eebd57343ac48cdea8b730fc, type: 3}
+      weight: 4
+      durationTillPut: 0.5
+      requiredWave: 8
+    - enemy: {fileID: 3744246206394951786, guid: 247852ccc43a69044bc95a3845bd440e, type: 3}
+      weight: 4
+      durationTillPut: 1
+      requiredWave: 9
   - faction: 3
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 731aaf563a93f7da294a7749e70f0332, type: 3}
@@ -7315,6 +7331,14 @@ MonoBehaviour:
       weight: 3
       durationTillPut: 1
       requiredWave: 6
+    - enemy: {fileID: 3744246206394951786, guid: d8ce9ad6a2d36994fadcd0bb0ebd7f89, type: 3}
+      weight: 4
+      durationTillPut: 0.5
+      requiredWave: 8
+    - enemy: {fileID: 3744246206394951786, guid: 44808b790629e3b4f815b7ac32e87906, type: 3}
+      weight: 5
+      durationTillPut: 2
+      requiredWave: 9
   - faction: 0
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 76bff327b671f3f3984c11dd529e64f1, type: 3}
@@ -7345,6 +7369,14 @@ MonoBehaviour:
       weight: 3
       durationTillPut: 1
       requiredWave: 6
+    - enemy: {fileID: 3744246206394951786, guid: 26efe9cd6b7697f49828eb89fdce12e7, type: 3}
+      weight: 4
+      durationTillPut: 1
+      requiredWave: 8
+    - enemy: {fileID: 3744246206394951786, guid: 07baa2edfc095cd48a8f50409b5d7df8, type: 3}
+      weight: 4
+      durationTillPut: 3
+      requiredWave: 9
   - faction: 5
     enemy:
     - enemy: {fileID: 3744246206394951786, guid: 11d6ef1021471054181af46950773094, type: 3}
@@ -26932,7 +26964,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 155.50002, y: -43.58}
+  m_AnchoredPosition: {x: 155.50063, y: -43.58}
   m_SizeDelta: {x: 250, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &938025242

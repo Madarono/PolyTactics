@@ -326,6 +326,8 @@ MonoBehaviour:
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
+  reverseMovement: 0
+  reverseMultipler: 1
   healthBar: {fileID: 6110457602156130357}
   maxScale: 0.9
   minScale: 0
@@ -359,9 +361,19 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  isGhost: 0
+  col: {fileID: 0}
+  ghostCooldown: 2
+  ghostDuration: 2
+  ghostColor: {r: 1, g: 1, b: 1, a: 0.23529412}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  isExplosive: 0
+  explosionRange: 3
+  explosionDuration: 0.5
+  shockDuration: 2
   magnitude: 0.05
   time: 0.1
-  moneyReward: 5
+  moneyReward: 2
   isSlowed: 0
   delayTillHide: 3
   visual: {fileID: 2977488198407936639}
@@ -1167,6 +1179,8 @@ MonoBehaviour:
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
+  reverseMovement: 0
+  reverseMultipler: 1
   healthBar: {fileID: 2946856582120947322}
   maxScale: 0.9
   minScale: 0
@@ -1202,6 +1216,16 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  isGhost: 0
+  col: {fileID: 0}
+  ghostCooldown: 2
+  ghostDuration: 2
+  ghostColor: {r: 1, g: 1, b: 1, a: 0.23529412}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  isExplosive: 0
+  explosionRange: 3
+  explosionDuration: 0.5
+  shockDuration: 2
   magnitude: 0.05
   time: 0.1
   moneyReward: 5
@@ -1480,6 +1504,8 @@ MonoBehaviour:
   o_health: 0
   rotationRatio: 5
   requirementDistance: 0.01
+  reverseMovement: 0
+  reverseMultipler: 1
   healthBar: {fileID: 608445701749812165}
   maxScale: 0.9
   minScale: 0
@@ -1513,9 +1539,19 @@ MonoBehaviour:
   chanceOfFull: 5
   PI_Shield: 0.4
   cacheImmunity: 0
+  isGhost: 0
+  col: {fileID: 0}
+  ghostCooldown: 2
+  ghostDuration: 2
+  ghostColor: {r: 1, g: 1, b: 1, a: 0.23529412}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  isExplosive: 0
+  explosionRange: 3
+  explosionDuration: 0.5
+  shockDuration: 2
   magnitude: 0.05
   time: 0.1
-  moneyReward: 5
+  moneyReward: 2
   isSlowed: 0
   delayTillHide: 3
   visual: {fileID: 7666059392899271268}

@@ -172,6 +172,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         if(makeWarsHappen)
         {
             FactionConquer.Instance.ConquerForAll();
+            Trading.Instance.CheckTrade();
             makeWarsHappen = false;
         }
         LandConquerer.Instance.ApplyPlaces();
