@@ -84,6 +84,7 @@ public class UpgradeManager : MonoBehaviour
 
     public GameObject targettingObj;
     public GameObject freezerObj;
+    public GameObject sellOption;
     
 
 
@@ -404,6 +405,7 @@ public class UpgradeManager : MonoBehaviour
         priceVisual.text = "$" + finalPrice.ToString();
         upgradeButtons.SetActive(false);
         sell.SetActive(true);
+        CloseSellOption();
     }
 
     public void HideLevelRemovers()
@@ -772,6 +774,10 @@ public class UpgradeManager : MonoBehaviour
         }
 
         priceVisual.text = "$" + finalPrice.ToString();
+        if(finalPrice == 0)
+        {
+            Decline(); //Automatically removes Upgrade-Mode since nothing has been planned to upgrade
+        }
     }
 
     public void SelectUpgrade(int index)
@@ -789,6 +795,7 @@ public class UpgradeManager : MonoBehaviour
         upgradeButtons.SetActive(true);
         sell.SetActive(false);
         ShowUpgrades();
+        CloseSellOption();
     }
 
     public void DelectUpgrade(int index)
@@ -845,6 +852,16 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
+    public void OpenSellOption()
+    {
+        sellOption.SetActive(true);
+    }
+
+    public void CloseSellOption()
+    {
+        sellOption.SetActive(false);
+    }
+
     public void Sell()
     {
         if(tower == null)
@@ -876,6 +893,7 @@ public class UpgradeManager : MonoBehaviour
         settings.money += tower.sellValue;
         settings.UpdateVisual();
         Destroy(tower.gameObject);
+        CloseSellOption();
     }
 
     public void NextTargetting()

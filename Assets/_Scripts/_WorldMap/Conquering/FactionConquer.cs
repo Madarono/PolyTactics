@@ -173,12 +173,13 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             if(tile == blueTile && ((chance <= factionChanceHate && blueRelation != Relation.Hate) || (chance <= factionChanceNeutral && blueRelation != Relation.Neutral)))
             {
                 enemyTileIndex = 0;
-                float attackerStrength = factionPower.factionStrength[attackerIndex].strength;
+                float finalStrength = TemporaryAIStrength(attacker);
+                float attackerStrength = factionPower.factionStrength[attackerIndex].strength + finalStrength;
                 float enemyStrength = factionPower.factionStrength[enemyTileIndex].strength;
                 float winChance = (attackerStrength * 100f) / (attackerStrength + enemyStrength + 1f); // +1 to avoid division by zero
                 float fightChance = Random.Range(0, 100f);
                 // Debug.Log($"Win Chance: {winChance.ToString()}, Chance: {fightChance.ToString()}");
-                if(fightChance <= winChance)
+                if(fightChance <= winChance && !isInAlliance(attacker) && !isInTemporaryAI(attacker, Factions.Circle))
                 {
                     places.Add(pos);
                 }
@@ -186,12 +187,13 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             else if(tile == redTile && ((chance <= factionChanceHate && redRelation != Relation.Hate) || (chance <= factionChanceNeutral && redRelation != Relation.Neutral)))
             {
                 enemyTileIndex = 1;
-                float attackerStrength = factionPower.factionStrength[attackerIndex].strength;
+                float finalStrength = TemporaryAIStrength(attacker);
+                float attackerStrength = factionPower.factionStrength[attackerIndex].strength + finalStrength;
                 float enemyStrength = factionPower.factionStrength[enemyTileIndex].strength;
                 float winChance = (attackerStrength * 100f) / (attackerStrength + enemyStrength + 1f);
                 float fightChance = Random.Range(0, 100f);
                 // Debug.Log($"Win Chance: {winChance.ToString()}, Chance: {fightChance.ToString()}");
-                if(fightChance <= winChance)
+                if(fightChance <= winChance && !isInAlliance(attacker) && !isInTemporaryAI(attacker, Factions.Rectangle))
                 {
                     places.Add(pos);
                 }
@@ -199,12 +201,14 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             else if(tile == yellowTile && ((chance <= factionChanceHate && yellowRelation != Relation.Hate) || (chance <= factionChanceNeutral && yellowRelation != Relation.Neutral)))
             {
                 enemyTileIndex = 2;
-                float attackerStrength = factionPower.factionStrength[attackerIndex].strength;
+                float finalStrength = TemporaryAIStrength(attacker);
+                float attackerStrength = factionPower.factionStrength[attackerIndex].strength + finalStrength;
                 float enemyStrength = factionPower.factionStrength[enemyTileIndex].strength;
                 float winChance = (attackerStrength * 100f) / (attackerStrength + enemyStrength + 1f);
                 float fightChance = Random.Range(0, 100f);
+
                 // Debug.Log($"Win Chance: {winChance.ToString()}, Chance: {fightChance.ToString()}");
-                if(fightChance <= winChance)
+                if(fightChance <= winChance && !isInAlliance(attacker) && !isInTemporaryAI(attacker, Factions.Triangle))
                 {
                     places.Add(pos);
                 }
@@ -212,12 +216,13 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             else if(tile == greenTile && ((chance <= factionChanceHate && greenRelation != Relation.Hate) || (chance <= factionChanceNeutral && greenRelation != Relation.Neutral)))
             {
                 enemyTileIndex = 3;
-                float attackerStrength = factionPower.factionStrength[attackerIndex].strength;
+                float finalStrength = TemporaryAIStrength(attacker);
+                float attackerStrength = factionPower.factionStrength[attackerIndex].strength + finalStrength;
                 float enemyStrength = factionPower.factionStrength[enemyTileIndex].strength;
                 float winChance = (attackerStrength * 100f) / (attackerStrength + enemyStrength + 1f);
                 float fightChance = Random.Range(0, 100f);
                 // Debug.Log($"Win Chance: {winChance.ToString()}, Chance: {fightChance.ToString()}");
-                if(fightChance <= winChance)
+                if(fightChance <= winChance && !isInAlliance(attacker) && !isInTemporaryAI(attacker, Factions.Square))
                 {
                     places.Add(pos);
                 }
@@ -233,6 +238,10 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                     Vector3Int posGround = new Vector3Int(x, y, 0);
                     if(ground.GetTile(posGround) != null && HasAnyAdjacentFactionTile(posGround, attackerTilemap))
                     {
+                        if(IsThereFactionTile(posGround))
+                        {
+                            continue;
+                        }
                         groundPlaces.Add(posGround);
                     }
                 }
@@ -279,7 +288,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == redTile && relations[i].faction == Factions.Rectangle)
                 {
-                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints -= pointDeduction, 0);
+                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.rectangleRelation.Length; o++)
                     {
                         if(attacker == relationships.rectangleRelation[o].faction)
@@ -293,7 +302,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == yellowTile && relations[i].faction == Factions.Triangle)
                 {
-                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints -= pointDeduction, 0);
+                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.triangleRelation.Length; o++)
                     {
                         if(attacker == relationships.triangleRelation[o].faction)
@@ -307,7 +316,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == greenTile && relations[i].faction == Factions.Square)
                 {
-                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints -= pointDeduction, 0);
+                    relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.squareRelation.Length; o++)
                     {
                         if(attacker == relationships.squareRelation[o].faction)
@@ -445,6 +454,23 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
         return result;
     }
 
+    bool IsThereFactionTile(Vector3Int center)
+    {
+        Tilemap[] tilemaps = new Tilemap[4] {blue, red, yellow, green};
+        
+        foreach(var tilemap in tilemaps)
+        {
+            if(tilemap.GetTile(center) != null)
+            {
+                // Debug.Log("There is a faction tile");
+                return true;
+            }
+        }
+            
+        // Debug.Log("There isn't a faction tile");
+        return false;
+    }
+
     bool HasAnyAdjacentFactionTile(Vector3Int center, Tilemap factionMap)
     {
         Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right, new Vector3Int(1,1,0), new Vector3Int(-1,1,0), new Vector3Int(-1,-1,0), new Vector3Int(1,-1,0)};
@@ -456,6 +482,116 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 return true;
             }
         }
+        return false;
+    }
+
+    bool isInAlliance(Factions attackingFaction)
+    {
+        Alliances alliances = Alliances.Instance;
+
+        foreach(var alliance in alliances.factionAlliances)
+        {
+            if(attackingFaction == alliance.faction && alliance.isUnderAlliance)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int TemporaryAIStrength(Factions attackingFaction)
+    {
+        Alliances alliances = Alliances.Instance;
+        FactionPower power = FactionPower.Instance;
+        TemporaryAI[] temp = new TemporaryAI[0];
+
+        switch(attackingFaction)
+        {
+            case Factions.Circle:
+                temp = alliances.circleTempAI;
+                break;
+
+            case Factions.Rectangle:
+                temp = alliances.rectangleTempAI;
+                break;
+
+            case Factions.Triangle:
+                temp = alliances.triangleTempAI;
+                break;
+
+            case Factions.Square:
+                temp = alliances.squareTempAI;
+                break;
+        }
+
+        int finalStrength = 0;
+
+        for(int i = 0; i < temp.Length; i++)
+        {
+            if(temp[i].isUnderAlliance)
+            {
+                finalStrength += power.factionStrength[i].strength;
+            }
+        }
+
+        return finalStrength;
+    }
+
+    bool isInTemporaryAI(Factions attackingFaction, Factions otherFaction)
+    {
+        Alliances alliances = Alliances.Instance;
+        TemporaryAI[] temp = new TemporaryAI[0];
+        TemporaryAI[] temp2 = new TemporaryAI[0];
+
+        switch(attackingFaction)
+        {
+            case Factions.Circle:
+                temp = alliances.circleTempAI;
+                break;
+
+            case Factions.Rectangle:
+                temp = alliances.rectangleTempAI;
+                break;
+
+            case Factions.Triangle:
+                temp = alliances.triangleTempAI;
+                break;
+
+            case Factions.Square:
+                temp = alliances.squareTempAI;
+                break;
+        }
+
+        switch(otherFaction)
+        {
+            case Factions.Circle:
+                temp2 = alliances.circleTempAI;
+                break;
+
+            case Factions.Rectangle:
+                temp2 = alliances.rectangleTempAI;
+                break;
+
+            case Factions.Triangle:
+                temp2 = alliances.triangleTempAI;
+                break;
+
+            case Factions.Square:
+                temp2 = alliances.squareTempAI;
+                break;
+        }
+
+        bool pass1 = temp.Any(tmp => otherFaction == tmp.faction && tmp.isUnderAlliance);
+        bool pass2 = temp2.Any(tmp2 => attackingFaction == tmp2.faction && tmp2.isUnderAlliance);
+
+        if(pass1 && pass2)
+        {
+            // Debug.Log($"{attackingFaction} is not fighting {otherFaction}");
+            return true;
+        }
+
+        // Debug.Log($"{attackingFaction} is fighting {otherFaction}");
         return false;
     }
 

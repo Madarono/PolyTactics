@@ -199,19 +199,19 @@ public class Trading : MonoBehaviour, IDataPersistence
         switch(otherFaction)
         {
             case Factions.Circle:
-                trust.circleTrust += finalPoints;
+                trust.circleTrust = Mathf.Clamp(trust.circleTrust + finalPoints, 0, 100);
                 break;
 
             case Factions.Rectangle:
-                trust.rectangleTrust += finalPoints;
+                trust.rectangleTrust = Mathf.Clamp(trust.rectangleTrust + finalPoints, 0, 100);
                 break;
 
             case Factions.Triangle:
-                trust.triangleTrust += finalPoints;
+                trust.triangleTrust = Mathf.Clamp(trust.triangleTrust + finalPoints, 0, 100);
                 break;
 
             case Factions.Square:
-                trust.squareTrust += finalPoints;
+                trust.squareTrust = Mathf.Clamp(trust.squareTrust + finalPoints, 0, 100);
                 break;
         }
 
@@ -251,7 +251,7 @@ public class Trading : MonoBehaviour, IDataPersistence
         
         for(int i = 0; i < visuals.Length; i++)
         {
-            if(visuals[i].faction != playerFaction)
+            if(visuals[i].faction != playerFaction && values[i] < 100)
             {
                 visuals[i].visual.SetActive(true);
                 visuals[i].value.text = values[i].ToString();

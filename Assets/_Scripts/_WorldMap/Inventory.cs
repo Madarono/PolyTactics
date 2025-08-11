@@ -9,6 +9,8 @@ public class Inventory : MonoBehaviour, IDataPersistence
     public TowerSlotSO[] towersList;
 
     public List<TowerSlotSO> towers = new List<TowerSlotSO>();
+    public List<TowerSlotSO> allianceTowers = new List<TowerSlotSO>(); //Controlled by Alliances.cs
+    public List<int> allianceIndex = new List<int>();
     public List<int> towerIndex = new List<int>();
 
     [Header("StockTowers")]

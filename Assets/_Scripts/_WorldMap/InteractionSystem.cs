@@ -32,6 +32,13 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public Tilemap green;
     private Tilemap tilemap;
 
+    [Header("Tiles")]
+    // public TileBase ground;
+    public TileBase blueTile;
+    public TileBase redTile;
+    public TileBase yellowTile;
+    public TileBase greenTile;
+
     [Header("Visual")]
     public GameObject dotPrefab;
     public Transform dotParent;
@@ -97,7 +104,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public bool hasWon;
     private bool makeWarsHappen = false;
 
-    private GameObject lastDot;
+    [HideInInspector]public GameObject lastDot;
     private int factionIndex; //For the tilebase
     bool checkedPlayer = false;
 
@@ -157,7 +164,11 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         Inventory.Instance.LoadTowers();
         Inventory.Instance.LoadStockTowers();
         CheckFaction.Instance.CheckVisuals(playerFaction);
-        FactionPower.Instance.CalculateStrength();
+        Alliances.Instance.RevertToAlliances();
+        AIFights.Instance.Refresh();
+        AIFights.Instance.PutIntoGlow();
+
+
         if(hasWon) //This is for land
         {
             Vector3Int placeVector = new Vector3Int(levelPlace[0], levelPlace[1], levelPlace[2]);
@@ -171,12 +182,16 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         }
         if(makeWarsHappen)
         {
+            AIFights.Instance.CheckAllys(); //Put this in makewarsHappen
             FactionConquer.Instance.ConquerForAll();
             Trading.Instance.CheckTrade();
             makeWarsHappen = false;
+            Alliances.Instance.ReduceRounds(); //Reduces the turns untill the alliance is terminated
+            Alliances.Instance.CheckTemporaryAlliancesAI(); //Checks after all fights occur
         }
         LandConquerer.Instance.ApplyPlaces();
         FactionConquer.Instance.ShowGlow();
+        FactionPower.Instance.CalculateStrength();
         
         InstantiateDots();
         saveLevel = false;
@@ -316,7 +331,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             }
             dots.Clear();
         }
-        
+
         switch(playerFaction)
         {
             case Factions.Circle:
@@ -345,7 +360,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 TileBase currentTile = tilemap.GetTile(pos);
                 TileBase groundTile = ground.GetTile(pos);
 
-                if(currentTile == null && groundTile != null && HasAnyAdjacentFactionTile(pos, tilemap)) //No already placed one and there is a ground tile
+                if(currentTile == null && groundTile != null && HasAnyAdjacentFactionTile(pos, tilemap) && !TileUnderAlliance(pos)) //No already placed one and there is a ground tile
                 {
                     Vector3 worldPos = tilemap.GetCellCenterWorld(pos);
                     GameObject go = Instantiate(dotPrefab, worldPos, Quaternion.identity);
@@ -392,7 +407,37 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
 
         foreach(Vector3Int dir in directions)
         {
+            // TileBase tile = factionMap.GetTile(center + dir);
             if(factionMap.GetTile(center + dir) != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    bool TileUnderAlliance(Vector3Int center)
+    {
+        Alliances alliance = Alliances.Instance;
+        List<Tilemap> tilemaps = new List<Tilemap>() {blue, red, yellow, green};
+
+        foreach(var tilemap in tilemaps)
+        {
+            TileBase tile = tilemap.GetTile(center);
+            if(tile == blueTile && alliance.factionAlliances[0].isUnderAlliance)
+            {
+                return true;
+            }
+            else if(tile == redTile && alliance.factionAlliances[1].isUnderAlliance)
+            {
+                return true;
+            }
+            else if(tile == yellowTile && alliance.factionAlliances[2].isUnderAlliance)
+            {
+                return true;
+            }
+            else if(tile == greenTile && alliance.factionAlliances[3].isUnderAlliance)
             {
                 return true;
             }
@@ -403,6 +448,11 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     //Selecting Level
     void Update()
     {
+        if(AIFights.Instance.canFight)
+        {
+            return;
+        }
+
         if(Application.isMobilePlatform && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -529,7 +579,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         }
         for(int i = 0; i < dots.Count; i++)
         {
-            if(tilePos == dots[i].transform.position)
+            if(tilePos == dots[i].transform.position && !AIFights.Instance.dots.Contains(dots[i]))
             {
                 if(lastDot != null && lastDot.TryGetComponent(out SpriteRenderer rend))
                 {
@@ -573,7 +623,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         inventoryOn = true;
     }
 
-    void CloseInventoryWindow()
+    public void CloseInventoryWindow()
     {
         inventoryWindow.SetActive(false);
         inventoryOn = false;
@@ -621,6 +671,27 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 }
                 goScript.slot = inventory.towers[i];
                 goScript.slotIndex = inventory.towerIndex[i];
+                goScript.Refresh();
+            }
+        } 
+
+        for(int i = 0; i < inventory.allianceTowers.Count; i++)
+        {
+            GameObject go = Instantiate(slotPrefab, slotParent.position, Quaternion.identity);
+            go.transform.SetParent(slotParent);
+            go.transform.localScale = Vector3.one;
+            go.transform.rotation = slotParent.rotation;
+            if(go.TryGetComponent(out TowerSlotInventory goScript))
+            {
+                if(currentTowers.Contains(inventory.allianceTowers[i]))
+                {
+                    if(go.TryGetComponent(out Button button))
+                    {
+                        button.interactable = false;
+                    }
+                }
+                goScript.slot = inventory.allianceTowers[i];
+                goScript.slotIndex = inventory.allianceIndex[i];
                 goScript.Refresh();
             }
         } 

@@ -87,6 +87,27 @@ public class GameData
     //Trading.cs
     public int reqIndex;
     public int inviteChance;
+    
+    //Alliances.cs
+    public bool[] isUnderAlliance;
+    public Factions[] factionsA;
+    public Factions[] factionsB;
+    public Factions[] factionsC;
+    public bool[] isUnderTemp1;
+    public int[] turnsLeft1;
+    public bool[] isUnderTemp2; 
+    public int[] turnsLeft2;
+    public bool[] isUnderTemp3; 
+    public int[] turnsLeft3;
+    public bool[] isUnderTemp4; 
+    public int[] turnsLeft4;
+    public int turnsTillattempt;
+
+    //AIFights.cs
+    public int[] placesInt;
+    public int[] lastFight;
+    public int[] strength_fights;
+    public int[] relationIndex;
 
     public GameData()
     {   
@@ -173,5 +194,26 @@ public class GameData
         //Trading.cs
         this.reqIndex = -1;
         this.inviteChance = 0;
+
+        //Alliances.cs
+        this.isUnderAlliance = new bool[4];
+        this.factionsA = new Factions[0];
+        this.factionsB = new Factions[0];
+        this.factionsC = new Factions[0];
+        this.isUnderTemp1 = new bool[4]; 
+        this.isUnderTemp2 = new bool[4]; 
+        this.isUnderTemp3 = new bool[4]; 
+        this.isUnderTemp4 = new bool[4]; 
+        this.turnsLeft1 = new int[4]; 
+        this.turnsLeft2 = new int[4]; 
+        this.turnsLeft3 = new int[4]; 
+        this.turnsLeft4 = new int[4]; 
+        this.turnsTillattempt = 5;
+
+        //AIFights.cs
+        this.placesInt = new int[0];
+        this.lastFight = new int[0];
+        this.strength_fights = new int[0];
+        this.relationIndex = new int[0];
     }
 }
