@@ -52,6 +52,7 @@ public class TowerManager : MonoBehaviour
     public List<Trap> trapTower = new List<Trap>(); //To directly access traps for live reduction
     public List<Tower> farm = new List<Tower>(); //To directly access farms for money
     public List<Tower> villages = new List<Tower>(); //To directly access villages
+    public List<Tower> freezer = new List<Tower>(); //To directly access freezers
     public TextMeshProUGUI priceVisual;
     public TextMeshProUGUI nameVisual;
 
@@ -262,6 +263,10 @@ public class TowerManager : MonoBehaviour
 
                     case TowerType.Village:
                         villages.Add(goScript);
+                        break;
+
+                    case TowerType.Freezer:
+                        freezer.Add(goScript);
                         break;
                 }
                 tower.Add(goScript);

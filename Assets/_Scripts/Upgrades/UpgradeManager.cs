@@ -886,6 +886,11 @@ public class UpgradeManager : MonoBehaviour
                 towerManager.tower.Remove(tower.tower);
                 break;
 
+            case TowerType.Freezer:
+                towerManager.freezer.Remove(tower.tower);
+                towerManager.tower.Remove(tower.tower);
+                break;
+
             default:
                 towerManager.tower.Remove(tower.tower);
                 break;

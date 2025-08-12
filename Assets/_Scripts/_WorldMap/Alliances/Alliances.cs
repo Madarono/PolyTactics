@@ -294,22 +294,27 @@ public class Alliances : MonoBehaviour, IDataPersistence
         foreach(var alliance in factionAlliances)
         {
             FactionRelation[] relation = new FactionRelation[0];
+            Factions otherFaction = Factions.Neutral;
             switch(alliance.faction)
             {
                 case Factions.Circle:
                     relation = relationships.circleRelation;
+                    otherFaction = Factions.Circle;
                     break;
 
                 case Factions.Rectangle:
                     relation = relationships.rectangleRelation;
+                    otherFaction = Factions.Rectangle;
                     break;
 
                 case Factions.Triangle:
                     relation = relationships.triangleRelation;
+                    otherFaction = Factions.Triangle;
                     break;
 
                 case Factions.Square:
                     relation = relationships.squareRelation;
+                    otherFaction = Factions.Square;
                     break;
             }
 
@@ -318,6 +323,11 @@ public class Alliances : MonoBehaviour, IDataPersistence
                 if(playerFaction == relation[i].faction)
                 {
                     alliance.relation = relation[i].relation;
+                    if(relation[i].relationPoints < 50)
+                    {
+                        RemoveManualAlliance(otherFaction);
+                    }
+                    break;
                 }
             }
         }
@@ -505,25 +515,30 @@ public class Alliances : MonoBehaviour, IDataPersistence
             TemporaryAI[] temp2 = new TemporaryAI[0];
             FactionRelation[] factionRelation1 = new FactionRelation[0];
             FactionRelation[] factionRelation2 = new FactionRelation[0];
+            int index = -1;
 
             switch(factionA)
             {
                 case Factions.Circle:
+                    index = 0;
                     temp = circleTempAI;
                     factionRelation1 = relationships.circleRelation;
                     break;
 
                 case Factions.Rectangle:
+                    index = 1;
                     temp = rectangleTempAI;
                     factionRelation1 = relationships.rectangleRelation;
                     break;
 
                 case Factions.Triangle:
+                    index = 2;
                     temp = triangleTempAI;
                     factionRelation1 = relationships.triangleRelation;
                     break;
 
                 case Factions.Square:
+                    index = 3;
                     temp = squareTempAI;
                     factionRelation1 = relationships.squareRelation;
                     break;
@@ -570,6 +585,10 @@ public class Alliances : MonoBehaviour, IDataPersistence
                     break;
                 }
             }
+
+            //Put something here in the News;
+            News news = News.Instance;
+            news.PutNewInfo(NewsType.TemporaryAllianceFormed, news.ReplaceStrings(factionA, factionB, news.temporaryAlliancePresets[Random.Range(0, news.temporaryAlliancePresets.Length)]), index);
 
             foreach(var relation in factionRelation1)
             {
@@ -630,22 +649,27 @@ public class Alliances : MonoBehaviour, IDataPersistence
             {
                 TemporaryAI[] temp = new TemporaryAI[0];
                 TemporaryAI[] temp2 = new TemporaryAI[0];
+                int index = -1;
 
                 switch(factionsA[i])
                 {
                     case Factions.Circle:
+                        index = 0;
                         temp = circleTempAI;
                         break;
 
                     case Factions.Rectangle:
+                        index = 1;
                         temp = rectangleTempAI;
                         break;
 
                     case Factions.Triangle:
+                        index = 2;
                         temp = triangleTempAI;
                         break;
 
                     case Factions.Square:
+                        index = 3;
                         temp = squareTempAI;
                         break;
                 }
@@ -686,6 +710,10 @@ public class Alliances : MonoBehaviour, IDataPersistence
                     }
                 }
 
+                //Put something here in the News;
+                News news = News.Instance;
+                news.PutNewInfo(NewsType.TemporaryAllianceBroken, news.ReplaceStrings(factionsA[i], factionsB[i], news.brokenTemporaryAlliancePresets[Random.Range(0, news.brokenTemporaryAlliancePresets.Length)]), index);
+
                 factionsA.RemoveAt(i);
                 factionsB.RemoveAt(i);
                 factionsC.RemoveAt(i);
@@ -696,12 +724,33 @@ public class Alliances : MonoBehaviour, IDataPersistence
     //Player-AI Manual Alliance
     public void MakeManualAlliance(Factions otherFaction)
     {
+        News news = News.Instance;
         RefreshRelations();
         for(int i = 0; i < factionAlliances.Length; i++)
         {
             if(otherFaction == factionAlliances[i].faction && factionAlliances[i].relation != Relation.Hate)
             {
                 factionAlliances[i].isUnderAlliance = true;
+                int index = -1;
+                switch(playerFaction)
+                {
+                    case Factions.Circle:
+                        index = 0;
+                        break;
+
+                    case Factions.Rectangle:
+                        index = 1;
+                        break;
+
+                    case Factions.Triangle:
+                        index = 2;
+                        break;
+
+                    case Factions.Square:
+                        index = 3;
+                        break;
+                }
+                news.PutNewInfo(NewsType.AllianceFormed, news.ReplaceStrings(playerFaction, factionAlliances[i].faction, news.alliancePresets[Random.Range(0, news.alliancePresets.Length)]), index);
                 break;
             }
         }
@@ -716,16 +765,38 @@ public class Alliances : MonoBehaviour, IDataPersistence
         isUnderAlliance = underAlliance.ToArray();
 
         CheckAlliances();
+        //Put something here in the News;
     }
 
     public void RemoveManualAlliance(Factions otherFaction)
     {
-        RefreshRelations();
+        News news = News.Instance;
+        // RefreshRelations();
         for(int i = 0; i < factionAlliances.Length; i++)
         {
-            if(otherFaction == factionAlliances[i].faction)
+            if(otherFaction == factionAlliances[i].faction && factionAlliances[i].isUnderAlliance)
             {
                 factionAlliances[i].isUnderAlliance = false;
+                int index = -1;
+                switch(playerFaction)
+                {
+                    case Factions.Circle:
+                        index = 0;
+                        break;
+
+                    case Factions.Rectangle:
+                        index = 1;
+                        break;
+
+                    case Factions.Triangle:
+                        index = 2;
+                        break;
+
+                    case Factions.Square:
+                        index = 3;
+                        break;
+                }
+                news.PutNewInfo(NewsType.AllianceBroken, news.ReplaceStrings(playerFaction, factionAlliances[i].faction, news.brokenAlliancePresets[Random.Range(0, news.brokenAlliancePresets.Length)]), index);
                 break;
             }
         }
@@ -740,5 +811,6 @@ public class Alliances : MonoBehaviour, IDataPersistence
         isUnderAlliance = underAlliance.ToArray();
 
         CheckAlliances();
+        //Put something here in the News;
     }
 }

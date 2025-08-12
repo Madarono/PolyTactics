@@ -72,6 +72,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
             data._uranium += this.uranium;
             data.hasWon = this.hasWon;
             data.makeWarsHappen = true; 
+            data.hasCheckedNews = false;
             hasSaved = true; //To only save once after winning
         }
         else if(finishedBattle && !hasSaved && !showUI)

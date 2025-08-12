@@ -53,6 +53,7 @@ public class GameData
     public int[] levelPlace = new int[3];
     public int[] slotIndex = new int[0];
     public bool checkedPlayer;
+    public bool hasCheckedNews;
 
     //LandConquerer.cs
     public int[] landPlaces = new int[0];
@@ -109,6 +110,13 @@ public class GameData
     public int[] strength_fights;
     public int[] relationIndex;
 
+    //News.cs
+    public NewsType[] savingType;
+    public string[] savingInfo;
+    public string[] savingHeader;
+    public int[] savingIconIndex;
+    public int days;
+
     public GameData()
     {   
         //PauseSystem.cs
@@ -160,6 +168,7 @@ public class GameData
         this.levelPlace = new int[3];
         this.slotIndex = new int[0];
         this.checkedPlayer = false;
+        this.hasCheckedNews = false;
 
         //LandConquerer.cs
         this.landPlaces = new int[0];
@@ -215,5 +224,12 @@ public class GameData
         this.lastFight = new int[0];
         this.strength_fights = new int[0];
         this.relationIndex = new int[0];
+        
+        //News.cs
+        this.savingType = new NewsType[0];
+        this.savingInfo = new string[0];
+        this.savingHeader = new string[0];
+        this.savingIconIndex = new int[0];
+        this.days = 0;
     }
 }

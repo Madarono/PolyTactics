@@ -419,6 +419,20 @@ public class Tower : MonoBehaviour
     {
         EnemyInfo colScript = new EnemyInfo();
         colScript.enemy = enemyScript;
+        bool noEnemy = true;   
+        foreach(var e in enemy)
+        {
+            if(e.enemy == enemyScript)
+            {
+                noEnemy = false;
+                break;
+            }
+        }
+        
+        if(!noEnemy)
+        {
+            return;
+        }
         enemy.Add(colScript);
         UpdateValues(); 
     }

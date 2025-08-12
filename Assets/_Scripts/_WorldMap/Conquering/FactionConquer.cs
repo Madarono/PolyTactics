@@ -41,6 +41,16 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
     [Header("AfterMath")]
     public int pointDeduction = 10;
     public int playerGain = 5; //From other factions when hitting a hated one
+    public int factionGain = 10; //From other factions to factions
+
+    //ToPutToNews
+    private HashSet<Factions> blueConquered = new HashSet<Factions>();
+    private HashSet<Factions> redConquered = new HashSet<Factions>();
+    private HashSet<Factions> yellowConquered = new HashSet<Factions>();
+    private HashSet<Factions> greenConquered = new HashSet<Factions>();
+
+    public Vector3Int dontAttackHere;
+    public bool hasChangedDont = false;
 
     [Header("Debug")]
     public bool debug = false;
@@ -108,12 +118,14 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
         tilesByPosition.Clear();
         tilemap = attackerTilemap;
         BoundsInt bounds = tilemap.cellBounds;
+        HashSet<Factions> tilesConquered = new HashSet<Factions>();
         for(int x = bounds.xMin - 1; x < bounds.xMax + 1; x++)
         {
             for(int y = bounds.yMin - 1; y < bounds.yMax + 1; y++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
-                if(tilemap.GetTile(pos) == null) 
+                Vector3Int otherPos = new Vector3Int(dontAttackHere.x, dontAttackHere.y, 0);
+                if(tilemap.GetTile(pos) == null || (pos == otherPos && hasChangedDont)) 
                 {
                     continue;
                 }
@@ -153,12 +165,13 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
 
                     case Factions.Rectangle:
                         attackerIndex = 1;
-                        redRelation = relation.relation;
+                        redRelation = relation.relation;    
                         break;
 
                     case Factions.Triangle:
                         attackerIndex = 2;
                         yellowRelation = relation.relation;
+
                         break;
 
                     case Factions.Square:
@@ -166,6 +179,21 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                         greenRelation = relation.relation;
                         break;
                 }
+            }
+            switch(attacker)
+            {
+                case Factions.Circle:
+                    tilesConquered = blueConquered;
+                    break;
+                case Factions.Rectangle:
+                    tilesConquered = redConquered;
+                    break;
+                case Factions.Triangle:
+                    tilesConquered = yellowConquered;
+                    break;
+                case Factions.Square:
+                    tilesConquered = greenConquered;
+                    break;
             }
 
             int enemyTileIndex = -1;
@@ -274,6 +302,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             {
                 if(endTile == blueTile && relations[i].faction == Factions.Circle)
                 {
+                    tilesConquered.Add(Factions.Circle);
                     relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.circleRelation.Length; o++)
                     {
@@ -288,6 +317,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == redTile && relations[i].faction == Factions.Rectangle)
                 {
+                    tilesConquered.Add(Factions.Rectangle);
                     relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.rectangleRelation.Length; o++)
                     {
@@ -302,6 +332,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == yellowTile && relations[i].faction == Factions.Triangle)
                 {
+                    tilesConquered.Add(Factions.Triangle);
                     relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.triangleRelation.Length; o++)
                     {
@@ -316,6 +347,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
                 }
                 else if(endTile == greenTile && relations[i].faction == Factions.Square)
                 {
+                    tilesConquered.Add(Factions.Square);
                     relations[i].relationPoints = Mathf.Max(relations[i].relationPoints - pointDeduction, 0);
                     for(int o = 0; o < relationships.squareRelation.Length; o++)
                     {
@@ -353,11 +385,11 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
 
     int GetAttackAmount(int strength)
     {
-        if(strength < 100)
+        if(strength < 150)
         {
             return 1;
         }
-        else if(strength < 150)
+        else if(strength < 200)
         {
             return 2;
         }
@@ -419,6 +451,24 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
             {
                 Conquer(Factions.Square, Relationships.Instance.squareRelation, tilemaps, green);
             }
+        }
+
+        News news = News.Instance;
+        foreach(var faction in blueConquered)
+        {
+            news.PutNewInfo(NewsType.Conflict, news.ReplaceStrings(Factions.Circle, faction, news.conflictPresets[Random.Range(0, news.conflictPresets.Length)]), 0);
+        }
+        foreach(var faction in redConquered)
+        {
+            news.PutNewInfo(NewsType.Conflict, news.ReplaceStrings(Factions.Rectangle, faction, news.conflictPresets[Random.Range(0, news.conflictPresets.Length)]), 1);
+        }
+        foreach(var faction in yellowConquered)
+        {
+            news.PutNewInfo(NewsType.Conflict, news.ReplaceStrings(Factions.Triangle, faction, news.conflictPresets[Random.Range(0, news.conflictPresets.Length)]), 2);
+        }
+        foreach(var faction in greenConquered)
+        {
+            news.PutNewInfo(NewsType.Conflict, news.ReplaceStrings(Factions.Square, faction, news.conflictPresets[Random.Range(0, news.conflictPresets.Length)]), 3);
         }
 
         // ShowGlow();

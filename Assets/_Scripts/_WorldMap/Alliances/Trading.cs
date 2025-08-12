@@ -196,23 +196,40 @@ public class Trading : MonoBehaviour, IDataPersistence
         float multipler = hasAccepted ? 1f: 0.5f;
         finalPoints = Mathf.FloorToInt(finalPoints * multipler);
 
+        FactionRelation[] relations = new FactionRelation[0];
+        
         switch(otherFaction)
         {
             case Factions.Circle:
                 trust.circleTrust = Mathf.Clamp(trust.circleTrust + finalPoints, 0, 100);
+                relations = relationships.circleRelation;
                 break;
 
             case Factions.Rectangle:
                 trust.rectangleTrust = Mathf.Clamp(trust.rectangleTrust + finalPoints, 0, 100);
+                relations = relationships.rectangleRelation;
                 break;
 
             case Factions.Triangle:
                 trust.triangleTrust = Mathf.Clamp(trust.triangleTrust + finalPoints, 0, 100);
+                relations = relationships.triangleRelation;
                 break;
 
             case Factions.Square:
                 trust.squareTrust = Mathf.Clamp(trust.squareTrust + finalPoints, 0, 100);
+                relations = relationships.squareRelation;
                 break;
+        }
+
+        if(hasAccepted)
+        {
+            foreach(var relation in relations)
+            {
+                if(relation.faction == playerFaction)
+                {
+                    relation.relationPoints = Mathf.Clamp(relation.relationPoints + relationshipIncrease, 0, 100);
+                }
+            }
         }
 
         foreach(var faction in visuals)

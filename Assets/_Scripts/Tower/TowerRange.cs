@@ -68,10 +68,26 @@ public class TowerRange : MonoBehaviour
             switch(tower.towerType)
             {         
                 case TowerType.Freezer:
+                bool stillSlowed = false;
+
+                foreach(var freezer in TowerManager.Instance.freezer)
+                {
+                    float dist = Vector2.Distance(enemy.transform.position, freezer.transform.position);
+                    if(dist <= freezer.range)
+                    {
+                        stillSlowed = true;
+                        break;
+                    }
+                }
+                if(!stillSlowed)
+                {
                     enemy.speed = enemy.o_speed;
                     enemy.overlayEffect.gameObject.SetActive(false);
                     enemy.isSlowed = false;
-                    break;
+
+                }
+                break;
+                    
 
                 case TowerType.Debuff:
                     if(tower.debuffEnemies.Contains(col.gameObject))

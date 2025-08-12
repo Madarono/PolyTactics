@@ -102,6 +102,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public int[] levelPlace = new int[3];
     public int levelFaction;
     public bool hasWon;
+    private bool hasCheckedNews;
     private bool makeWarsHappen = false;
 
     [HideInInspector]public GameObject lastDot;
@@ -125,6 +126,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         this.levelPlace = data.levelPlace;
         this.makeWarsHappen = data.makeWarsHappen;
         this.checkedPlayer = data.checkedPlayer;
+        this.hasCheckedNews = data.hasCheckedNews;
         
         if(hasWon)
         {
@@ -140,6 +142,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     {
         data.makeWarsHappen = this.makeWarsHappen;
         data.checkedPlayer = this.checkedPlayer;
+        data.hasCheckedNews = this.hasCheckedNews;
         if(saveLevel)
         {
             data.a_waves = Mathf.RoundToInt(this.waves * bases[factionIndex].multiplyer * this.multiplyer);
@@ -168,11 +171,62 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         AIFights.Instance.Refresh();
         AIFights.Instance.PutIntoGlow();
 
+        if(makeWarsHappen)
+        {
+            News.Instance.days++;
+        }
 
         if(hasWon) //This is for land
         {
             Vector3Int placeVector = new Vector3Int(levelPlace[0], levelPlace[1], levelPlace[2]);
             FactionConquer.Instance.glowPlayerPositions.Add(placeVector);
+            FactionConquer.Instance.dontAttackHere = placeVector;
+            FactionConquer.Instance.hasChangedDont = true;
+            int index = -1;
+            TileBase tile = IsThereFactionTile(placeVector);
+            Factions otherFaction = Factions.Neutral;
+
+            if(!hasCheckedNews)
+            {
+                if(tile == blueTile)
+                {
+                    otherFaction = Factions.Circle;
+                }
+                else if(tile == redTile)
+                {
+                    otherFaction = Factions.Rectangle;
+                }
+                else if(tile == yellowTile)
+                {
+                    otherFaction = Factions.Triangle;
+                }
+                else if(tile == greenTile)
+                {
+                    otherFaction = Factions.Square;
+                }
+
+                switch(playerFaction)
+                {
+                    case Factions.Circle:
+                        index = 0;
+                        break;
+                    case Factions.Rectangle:
+                        index = 1;
+                        break;
+                    case Factions.Triangle:
+                        index = 2;
+                        break;
+                    case Factions.Square:
+                        index = 3;
+                        break;
+                }
+                if(otherFaction != Factions.Neutral && otherFaction != playerFaction)
+                {
+                    News.Instance.PutNewInfo(NewsType.Conflict, News.Instance.ReplaceStrings(playerFaction, otherFaction, News.Instance.conflictPresets[Random.Range(0, News.Instance.conflictPresets.Length)]), index);
+                }
+                hasCheckedNews = true;
+            }
+
             LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
             if(!checkedPlayer)
             {
@@ -185,14 +239,16 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             AIFights.Instance.CheckAllys(); //Put this in makewarsHappen
             FactionConquer.Instance.ConquerForAll();
             Trading.Instance.CheckTrade();
-            makeWarsHappen = false;
             Alliances.Instance.ReduceRounds(); //Reduces the turns untill the alliance is terminated
             Alliances.Instance.CheckTemporaryAlliancesAI(); //Checks after all fights occur
+            makeWarsHappen = false;
         }
         LandConquerer.Instance.ApplyPlaces();
         FactionConquer.Instance.ShowGlow();
         FactionPower.Instance.CalculateStrength();
-        
+
+                    
+
         InstantiateDots();
         saveLevel = false;
         DataPersistenceManager.instance.SaveGame();
@@ -763,6 +819,23 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         anim.SetTrigger("Close");
         yield return new WaitForSeconds(duration);
         window.SetActive(false);
+    }
+
+    TileBase IsThereFactionTile(Vector3Int center)
+    {
+        Tilemap[] tilemaps = new Tilemap[4] {blue, red, yellow, green};
+        
+        foreach(var tilemap in tilemaps)
+        {
+            if(tilemap.GetTile(center) != null)
+            {
+                // Debug.Log("There is a faction tile");
+                return tilemap.GetTile(center);
+            }
+        }
+            
+        // Debug.Log("There isn't a faction tile");
+        return null;
     }
 
     void FixedUpdate()
