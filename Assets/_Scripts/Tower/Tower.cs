@@ -729,9 +729,10 @@ public class Tower : MonoBehaviour
             {
                 currentlyInRange.Add(stats);
 
-                if(!towersNear.Contains(stats) && !stats.isUnderRange)
+                if(!towersNear.Contains(stats) && !stats.isUnderRange && !BuffedTowerManager.Instance.buffedTowers.Contains(stats))
                 {
                     towersNear.Add(stats);
+                    BuffedTowerManager.Instance.buffedTowers.Add(stats);
                     stats.KeepTrack();
                     stats.isUnderRange = true;
                     stats.rangeIncrease = rangeIncrease;
@@ -772,6 +773,10 @@ public class Tower : MonoBehaviour
         {
             stats.isUnderRange = false;
             stats.ReturnToDefaults();
+            if(BuffedTowerManager.Instance.buffedTowers.Contains(stats))
+            {
+                BuffedTowerManager.Instance.buffedTowers.Remove(stats);
+            }
         }
     }
 

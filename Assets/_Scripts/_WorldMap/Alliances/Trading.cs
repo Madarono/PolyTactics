@@ -39,6 +39,7 @@ public class Trading : MonoBehaviour, IDataPersistence
     private SoundManager sound;
     
     public GameObject tradingWindow;
+    public GameObject canvas;
     public Animator windowAnim;
     public float animationDuration;
 
@@ -140,6 +141,7 @@ public class Trading : MonoBehaviour, IDataPersistence
         tradingWindow.SetActive(false);
         inviteWindow.SetActive(false);
         checkWindow.SetActive(false);
+        canvas.SetActive(false);
         trust = Trust.Instance;
         relationships = Relationships.Instance;
         storage = ResourcesStorage.Instance;
@@ -250,13 +252,14 @@ public class Trading : MonoBehaviour, IDataPersistence
     public void OpenWindow()
     {
         tradingWindow.SetActive(true);
+        canvas.SetActive(true);
         UpdateWindow();
         Time.timeScale = 0f;
     }
     public void CloseWindow()
     {
         Time.timeScale = 1f;
-        StartCoroutine(closeWindowAnimation(tradingWindow, windowAnim));
+        StartCoroutine(closeWindowAnimation(tradingWindow, windowAnim, true));
     }
     void UpdateWindow()
     {
@@ -315,7 +318,7 @@ public class Trading : MonoBehaviour, IDataPersistence
     }
     public void CloseInviteWindow()
     {
-        StartCoroutine(closeWindowAnimation(inviteWindow, inviteAnim));
+        StartCoroutine(closeWindowAnimation(inviteWindow, inviteAnim, false));
     }
     void UpdateInviteWindow(int index)
     {
@@ -414,7 +417,7 @@ public class Trading : MonoBehaviour, IDataPersistence
             faction.buttonVisual.text = "Send Invite";
         }
         UpdateWindow();
-        StartCoroutine(closeWindowAnimation(checkWindow, checkAnim));
+        StartCoroutine(closeWindowAnimation(checkWindow, checkAnim, false));
     }
     void UpdateAcceptWindow()
     {
@@ -454,11 +457,16 @@ public class Trading : MonoBehaviour, IDataPersistence
         relationshipVisual.text = $"{previousPoints} > {nowPoints}";
     }
 
-    IEnumerator closeWindowAnimation(GameObject window, Animator anim)
+    IEnumerator closeWindowAnimation(GameObject window, Animator anim, bool closeCanvas)
     {
         anim.SetTrigger("Close");
         yield return new WaitForSecondsRealtime(animationDuration);
         window.SetActive(false);
+
+        if(closeCanvas)
+        {
+            canvas.SetActive(false);
+        }
     }
 
     IEnumerator Cooldown()

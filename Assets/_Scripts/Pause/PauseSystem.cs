@@ -9,6 +9,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public static PauseSystem Instance { get; private set; }
 
     public GameObject window;
+    public GameObject canvas;
 
     [Header("Modifications")]
     public int graphics = 1;
@@ -85,13 +86,17 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         canSound = true;
         window.SetActive(true);
+        if(canvas != null)
+        {
+            canvas.SetActive(true);
+        }
         Time.timeScale = 0f;
     }
 
     public void CloseWindow()
     {
         canSound = false;
-        StartCoroutine(AnimationCloseWindow(windowAnim, window));
+        StartCoroutine(AnimationCloseWindow(windowAnim, window, true));
         if(worldMap)
         {
             Time.timeScale = 1f;
@@ -104,11 +109,16 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         }
     }
 
-    public IEnumerator AnimationCloseWindow(Animator anim, GameObject win)
+    public IEnumerator AnimationCloseWindow(Animator anim, GameObject win, bool closeCanvas)
     {
         anim.SetTrigger("Close");
         yield return new WaitForSecondsRealtime(closeDuration);
         win.SetActive(false);
+
+        if(closeCanvas && canvas != null)
+        {
+            canvas.SetActive(false);
+        }
     }
 
     void Refresh()
@@ -234,7 +244,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     
     public void CloseLeaveWindow()
     {
-        StartCoroutine(AnimationCloseWindow(leaveWindowAnim, leaveWindow));
+        StartCoroutine(AnimationCloseWindow(leaveWindowAnim, leaveWindow, false));
     }
 
     public void ConfirmLeave()

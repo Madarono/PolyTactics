@@ -23,6 +23,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     public Factions enemyFaction;
     public Camera cam;
 
+    public GameObject canvas;
 
     [Header("Tilemaps")]
     public Tilemap ground;
@@ -118,6 +119,12 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         playWindow.SetActive(false);
     }
 
+    void Start()
+    {
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 1;
+    }
+
     public void LoadData(GameData data)
     {
         this.multiplyer = data.resourceMultiplyer;
@@ -182,12 +189,16 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             FactionConquer.Instance.glowPlayerPositions.Add(placeVector);
             FactionConquer.Instance.dontAttackHere = placeVector;
             FactionConquer.Instance.hasChangedDont = true;
-            int index = -1;
-            TileBase tile = IsThereFactionTile(placeVector);
-            Factions otherFaction = Factions.Neutral;
+            if(makeWarsHappen)
+            {
+                LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
+            }
 
             if(!hasCheckedNews)
             {
+                int index = -1;
+                TileBase tile = IsThereFactionTile(placeVector);
+                Factions otherFaction = Factions.Neutral;
                 if(tile == blueTile)
                 {
                     otherFaction = Factions.Circle;
@@ -226,8 +237,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 }
                 hasCheckedNews = true;
             }
-
-            LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
+            
             if(!checkedPlayer)
             {
                 CheckFactionsPlayer(placeVector);
@@ -582,7 +592,8 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         int landSteel = Mathf.RoundToInt(steel * bases[factionIndex].multiplyer * multiplyer);
         int landOil = Mathf.RoundToInt(oil * bases[factionIndex].multiplyer * multiplyer);
         int landUranium = Mathf.RoundToInt(uranium * bases[factionIndex].multiplyer * multiplyer);
-        int landWaves = Mathf.RoundToInt(waves * bases[factionIndex].multiplyer * multiplyer);
+        float waveMultipler = bases[factionIndex].multiplyer > 1f ? 1.33f : 1f; 
+        int landWaves = Mathf.RoundToInt(waves * waveMultipler * multiplyer);
 
         coinsVisual.text = landCoins.ToString();
         grainVisual.text = landGrains.ToString();
@@ -751,6 +762,27 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 goScript.Refresh();
             }
         } 
+
+        for(int i = 0; i < inventory.shopTowers.Count; i++)
+        {
+            GameObject go = Instantiate(slotPrefab, slotParent.position, Quaternion.identity);
+            go.transform.SetParent(slotParent);
+            go.transform.localScale = Vector3.one;
+            go.transform.rotation = slotParent.rotation;
+            if(go.TryGetComponent(out TowerSlotInventory goScript))
+            {
+                if(currentTowers.Contains(inventory.shopTowers[i]))
+                {
+                    if(go.TryGetComponent(out Button button))
+                    {
+                        button.interactable = false;
+                    }
+                }
+                goScript.slot = inventory.shopTowers[i];
+                goScript.slotIndex = inventory.shopIndex[i];
+                goScript.Refresh();
+            }
+        } 
     }
 
     public void AddToCurrentTowers(TowerSlotSO slot, Color color, int index)
@@ -842,17 +874,16 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     {
         if(isOpen)
         {
-            // Vector3Int pos = intPos;
-            // pos.z = -10;
-            // pos.x += 1;
-            // pos.y += 1;
             levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[1].position, Time.deltaTime * windowSpeed);
-            // cam.transform.position = Vector3.Lerp(cam.transform.position, pos, Time.deltaTime * moveSpeed);
-            // cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, zoom, Time.deltaTime * zoomSpeed);
+            canvas.SetActive(true);
         }
         else
         {
             levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[0].position, Time.deltaTime * windowSpeed);
+            if(Vector2.Distance(levelWindow.transform.position, windowStates[0].position) <= 0.1f)
+            {
+                canvas.SetActive(false);
+            }
         }
     }
 }

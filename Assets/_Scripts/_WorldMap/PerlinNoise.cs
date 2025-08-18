@@ -35,12 +35,12 @@ public class PerlinNoise : MonoBehaviour, IDataPersistence
 
     public Tilemap ground;
     public Tilemap groundShadow;
-    public Tilemap water;
+    public GameObject water;
+    public GameObject white;
+    public GameObject LOD;
     public Tilemap border;
-    public TileBase waterTile;
     public TileBase groundTile;
     public TileBase shadowTile;
-    public TileBase whiteTile;
 
     [Header("Factions")]
     public FactionWorldMap[] factions; 
@@ -159,29 +159,14 @@ public class PerlinNoise : MonoBehaviour, IDataPersistence
 
                 map.SetTile(pos, tile);
                 ground.SetTile(pos, groundTile);
-                groundShadow.SetTile(pos, shadowTile);
+                Vector3Int below = pos;
+                below.y -= 1;
+                if(ground.GetTile(below) == null)
+                {
+                    groundShadow.SetTile(pos, shadowTile);
+                }
             }
         }
-
-        for(int x = -2; x < width + 2; x++)
-        {
-            for(int y = -2; y < height + 2; y++)
-            {
-                Vector3Int pos = new Vector3Int(x, y, 0);
-                water.SetTile(pos, waterTile);
-            }
-        }
-
-        for(int x = -3; x < width + 3; x++)
-        {
-            for(int y = -3; y < height + 3; y++)
-            {
-                Vector3Int pos = new Vector3Int(x, y, 0);
-                border.SetTile(pos, whiteTile);
-            }
-        }
-
-
 
         foreach(FactionWorldMap faction in factions)
         {
@@ -193,9 +178,17 @@ public class PerlinNoise : MonoBehaviour, IDataPersistence
         }
 
         Vector3Int middlePos = new Vector3Int(width / 2, height / 2, -10);
+        Vector3Int waterPos = middlePos;
+        waterPos.z = 0;
+
+        water.transform.position = waterPos;
+        water.transform.localScale = new Vector3(width + 2, height + 2, width);
+        white.transform.position = waterPos;
+        white.transform.localScale = new Vector3(width + 4, height + 4, width);
+        
         cam.transform.position = middlePos;
         pinch.islandPlace = new Vector3(width / 2, height / 2, -10);
-        cam.orthographicSize = width * 0.9375f;
+        cam.orthographicSize = width * 1.25f;
     }
 
     Vector3Int GetCenterOfFaction(WorldFactionPosition pos)

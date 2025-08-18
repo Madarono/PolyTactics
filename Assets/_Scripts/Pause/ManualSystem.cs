@@ -144,7 +144,7 @@ public class ManualSystem : MonoBehaviour
     public void CloseWindow()
     {
         PauseSystem script = PauseSystem.Instance;
-        script.StartCoroutine(script.AnimationCloseWindow(manualAnim, manualWindow));
+        script.StartCoroutine(script.AnimationCloseWindow(manualAnim, manualWindow, false));
     }
 
     

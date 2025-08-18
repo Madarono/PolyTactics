@@ -115,7 +115,11 @@ public class GameData
     public string[] savingInfo;
     public string[] savingHeader;
     public int[] savingIconIndex;
+    public int[] savingDays;
     public int days;
+
+    //Shop.cs
+    public int[] shopSaved;
 
     public GameData()
     {   
@@ -230,6 +234,10 @@ public class GameData
         this.savingInfo = new string[0];
         this.savingHeader = new string[0];
         this.savingIconIndex = new int[0];
+        this.savingDays = new int[0];
         this.days = 0;
+
+        //Shop.cs
+        this.shopSaved = new int[0];
     }
 }

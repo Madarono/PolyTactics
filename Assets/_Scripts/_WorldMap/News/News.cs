@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 public enum NewsType
 {
@@ -19,6 +20,7 @@ public class NewsInfo
 {
     public NewsType type;
     public string info;
+    public int day;
     public int iconIndex;
     public string header;
 }
@@ -34,6 +36,7 @@ public class InfoStructure
 public class News : MonoBehaviour, IDataPersistence
 {
     public static News Instance {get; private set;}
+    public GameObject windowCanvas;
     public GameObject window;
     public Animator windowAnim;
     public float duration = 0.17f;
@@ -68,6 +71,7 @@ public class News : MonoBehaviour, IDataPersistence
     private string[] savingInfo;
     private string[] savingHeader;
     private int[] savingIconIndex;
+    private int[] savingDays;
     private bool hasRecieved = false;
 
     void Awake()
@@ -81,6 +85,7 @@ public class News : MonoBehaviour, IDataPersistence
         this.savingInfo = data.savingInfo;
         this.savingIconIndex = data.savingIconIndex;
         this.savingHeader = data.savingHeader;
+        this.savingDays = data.savingDays;
         this.days = data.days;
         PutIntoLoad();
         hasRecieved = true;
@@ -95,6 +100,7 @@ public class News : MonoBehaviour, IDataPersistence
             data.savingInfo = this.savingInfo;
             data.savingHeader = this.savingHeader;
             data.savingIconIndex = this.savingIconIndex;
+            data.savingDays = this.savingDays;
             data.days = this.days;
         }
     }
@@ -105,6 +111,7 @@ public class News : MonoBehaviour, IDataPersistence
         List<string> info = new List<string>();
         List<string> header = new List<string>();
         List<int> icon = new List<int>();
+        List<int> days = new List<int>();
         
         foreach(var news in newsInfo)
         {
@@ -112,23 +119,32 @@ public class News : MonoBehaviour, IDataPersistence
             info.Add(news.info);
             header.Add(news.header);
             icon.Add(news.iconIndex);
+            days.Add(news.day);
         }
 
         savingType = type.ToArray();
         savingInfo = info.ToArray();
         savingHeader = header.ToArray();
         savingIconIndex = icon.ToArray();
+        savingDays = days.ToArray();
     }
 
     void PutIntoLoad()
     {
         for(int i = 0; i < savingType.Length; i++)
         {
+            // Debug.Log($"{savingDays[i]}, {this.days}");
+            if(savingDays[i] < this.days - 1)
+            {
+                continue;
+            }
+
             NewsInfo info = new NewsInfo();
             info.type = savingType[i];
             info.info = savingInfo[i];
             info.iconIndex = savingIconIndex[i];
             info.header = savingHeader[i];
+            info.day = savingDays[i];
             newsInfo.Add(info);
         }
     }
@@ -136,11 +152,12 @@ public class News : MonoBehaviour, IDataPersistence
     void Start()
     {
         window.SetActive(false);
+        windowCanvas.SetActive(false);
     }
 
     void Update()
     {
-        bool wentDown = scrollRect.verticalNormalizedPosition <= 0.05f;
+        bool wentDown = scrollRect.verticalNormalizedPosition <= 0.05f || parent.childCount < 5;
         goingDown.SetActive(!wentDown);
     }
 
@@ -148,6 +165,7 @@ public class News : MonoBehaviour, IDataPersistence
     {
         Time.timeScale = 0f;
         window.SetActive(true);
+        windowCanvas.SetActive(true);
         UpdateWindow();
     }
 
@@ -271,6 +289,7 @@ public class News : MonoBehaviour, IDataPersistence
         news.type = type;
         news.info = info;
         news.iconIndex = iconIndex;
+        news.day = this.days;
         foreach(var structure in newsStructure)
         {
             if(news.type == structure.type)
@@ -301,6 +320,7 @@ public class News : MonoBehaviour, IDataPersistence
         anim.SetTrigger("Close");
         yield return new WaitForSecondsRealtime(duration);
         window.SetActive(false);
+        windowCanvas.SetActive(false);
     }
 
     IEnumerator goDown()

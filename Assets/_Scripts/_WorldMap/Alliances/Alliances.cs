@@ -71,7 +71,6 @@ public class Alliances : MonoBehaviour, IDataPersistence
     {
         this.playerFaction = data.playerFaction;
         this.isUnderAlliance = data.isUnderAlliance;
-        this.factionsA = data.factionsA.ToList();
         this.factionsB = data.factionsB.ToList();
         this.factionsC = data.factionsC.ToList();
         this.isUnderTemp1 = data.isUnderTemp1;
@@ -84,7 +83,6 @@ public class Alliances : MonoBehaviour, IDataPersistence
         this.turnsLeft4 = data.turnsLeft4;
         this.turnsTillattempt = data.turnsTillattempt;
         ConvertBack();
-        hasRecieved = true;
     }
 
     public void SaveData(GameData data)
@@ -121,6 +119,15 @@ public class Alliances : MonoBehaviour, IDataPersistence
             isUnderTemp4[i] = squareTempAI[i].isUnderAlliance;
             turnsLeft4[i] = squareTempAI[i].turnsLeft;
         }
+
+        List<bool> underAlliance = new List<bool>();
+        
+        foreach(var alliance in factionAlliances)
+        {
+            underAlliance.Add(alliance.isUnderAlliance);
+        }
+
+        isUnderAlliance = underAlliance.ToArray();
     }
 
     void ConvertBack()
@@ -247,18 +254,23 @@ public class Alliances : MonoBehaviour, IDataPersistence
     public void RevertToAlliances()
     {
         RefreshRelations();
+        Trust trust = Trust.Instance;
+
+        factionAlliances[0].trust = trust.circleTrust;
+        factionAlliances[1].trust = trust.rectangleTrust;
+        factionAlliances[2].trust = trust.triangleTrust;
+        factionAlliances[3].trust = trust.squareTrust;
         for(int i = 0; i < factionAlliances.Length; i++)
         {
-            if(factionAlliances[i].relation == Relation.Hate)
+            factionAlliances[i].isUnderAlliance = isUnderAlliance[i]; //I hate debugging you, now I got it done.
+            if(factionAlliances[i].relation == Relation.Hate || factionAlliances[i].trust < 60)
             {
-                factionAlliances[i].isUnderAlliance = false;
-                isUnderAlliance[i] = false;
-                continue;
+                RemoveManualAlliance(factionAlliances[i].faction);
             }
 
-            factionAlliances[i].isUnderAlliance = isUnderAlliance[i];
         }
         CheckAlliances();
+        hasRecieved = true;
     }
 
     void Update()
@@ -754,16 +766,6 @@ public class Alliances : MonoBehaviour, IDataPersistence
                 break;
             }
         }
-
-        List<bool> underAlliance = new List<bool>();
-        
-        foreach(var alliance in factionAlliances)
-        {
-            underAlliance.Add(alliance.isUnderAlliance);
-        }
-
-        isUnderAlliance = underAlliance.ToArray();
-
         CheckAlliances();
         //Put something here in the News;
     }
@@ -776,6 +778,7 @@ public class Alliances : MonoBehaviour, IDataPersistence
         {
             if(otherFaction == factionAlliances[i].faction && factionAlliances[i].isUnderAlliance)
             {
+                Debug.Log($"Removing alliance with {factionAlliances[i].faction}");
                 factionAlliances[i].isUnderAlliance = false;
                 int index = -1;
                 switch(playerFaction)
@@ -801,16 +804,7 @@ public class Alliances : MonoBehaviour, IDataPersistence
             }
         }
 
-        List<bool> underAlliance = new List<bool>();
-        
-        foreach(var alliance in factionAlliances)
-        {
-            underAlliance.Add(alliance.isUnderAlliance);
-        }
-
-        isUnderAlliance = underAlliance.ToArray();
-
-        CheckAlliances();
+        // CheckAlliances();
         //Put something here in the News;
     }
 }

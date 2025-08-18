@@ -98,6 +98,79 @@ public class EnemyManager : MonoBehaviour
         Instance = this;
     }
 
+    void Update()
+    {
+        for(int i = currentEnemy.Count - 1; i >= 0; i--)
+        {
+            Enemy enemyScript = null;
+
+            if(currentEnemy[i].TryGetComponent(out Enemy enemy))
+            {
+                enemyScript = enemy;
+            }
+            else
+            {
+                continue;
+            }
+
+            if(waypoints.Length == 0 || enemyScript.waypointIndex == waypoints.Length)
+            {
+                continue;
+            }
+
+            if(enemyScript.reverseMovement)
+            {
+                int reverseIndex = Mathf.Max(enemyScript.waypointIndex - 1, 0);
+                currentEnemy[i].transform.position = Vector3.MoveTowards(currentEnemy[i].transform.position, waypoints[reverseIndex].position, Time.deltaTime * enemyScript.speed * enemyScript.reverseMultipler);
+
+                Vector3 direction1 = waypoints[reverseIndex].position - currentEnemy[i].transform.position;
+                float angle1 = Mathf.Atan2(direction1.y, direction1.x) * Mathf.Rad2Deg;
+                Quaternion rot1 = Quaternion.Euler(0f, 0f, angle1);
+
+                enemyScript.visual.rotation = Quaternion.Lerp(enemyScript.visual.rotation, rot1, Time.deltaTime * enemyScript.rotationSpeed);
+
+                float distance1 = Vector2.Distance(currentEnemy[i].transform.position, waypoints[reverseIndex].position);
+                if((distance1 <= enemyScript.requirementDistance))
+                {
+                    enemyScript.waypointIndex = Mathf.Max(enemyScript.waypointIndex - 1, 0);
+                }
+                if (enemyScript.waypointIndex == 0 && distance1 <= enemyScript.requirementDistance)
+                {
+                    enemyScript.reverseMovement = false;
+                }
+
+                return;
+            }
+
+            currentEnemy[i].transform.position = Vector3.MoveTowards(currentEnemy[i].transform.position, waypoints[enemyScript.waypointIndex].position, Time.deltaTime * enemyScript.speed);
+
+            Vector3 direction = waypoints[enemyScript.waypointIndex].position - currentEnemy[i].transform.position;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Quaternion rot = Quaternion.Euler(0f, 0f, angle);
+
+            enemyScript.visual.rotation = Quaternion.Lerp(enemyScript.visual.rotation, rot, Time.deltaTime * enemyScript.rotationSpeed);
+
+            float distance = Vector2.Distance(currentEnemy[i].transform.position, waypoints[enemyScript.waypointIndex].position);
+            if((distance <= enemyScript.requirementDistance) && enemyScript.waypointIndex <= waypoints.Length - 1)
+            {
+                enemyScript.waypointIndex++;
+
+                if(enemyScript.waypointIndex == waypoints.Length)
+                {
+                    settings.health -= enemyScript.damageToBase;
+                    settings.CheckHealth();
+                    int randomIndex = Random.Range(0, soundManager.baseHit.Length);
+                    soundManager.PlayClip(soundManager.baseHit[randomIndex], 1f);
+                    if(PauseSystem.Instance.screenShake)
+                    {
+                        CameraShake.Instance.Shake(enemyScript.time, enemyScript.magnitude);
+                    }
+                    DestroyEnemy(currentEnemy[i]);
+                }
+            }
+        }
+    }
+
     public void InitiateStart()
     {
         for(int i = 0; i < multiplyer.Length; i++)

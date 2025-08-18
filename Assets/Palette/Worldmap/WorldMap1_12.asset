@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WorldMap1_12
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: -1625329408, guid: 5b5116b282f5bfe499cbf53efdb92545, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.54901963, g: 0.56078434, b: 0.68235296, a: 1}
   m_Transform:
     e00: 1
     e01: 0

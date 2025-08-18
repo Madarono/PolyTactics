@@ -15,6 +15,7 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
     private bool hasRecieved = false;
 
     public GameObject allianceWindow;
+    public GameObject canvas;
     public Animator allianceAnim;
     public float animationDuration = 0.17f;
 
@@ -65,7 +66,6 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
     {
         if(hasRecieved)
         {
-            
         }
     }
 
@@ -73,6 +73,7 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
     {
         allianceWindow.SetActive(false);
         formationWindow.SetActive(false);
+        canvas.SetActive(false);
         alliances = Alliances.Instance;
         storage = ResourcesStorage.Instance;
         relationships = Relationships.Instance;
@@ -84,13 +85,14 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
     public void OpenWindow()
     {
         allianceWindow.SetActive(true);
+        canvas.SetActive(true);
         UpdateWindow();
         Time.timeScale = 0f;
     }
     public void CloseWindow()
     {
         Time.timeScale = 1f;
-        StartCoroutine(closeWindowAnimation(allianceWindow, allianceAnim));
+        StartCoroutine(closeWindowAnimation(allianceWindow, allianceAnim, true));
     }
     void UpdateWindow()
     {
@@ -181,7 +183,7 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
     }
     public void CloseAllianceWindow()
     {
-        StartCoroutine(closeWindowAnimation(formationWindow, formationAnim));
+        StartCoroutine(closeWindowAnimation(formationWindow, formationAnim, false));
     }
     void UpdateAllianceWindow(int index)
     {
@@ -266,10 +268,15 @@ public class AllianceSystem : MonoBehaviour, IDataPersistence
         UpdateWindow();
     }
 
-    IEnumerator closeWindowAnimation(GameObject window, Animator anim)
+    IEnumerator closeWindowAnimation(GameObject window, Animator anim, bool closeCanvas)
     {
         anim.SetTrigger("Close");
         yield return new WaitForSecondsRealtime(animationDuration);
         window.SetActive(false);
+
+        if(closeCanvas)
+        {
+            canvas.SetActive(false);
+        }
     }
 }

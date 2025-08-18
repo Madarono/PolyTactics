@@ -53,7 +53,7 @@ public class TowerRange : MonoBehaviour
 
                 case TowerType.Debuff:
                     tower.debuffEnemies.Add(col.gameObject);
-                    enemy.StartCoroutine(enemy.TimeForRemoval(tower.timeTillRemoval, tower));
+                    enemy.TimeForRemove(tower.timeTillRemoval, tower);
                     break;
 
             }

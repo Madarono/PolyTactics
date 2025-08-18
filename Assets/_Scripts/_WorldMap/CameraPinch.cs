@@ -132,14 +132,19 @@ public class CameraPinch : MonoBehaviour
 
         if (cam.orthographic)
         {
-            cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - delta * zoomSpeed, minSize, maxSize);
+            float sizeBefore = cam.orthographicSize;
+
+            float zoomStep = delta * zoomSpeed * (sizeBefore / maxSize);
+
+            cam.orthographicSize = Mathf.Clamp(sizeBefore - zoomStep, minSize, maxSize);
+
             if(cam.orthographicSize <= zoomRequired)
             {
                 InteractionSystem.Instance.ShowDots();
             }
             else
             {
-                InteractionSystem.Instance.HideDots();   
+                InteractionSystem.Instance.HideDots();
             }
         }
         else
@@ -147,6 +152,7 @@ public class CameraPinch : MonoBehaviour
             cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - delta * zoomSpeed, 15f, 100f);
         }
     }
+
 
     IEnumerator ReturnToIslandAfterDelay(float delay)
     {

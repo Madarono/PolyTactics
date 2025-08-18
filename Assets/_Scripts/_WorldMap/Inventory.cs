@@ -10,8 +10,10 @@ public class Inventory : MonoBehaviour, IDataPersistence
 
     public List<TowerSlotSO> towers = new List<TowerSlotSO>();
     public List<TowerSlotSO> allianceTowers = new List<TowerSlotSO>(); //Controlled by Alliances.cs
-    public List<int> allianceIndex = new List<int>();
+    public List<TowerSlotSO> shopTowers = new List<TowerSlotSO>();
     public List<int> towerIndex = new List<int>();
+    public List<int> allianceIndex = new List<int>();
+    public List<int> shopIndex = new List<int>();
 
     [Header("StockTowers")]
     public int[] indexBlue;
@@ -71,7 +73,7 @@ public class Inventory : MonoBehaviour, IDataPersistence
 
         towers.Add(towersList[index]);
         towerIndex.Add(index);
-        DataPersistenceManager.instance.SaveGame();
+        // DataPersistenceManager.instance.SaveGame();
     }
 
     public void LoadStockTowers()

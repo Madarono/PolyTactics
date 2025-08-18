@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour
 
     [Header("Rotation")]
     public float rotationRatio = 10/3;
-    private float rotationSpeed = 2f;
+    [HideInInspector]public float rotationSpeed = 2f;
     public float requirementDistance = 0.01f;
 
     [Header("Going back")]
@@ -115,7 +115,8 @@ public class Enemy : MonoBehaviour
     [Header("SpriteVisual")]
     public Transform visual;
 
-    
+    Coroutine debuffCoroutine;
+
 
     void Start()
     {
@@ -318,64 +319,64 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
-    {
-        if(waypoint.Count == 0)
-        {
-            return;
-        }
+    // void FixedUpdate()
+    // {
+    //     if(waypoint.Count == 0)
+    //     {
+    //         return;
+    //     }
 
-        if(reverseMovement)
-        {
-            int reverseIndex = Mathf.Max(waypointIndex - 1, 0);
-            transform.position = Vector3.MoveTowards(transform.position, waypoint[reverseIndex], Time.deltaTime * speed * reverseMultipler);
+    //     if(reverseMovement)
+    //     {
+    //         int reverseIndex = Mathf.Max(waypointIndex - 1, 0);
+    //         transform.position = Vector3.MoveTowards(transform.position, waypoint[reverseIndex], Time.deltaTime * speed * reverseMultipler);
         
-            Vector3 direction1 = waypoint[reverseIndex] - transform.position;
-            float angle1 = Mathf.Atan2(direction1.y, direction1.x) * Mathf.Rad2Deg;
-            Quaternion rot1 = Quaternion.Euler(0f, 0f, angle1);
+    //         Vector3 direction1 = waypoint[reverseIndex] - transform.position;
+    //         float angle1 = Mathf.Atan2(direction1.y, direction1.x) * Mathf.Rad2Deg;
+    //         Quaternion rot1 = Quaternion.Euler(0f, 0f, angle1);
 
-            visual.rotation = Quaternion.Lerp(visual.rotation, rot1, Time.deltaTime * rotationSpeed);
+    //         visual.rotation = Quaternion.Lerp(visual.rotation, rot1, Time.deltaTime * rotationSpeed);
 
-            float distance1 = Vector2.Distance(transform.position, waypoint[reverseIndex]);
-            if((distance1 <= requirementDistance))
-            {
-                waypointIndex = Mathf.Max(waypointIndex - 1, 0);
-            }
-            if (waypointIndex == 0 && distance1 <= requirementDistance)
-            {
-                reverseMovement = false;
-            }
+    //         float distance1 = Vector2.Distance(transform.position, waypoint[reverseIndex]);
+    //         if((distance1 <= requirementDistance))
+    //         {
+    //             waypointIndex = Mathf.Max(waypointIndex - 1, 0);
+    //         }
+    //         if (waypointIndex == 0 && distance1 <= requirementDistance)
+    //         {
+    //             reverseMovement = false;
+    //         }
 
-            return;
-        }
+    //         return;
+    //     }
 
-        transform.position = Vector3.MoveTowards(transform.position, waypoint[waypointIndex], Time.deltaTime * speed);
+    //     transform.position = Vector3.MoveTowards(transform.position, waypoint[waypointIndex], Time.deltaTime * speed);
         
-        Vector3 direction = waypoint[waypointIndex] - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        Quaternion rot = Quaternion.Euler(0f, 0f, angle);
+    //     Vector3 direction = waypoint[waypointIndex] - transform.position;
+    //     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    //     Quaternion rot = Quaternion.Euler(0f, 0f, angle);
 
-        visual.rotation = Quaternion.Lerp(visual.rotation, rot, Time.deltaTime * rotationSpeed);
+    //     visual.rotation = Quaternion.Lerp(visual.rotation, rot, Time.deltaTime * rotationSpeed);
 
-        float distance = Vector2.Distance(transform.position, waypoint[waypointIndex]);
-        if((distance <= requirementDistance) && waypointIndex <= waypoint.Count - 1)
-        {
-            waypointIndex++;
+    //     float distance = Vector2.Distance(transform.position, waypoint[waypointIndex]);
+    //     if((distance <= requirementDistance) && waypointIndex <= waypoint.Count - 1)
+    //     {
+    //         waypointIndex++;
 
-            if(waypointIndex == waypoint.Count)
-            {
-                settings.health -= damageToBase;
-                settings.CheckHealth();
-                int randomIndex = Random.Range(0, manager.soundManager.baseHit.Length);
-                manager.soundManager.PlayClip(manager.soundManager.baseHit[randomIndex], 1f);
-                if(PauseSystem.Instance.screenShake)
-                {
-                    CameraShake.Instance.Shake(time, magnitude);
-                }
-                manager.DestroyEnemy(gameObject);
-            }
-        }
-    }
+    //         if(waypointIndex == waypoint.Count)
+    //         {
+    //             settings.health -= damageToBase;
+    //             settings.CheckHealth();
+    //             int randomIndex = Random.Range(0, manager.soundManager.baseHit.Length);
+    //             manager.soundManager.PlayClip(manager.soundManager.baseHit[randomIndex], 1f);
+    //             if(PauseSystem.Instance.screenShake)
+    //             {
+    //                 CameraShake.Instance.Shake(time, magnitude);
+    //             }
+    //             manager.DestroyEnemy(gameObject);
+    //         }
+    //     }
+    // }
 
     public void Freeze(float duration, float slowSpeed, Color cold, Color freeze)
     {
@@ -423,6 +424,16 @@ public class Enemy : MonoBehaviour
         }
 
         criticalEffect.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
+    }
+
+    public void TimeForRemove(float duration, Tower tower)
+    {
+        if(debuffCoroutine != null)
+        {
+            StopCoroutine(debuffCoroutine);
+        }
+
+        debuffCoroutine = StartCoroutine(TimeForRemoval(duration, tower));
     }
 
     public IEnumerator TimeForRemoval(float duration, Tower tower)

@@ -12,6 +12,7 @@ public class UpgradeManager : MonoBehaviour
     public Settings settings;
     public TowerUpgrade tower;
     public GameObject window;
+    public GameObject canvas;
     public Transform[] windowStatesRight;
     public Transform[] windowStatesLeft;
     public float stayDistance = 0.1f;
@@ -103,6 +104,7 @@ public class UpgradeManager : MonoBehaviour
 
     void Start()
     {
+        canvas.SetActive(false);
         windowStates = windowStatesLeft;
         window.transform.position = windowStates[0].position;
         foreach(PositionChange script in positionChange)
@@ -115,15 +117,22 @@ public class UpgradeManager : MonoBehaviour
         HideLevelRemovers();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if(tower != null)
         {
-            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[1].position, Time.unscaledDeltaTime * speedOfWindow);
+            canvas.SetActive(true);
+            float step = speedOfWindow * Time.unscaledDeltaTime;
+            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[1].position, step);
         }
         else
         {
-            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[0].position, Time.unscaledDeltaTime * speedOfWindow);
+            float step = speedOfWindow * Time.unscaledDeltaTime;
+            window.transform.position = Vector3.Lerp(window.transform.position, windowStates[0].position, step);
+            if(Vector2.Distance(window.transform.position, windowStates[0].position) <= 0.1f)
+            {
+                canvas.SetActive(false);
+            }
         }
     }
 
@@ -884,6 +893,7 @@ public class UpgradeManager : MonoBehaviour
                 tower.tower.DefaultTowers();
                 towerManager.villages.Remove(tower.tower);
                 towerManager.tower.Remove(tower.tower);
+                BuffedTowerManager.Instance.SearchForAll(); //Remove this if bugs occur
                 break;
 
             case TowerType.Freezer:

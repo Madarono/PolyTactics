@@ -104,6 +104,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
             return;
         }
 
+        // TowerManager.Instance.HideOtherTowerInfo();
         window.SetActive(true);
         header.text = hasWon ? "Battle Won!" : "Battle Lost..";
         SoundManager.Instance.PlayMusicClip(SoundManager.Instance.musicEndOfRound, 3f);
