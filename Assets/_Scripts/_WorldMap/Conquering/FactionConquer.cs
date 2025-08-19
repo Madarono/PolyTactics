@@ -36,6 +36,7 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
     private List<Vector3Int> glowPositions = new List<Vector3Int>();
     private List<int> glowInt = new List<int>();
     public List<Vector3Int> glowPlayerPositions = new List<Vector3Int>();
+    private List<int> glowPlayerInt = new List<int>();
     private bool hasRecieved = false;
 
     [Header("AfterMath")]
@@ -64,37 +65,54 @@ public class FactionConquer : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         this.glowInt = data.glowInt.ToList();
+        this.glowPlayerInt = data.glowPlayerInt.ToList();
         ConvertToPositions();
         hasRecieved = true;
     }
 
     public void SaveData(GameData data)
     {
-        if(hasRecieved)
+        if (hasRecieved)
         {
             ConvertToInt();
             data.glowInt = this.glowInt.ToArray();
+            data.glowPlayerInt = this.glowPlayerInt.ToArray();
         }
     }
 
     void ConvertToInt()
     {
         glowInt.Clear();
-        foreach(var pos in glowPositions)
+        foreach (var pos in glowPositions)
         {
             glowInt.Add(pos.x);
             glowInt.Add(pos.y);
             glowInt.Add(pos.z);
+        }
+        
+        glowPlayerInt.Clear();
+        foreach(var pos in glowPlayerPositions)
+        {
+            glowPlayerInt.Add(pos.x);
+            glowPlayerInt.Add(pos.y);
+            glowPlayerInt.Add(pos.z);
         }
     }
 
     void ConvertToPositions()
     {
         glowPositions.Clear();
-        for(int i = 0; i < glowInt.Count; i += 3)
+        for (int i = 0; i < glowInt.Count; i += 3)
         {
             Vector3Int pos = new Vector3Int(glowInt[i], glowInt[i + 1], glowInt[i + 2]);
             glowPositions.Add(pos);
+        }
+        
+        glowPlayerPositions.Clear();
+        for(int i = 0; i < glowPlayerInt.Count; i += 3)
+        {
+            Vector3Int pos = new Vector3Int(glowPlayerInt[i], glowPlayerInt[i + 1], glowPlayerInt[i + 2]);
+            glowPlayerPositions.Add(pos);
         }
     }
 

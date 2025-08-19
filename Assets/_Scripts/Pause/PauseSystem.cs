@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -47,6 +48,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     [Header("Extra")]
     public bool worldMap = false;
+    public bool mainMenu = false;
     public GameObject leaveTransition;
     public float leaveDuration = 1.5f;
 
@@ -60,7 +62,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         this.showRange = data.showRange;
         window.SetActive(false);
         leaveWindow.SetActive(false);
-        if(leaveTransition != null)
+        if (leaveTransition != null)
         {
             leaveTransition.SetActive(false);
         }
@@ -76,17 +78,17 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         data.autoPlay = this.autoPlay;
         data.showRange = this.showRange;
     }
-    
+
     void Awake()
     {
         Instance = this;
-    } 
-    
+    }
+
     public void OpenWindow()
     {
         canSound = true;
         window.SetActive(true);
-        if(canvas != null)
+        if (canvas != null)
         {
             canvas.SetActive(true);
         }
@@ -97,13 +99,13 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         canSound = false;
         StartCoroutine(AnimationCloseWindow(windowAnim, window, true));
-        if(worldMap)
+        if (worldMap)
         {
             Time.timeScale = 1f;
             return;
         }
 
-        if(!WaveResources.Instance.finishedBattle)
+        if (!WaveResources.Instance.finishedBattle)
         {
             Time.timeScale = settings.isSpeeding ? settings.speedValue : 1f;
         }
@@ -115,7 +117,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         yield return new WaitForSecondsRealtime(closeDuration);
         win.SetActive(false);
 
-        if(closeCanvas && canvas != null)
+        if (closeCanvas && canvas != null)
         {
             canvas.SetActive(false);
         }
@@ -132,7 +134,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         autoPlayTick.SetActive(autoPlay);
         showRangeTick.SetActive(showRange);
 
-        if(graphics == 1)
+        if (graphics == 1)
         {
             postprocessing.SetActive(true);
         }
@@ -141,12 +143,12 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
             postprocessing.SetActive(false);
         }
 
-        if(graphicButtons.Length == 0)
+        if (graphicButtons.Length == 0)
         {
             return;
         }
 
-        foreach(Image img in graphicButtons)
+        foreach (Image img in graphicButtons)
         {
             img.color = graphicsStates[0];
             img.raycastTarget = false;
@@ -167,7 +169,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     void ChangeGraphics(int index)
     {
         graphics = index;
-        if(graphics == 1)
+        if (graphics == 1)
         {
             postprocessing.SetActive(true);
         }
@@ -176,13 +178,13 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
             postprocessing.SetActive(false);
         }
         DataPersistenceManager.instance.SaveGame();
-        
-        if(graphicButtons.Length == 0)
+
+        if (graphicButtons.Length == 0)
         {
             return;
         }
 
-        foreach(Image img in graphicButtons)
+        foreach (Image img in graphicButtons)
         {
             img.color = graphicsStates[0];
             img.raycastTarget = false;
@@ -197,9 +199,9 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         background = backgroundSlider.value;
         soundManager.masterVolume = this.master;
         soundManager.backgroundVolume = this.background;
-        if(canSound)
+        if (canSound)
         {
-            soundManager.PlayClip(soundManager.changingSliders, isMaster ? master * amplifier: background * amplifier);
+            soundManager.PlayClip(soundManager.changingSliders, isMaster ? master * amplifier : background * amplifier);
             StartCoroutine(Cooldown());
         }
         DataPersistenceManager.instance.SaveGame();
@@ -241,7 +243,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         leaveWindow.SetActive(true);
     }
-    
+
     public void CloseLeaveWindow()
     {
         StartCoroutine(AnimationCloseWindow(leaveWindowAnim, leaveWindow, false));
@@ -249,7 +251,12 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     public void ConfirmLeave()
     {
-        if(worldMap)
+        if (worldMap)
+        {
+            StartCoroutine(GoToMainMenu());
+            return;
+        }
+        else if (mainMenu)
         {
             StartCoroutine(LeaveGame());
             return;
@@ -264,5 +271,13 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
         Application.Quit();
+    }
+    
+    IEnumerator GoToMainMenu()
+    {
+        leaveTransition.SetActive(true);
+        yield return new WaitForSecondsRealtime(leaveDuration);
+        DataPersistenceManager.instance.SaveGame();
+        SceneManager.LoadScene("MainMenu");
     }
 }

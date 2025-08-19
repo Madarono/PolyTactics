@@ -152,7 +152,8 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         data.hasCheckedNews = this.hasCheckedNews;
         if(saveLevel)
         {
-            data.a_waves = Mathf.RoundToInt(this.waves * bases[factionIndex].multiplyer * this.multiplyer);
+            float waveMultipler = bases[factionIndex].multiplyer > 1f ? 1.33f : 1f; 
+            data.a_waves = Mathf.RoundToInt(this.waves * waveMultipler * this.multiplyer);;
             data.a_waveWeight = Mathf.RoundToInt(this.waveWeight * bases[factionIndex].multiplyer * this.multiplyer);
             data.coins = Mathf.RoundToInt(this.coins * bases[factionIndex].multiplyer * this.multiplyer);
             data.grain = Mathf.RoundToInt(this.grains * bases[factionIndex].multiplyer * this.multiplyer);
@@ -186,11 +187,12 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         if(hasWon) //This is for land
         {
             Vector3Int placeVector = new Vector3Int(levelPlace[0], levelPlace[1], levelPlace[2]);
-            FactionConquer.Instance.glowPlayerPositions.Add(placeVector);
-            FactionConquer.Instance.dontAttackHere = placeVector;
-            FactionConquer.Instance.hasChangedDont = true;
             if(makeWarsHappen)
             {
+                FactionConquer.Instance.glowPlayerPositions.Clear();
+                FactionConquer.Instance.glowPlayerPositions.Add(placeVector);
+                FactionConquer.Instance.dontAttackHere = placeVector;
+                FactionConquer.Instance.hasChangedDont = true;
                 LandConquerer.Instance.AddPlaces(levelPlace, playerFaction);
             }
 
@@ -257,7 +259,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         FactionConquer.Instance.ShowGlow();
         FactionPower.Instance.CalculateStrength();
 
-                    
+        WinCondition.Instance.CalculateWinRate();
 
         InstantiateDots();
         saveLevel = false;
@@ -514,25 +516,25 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
     //Selecting Level
     void Update()
     {
-        if(AIFights.Instance.canFight)
+        if (AIFights.Instance.canFight)
         {
             return;
         }
 
-        if(Application.isMobilePlatform && Input.touchCount > 0)
+        if (Application.isMobilePlatform && Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            if(EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
             {
                 return;
             }
 
-            if(touch.phase == TouchPhase.Began)
+            if (touch.phase == TouchPhase.Began)
             {
                 Vector3 worldPos = Camera.main.ScreenToWorldPoint(touch.position);
                 intPos = ground.WorldToCell(worldPos);
                 worldPos.z = 0f;
-                if(!isHidden && isSteppingOnLand(intPos))
+                if (!isHidden && isSteppingOnLand(intPos))
                 {
                     UpdateWindow();
                     isOpen = true;
@@ -543,7 +545,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 }
                 else
                 {
-                    if(isOpen)
+                    if (isOpen)
                     {
                         SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 0.6f);
                     }
@@ -552,9 +554,9 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
                 }
             }
         }
-        else if(Input.GetMouseButtonDown(0))
+        else if (Input.GetMouseButtonDown(0))
         {
-            if(EventSystem.current.IsPointerOverGameObject())
+            if (EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }
@@ -562,7 +564,7 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             intPos = ground.WorldToCell(worldPos);
             worldPos.z = 0f;
-            if(!isHidden && isSteppingOnLand(intPos))
+            if (!isHidden && isSteppingOnLand(intPos))
             {
                 UpdateWindow();
                 isOpen = true;
@@ -573,12 +575,27 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             }
             else
             {
-                if(isOpen)
+                if (isOpen)
                 {
                     SoundManager.Instance.PlayClip(SoundManager.Instance.deselectDot, 0.6f);
                 }
                 isOpen = false;
                 CloseInventoryWindow();
+            }
+        }
+        
+
+        if(isOpen)
+        {
+            levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[1].position, Time.deltaTime * windowSpeed);
+            canvas.SetActive(true);
+        }
+        else
+        {
+            levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[0].position, Time.deltaTime * windowSpeed);
+            if(Vector2.Distance(levelWindow.transform.position, windowStates[0].position) <= 0.1f)
+            {
+                canvas.SetActive(false);
             }
         }
     }
@@ -868,22 +885,5 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
             
         // Debug.Log("There isn't a faction tile");
         return null;
-    }
-
-    void FixedUpdate()
-    {
-        if(isOpen)
-        {
-            levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[1].position, Time.deltaTime * windowSpeed);
-            canvas.SetActive(true);
-        }
-        else
-        {
-            levelWindow.transform.position = Vector3.Lerp(levelWindow.transform.position, windowStates[0].position, Time.deltaTime * windowSpeed);
-            if(Vector2.Distance(levelWindow.transform.position, windowStates[0].position) <= 0.1f)
-            {
-                canvas.SetActive(false);
-            }
-        }
     }
 }

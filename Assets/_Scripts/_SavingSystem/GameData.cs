@@ -75,6 +75,7 @@ public class GameData
 
     //FactionConquer.cs
     public int[] glowInt;
+    public int[] glowPlayerInt;
 
     //FactionPower.cs
     public int[] strength;
@@ -194,6 +195,7 @@ public class GameData
 
         //FactionConquer.cs
         this.glowInt = new int[0];
+        this.glowPlayerInt = new int[0];
 
         //FactionPower.cs
         this.strength = new int[4];
