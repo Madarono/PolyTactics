@@ -40,17 +40,22 @@ public class DataPersistenceManager : MonoBehaviour
         this.gameData = new GameData();
     }
 
+    public void NewWorld()
+    {
+        this.gameData.NewFactionGame();
+    }
+
     public void LoadGame()
     {
         this.gameData = dataHandler.Load();
 
-        if(this.gameData == null)
+        if (this.gameData == null)
         {
             Debug.Log("Initializing data to defaults");
             NewGame();
         }
 
-        foreach(IDataPersistence dataPersistenceObj in dataPersistenceObjects)
+        foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.LoadData(gameData);
         }

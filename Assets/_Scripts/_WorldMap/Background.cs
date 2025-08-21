@@ -34,6 +34,7 @@ public class Background : MonoBehaviour
                 GameObject destination = Instantiate(positions[1].gameObject, positions[1].position, Quaternion.identity);
                 destination.transform.SetParent(_canvas);
                 goScript.icon.sprite = cloudSprites[Random.Range(0, cloudSprites.Length)];
+                goScript.icon.enabled = true;
                 goScript.speed = Random.Range(minMaxSpeed[0], minMaxSpeed[1]);
                 go.SetActive(false);
                 destinations.Add(destination.transform);

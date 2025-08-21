@@ -182,5 +182,6 @@ public class WinCondition : MonoBehaviour
         blackTransition.SetActive(true);
         yield return new WaitForSecondsRealtime(sceneLeaveDuration);
         SceneManager.LoadScene("MainMenu");
+        Time.timeScale = 1f;
     }
 }
