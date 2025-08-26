@@ -6,7 +6,7 @@ using TMPro;
 
 public class WaveResources : MonoBehaviour, IDataPersistence
 {
-    public static WaveResources Instance {get; private set;}
+    public static WaveResources Instance { get; private set; }
 
     [Header("Resources")]
     public int coins;
@@ -63,7 +63,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
 
     public void SaveData(GameData data)
     {
-        if(finishedBattle && !hasSaved && showUI)
+        if (finishedBattle && !hasSaved && showUI)
         {
             data._coins += this.coins;
             data._grain += this.grain;
@@ -71,18 +71,18 @@ public class WaveResources : MonoBehaviour, IDataPersistence
             data._oil += this.oil;
             data._uranium += this.uranium;
             data.hasWon = this.hasWon;
-            data.makeWarsHappen = true; 
+            data.makeWarsHappen = true;
             data.hasCheckedNews = false;
             hasSaved = true; //To only save once after winning
         }
-        else if(finishedBattle && !hasSaved && !showUI)
+        else if (finishedBattle && !hasSaved && !showUI)
         {
             data.hasWon = false;
-            data.makeWarsHappen = true; 
+            data.makeWarsHappen = true;
             hasSaved = true;
         }
 
-        if(saveToData)
+        if (saveToData)
         {
             data.coins = this.coins;
             data.grain = this.grain;
@@ -98,9 +98,9 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         hasWon = won;
         finishedBattle = true;
         this.showUI = showUI;
-        if(!this.showUI)
+        if (!this.showUI)
         {
-            ReturnToWorldMap();    
+            ReturnToWorldMap();
             return;
         }
 
@@ -108,7 +108,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         window.SetActive(true);
         header.text = hasWon ? "Battle Won!" : "Battle Lost..";
         SoundManager.Instance.PlayMusicClip(SoundManager.Instance.musicEndOfRound, 3f);
-        if(hasWon)
+        if (hasWon)
         {
             StartCoroutine(IncreaseByTime(coins, coinsVisual));
             StartCoroutine(IncreaseByTime(grain, grainVisual));
@@ -123,14 +123,14 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         StartCoroutine(IncreaseByTime(Mathf.FloorToInt((float)steel / 5), steelVisual));
         StartCoroutine(IncreaseByTime(Mathf.FloorToInt((float)oil / 5), oilVisual));
         StartCoroutine(IncreaseByTime(Mathf.FloorToInt((float)uranium / 5), uraniumVisual));
-    
+
     }
 
     private IEnumerator IncreaseByTime(int amount, TextMeshProUGUI visual)
     {
         int maxAmount = amount;
         float currentAmount = 0;
-        if(amount >= 1)
+        if (amount >= 1)
         {
             currentAmount = 1;
         }
@@ -138,7 +138,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         float soundCooldown = 0.15f;
         float soundTimer = 0f;
 
-        while(currentAmount < maxAmount)
+        while (currentAmount < maxAmount)
         {
             multipler += Time.unscaledDeltaTime * 15;
 
@@ -171,7 +171,7 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("WorldMap");
+        LoadSceneAsync("WorldMap");
     }
 
     IEnumerator EnterTransition()
@@ -179,5 +179,22 @@ public class WaveResources : MonoBehaviour, IDataPersistence
         enterTransition.SetActive(true);
         yield return new WaitForSecondsRealtime(enterDuration);
         enterTransition.SetActive(false);
+    }
+    
+    public void LoadSceneAsync(string sceneName)
+    {
+        StartCoroutine(LoadAsync(sceneName));
+    }
+
+    private IEnumerator LoadAsync(string sceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = true;
+
+        while (!operation.isDone)
+        {
+            //Make loading here or smth
+            yield return null;
+        }
     }
 }

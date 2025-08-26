@@ -860,7 +860,24 @@ public class InteractionSystem : MonoBehaviour, IDataPersistence
         leaveTransition.SetActive(true);
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
-        SceneManager.LoadScene("Game");
+        LoadSceneAsync("Game");
+    }
+
+    public void LoadSceneAsync(string sceneName)
+    {
+        StartCoroutine(LoadAsync(sceneName));
+    }
+
+    private IEnumerator LoadAsync(string sceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = true;
+
+        while (!operation.isDone)
+        {
+            //Make loading here or smth
+            yield return null;
+        }
     }
 
     IEnumerator CloseWindow(GameObject window, Animator anim, float duration)

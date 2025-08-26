@@ -173,9 +173,11 @@ public class PerlinNoise : MonoBehaviour, IDataPersistence
             if (!assignedFactions.Contains(faction.factionPos))
             {
                 Vector3Int forcePos = GetCenterOfFaction(faction.factionPos);
-                ground.SetTile(forcePos, faction.tile);
+                faction.tileMap.SetTile(forcePos, faction.tile);
+                ground.SetTile(forcePos, groundTile);
             }
         }
+
 
         Vector3Int middlePos = new Vector3Int(width / 2, height / 2, -10);
         Vector3Int waterPos = middlePos;

@@ -40,7 +40,7 @@ public class ButtonScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         while (Vector3.Distance(transform.localScale, target) > 0.001f)
         {
-            transform.localScale = Vector3.MoveTowards(transform.localScale, target, Time.deltaTime * speedOfScale);
+            transform.localScale = Vector3.MoveTowards(transform.localScale, target, Time.unscaledDeltaTime * speedOfScale);
             yield return null;
         }
         transform.localScale = target;

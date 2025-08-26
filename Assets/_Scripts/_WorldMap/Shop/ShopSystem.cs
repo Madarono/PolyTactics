@@ -134,7 +134,9 @@ public class ShopSystem : MonoBehaviour, IDataPersistence
     {
         slots.Add(slot);
         item.Inactive();
+        InitializeToSave();
         Inventory.Instance.shopTowers = slots.ToList();
+        Inventory.Instance.shopIndex = shopSaved;
         UpdateWindow();
     }
 

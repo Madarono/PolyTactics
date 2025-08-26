@@ -52,6 +52,9 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public GameObject leaveTransition;
     public float leaveDuration = 1.5f;
 
+    private bool hasRecieved = false;
+    private bool isRefreshing = false;
+
     public void LoadData(GameData data)
     {
         this.graphics = data.graphics;
@@ -67,16 +70,20 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
             leaveTransition.SetActive(false);
         }
         Refresh();
+        hasRecieved = true;
     }
 
     public void SaveData(GameData data)
     {
-        data.graphics = this.graphics;
-        data.screenShake = this.screenShake;
-        data.master = this.master;
-        data.background = this.background;
-        data.autoPlay = this.autoPlay;
-        data.showRange = this.showRange;
+        if (hasRecieved)
+        {    
+            data.graphics = this.graphics;
+            data.screenShake = this.screenShake;
+            data.master = this.master;
+            data.background = this.background;
+            data.autoPlay = this.autoPlay;
+            data.showRange = this.showRange;
+        }
     }
 
     void Awake()
@@ -92,6 +99,11 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         {
             canvas.SetActive(true);
         }
+        if (mainMenu)
+        {
+            return;
+        }
+
         Time.timeScale = 0f;
     }
 
@@ -99,7 +111,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     {
         canSound = false;
         StartCoroutine(AnimationCloseWindow(windowAnim, window, true));
-        if (worldMap)
+        if (worldMap || mainMenu)
         {
             Time.timeScale = 1f;
             return;
@@ -125,7 +137,10 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
 
     void Refresh()
     {
+        isRefreshing = true;
         StartCoroutine(Cooldown());
+        masterSlider.onValueChanged.RemoveAllListeners();
+        backgroundSlider.onValueChanged.RemoveAllListeners();
         masterSlider.value = master;
         backgroundSlider.value = background;
         soundManager.masterVolume = this.master;
@@ -154,6 +169,10 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
             img.raycastTarget = false;
         }
         graphicButtons[graphics].color = graphicsStates[1];
+
+        masterSlider.onValueChanged.AddListener(delegate { UpdateValues(true); });
+        backgroundSlider.onValueChanged.AddListener(delegate { UpdateValues(false); });
+        isRefreshing = false;
     }
 
     //Graphics
@@ -195,6 +214,10 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     //Audio
     public void UpdateValues(bool isMaster)
     {
+        if (isRefreshing)
+        {
+            return;
+        }
         master = masterSlider.value;
         background = backgroundSlider.value;
         soundManager.masterVolume = this.master;
@@ -268,6 +291,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     IEnumerator LeaveGame()
     {
         leaveTransition.SetActive(true);
+        MusicLoader.Instance.CallFadeOut();
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
         Application.Quit();
@@ -276,6 +300,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     IEnumerator GoToMainMenu()
     {
         leaveTransition.SetActive(true);
+        MusicLoader.Instance.CallFadeOut();
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
         SceneManager.LoadScene("MainMenu");

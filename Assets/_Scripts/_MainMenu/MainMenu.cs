@@ -193,19 +193,38 @@ public class MainMenu : MonoBehaviour, IDataPersistence
     IEnumerator MakeNewGame()
     {
         leaveTransition.SetActive(true);
+        MusicLoader.Instance.CallFadeOut();
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.NewWorld();
         canSave = true;
         DataPersistenceManager.instance.SaveGame();
-        SceneManager.LoadScene("WorldMap");
+        LoadSceneAsync("WorldMap");
     }
 
     IEnumerator Continue()
     {
         leaveTransition.SetActive(true);
+        MusicLoader.Instance.CallFadeOut();
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
-        SceneManager.LoadScene("WorldMap");
+        LoadSceneAsync("WorldMap");
+    }
+
+    public void LoadSceneAsync(string sceneName)
+    {
+        StartCoroutine(LoadAsync(sceneName));
+    }
+
+    private IEnumerator LoadAsync(string sceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = true;
+
+        while (!operation.isDone)
+        {
+            //Make loading here or smth
+            yield return null;
+        }
     }
 
 }
