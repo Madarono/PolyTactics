@@ -93,6 +93,9 @@ public class EnemyManager : MonoBehaviour
     public Pool explosivePool;
     public Color shockColor;
 
+    private Coroutine _sendRoutine;
+
+
     void Awake()
     {
         Instance = this;
@@ -191,108 +194,122 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
+
     public void StartWave()
     {
         SetEnemyWaves();
-        StartCoroutine(SendWaves());
+        if (_sendRoutine != null) StopCoroutine(_sendRoutine);
+        _sendRoutine = StartCoroutine(SendWaves());
     }
+
+    IEnumerator SendWaves()
+    {
+        for (int i = 0; i < enemyWave.Count; i++)
+        {
+            SendEnemy(enemyWave[i]);
+            spawnLeft--;
+            currentEnemy.Add(enemyWave[i]);
+
+            if (i + 1 != enemyWave.Count)
+                yield return new WaitForSeconds(enemyDelay[i + 1]); // timescale-aware
+        }
+        _sendRoutine = null;
+    }
+
 
     void SetEnemyWaves()
     {
-        if(WaveResources.Instance.finishedBattle)
+        if (WaveResources.Instance.finishedBattle)
         {
             return;
         }
 
-        if(enemyParent.childCount > 0)
+        if (enemyParent.childCount > 0)
         {
             for (int i = enemyParent.childCount - 1; i >= 0; i--)
             {
-                Transform child = enemyParent.GetChild(i);
-                Destroy(child.gameObject);
+                Destroy(enemyParent.GetChild(i).gameObject);
             }
         }
+
         enemyWave.Clear();
         enemyDelay.Clear();
-        StopAllCoroutines();
-        
-        float weight = 0;
 
-        for(int i = 0; i < multiplyer.Length; i++)
+        // STOP ONLY OUR OWN SENDER (don’t kill unrelated coroutines)
+        if (_sendRoutine != null)
         {
-            if(settings.difficulty == multiplyer[i].difficulty)
+            StopCoroutine(_sendRoutine);
+            _sendRoutine = null;
+        }
+
+        // Compute wave weight by difficulty
+        float weight = 0f;
+        for (int i = 0; i < multiplyer.Length; i++)
+        {
+            if (settings.difficulty == multiplyer[i].difficulty)
             {
                 weight = waveWeight[currentWave] * multiplyer[i].multiplyer;
                 break;
             }
         }
 
+        // Build eligible list by required wave
         List<EnemyWeight> possibleEnemies = new List<EnemyWeight>();
-        foreach(EnemyWeight enemyWeight in enemy[enemyIndex].enemy)
+        foreach (EnemyWeight ew in enemy[enemyIndex].enemy)
+            if (currentWave >= ew.requiredWave) possibleEnemies.Add(ew);
+
+        if (possibleEnemies.Count == 0)
         {
-            if(currentWave >= enemyWeight.requiredWave)
-            {
-                possibleEnemies.Add(enemyWeight);
-            }
+            Debug.LogWarning("[EnemyManager] No eligible enemies for this wave. Ending wave generation.");
+            spawnLeft = 0;
+            return;
         }
 
-        while(weight > 0)
+        // Pre-calc minimum weight to avoid infinite loop
+        int minWeight = int.MaxValue;
+        foreach (var ew in possibleEnemies) minWeight = Mathf.Min(minWeight, ew.weight);
+
+        // SAFETY: if initial weight is smaller than minimum enemy weight, abort
+        if (weight < minWeight)
         {
-            int random = Random.Range(0, possibleEnemies.Count);
-            if(weight >= possibleEnemies[random].weight)
-            {
-                weight -= possibleEnemies[random].weight;
-                GameObject go = Instantiate(possibleEnemies[random].enemy, spawnPoint.position, Quaternion.identity);
-                go.transform.SetParent(enemyParent);
-                go.SetActive(false);
-                if(go.TryGetComponent(out Enemy goScript))
-                {
-                    goScript.enabled = false;
-                }
-                enemyWave.Add(go);
-                enemyDelay.Add(possibleEnemies[random].durationTillPut);
-            }
-            else
-            {
-                for(int i = 0; i < possibleEnemies.Count; i++)
-                {
-                    if(i == random)
-                    {
-                        continue;
-                    }
+            Debug.LogWarning("[EnemyManager] Remaining weight < min enemy weight, skipping wave content.");
+            spawnLeft = 0;
+            return;
+        }
 
-                    if(weight >= possibleEnemies[i].weight)
-                    {
-                        weight -= possibleEnemies[i].weight;
-                        GameObject go = Instantiate(possibleEnemies[i].enemy, spawnPoint.position, Quaternion.identity);
-                        go.transform.SetParent(enemyParent);
-                        if(go.TryGetComponent(out Enemy goScript))
-                        {
-                            goScript.enabled = false;
-                        }
-                        enemyWave.Add(go);
-                        enemyDelay.Add(possibleEnemies[i].durationTillPut);
-                        break;
-                    }
-                }
+        // Fill the wave greedily with only candidates that fit the remaining weight
+        int safety = 100000; // safety valve to avoid any accidental infinite loop
+        while (weight >= minWeight && safety-- > 0)
+        {
+            // Filter to only those we can afford now
+            List<EnemyWeight> affordable = new List<EnemyWeight>();
+            foreach (var ew in possibleEnemies)
+                if (ew.weight <= weight) affordable.Add(ew);
+
+            if (affordable.Count == 0)
+            {
+                // Nothing fits the remainder -> stop cleanly
+                break;
             }
 
+            int r = Random.Range(0, affordable.Count);
+            EnemyWeight choice = affordable[r];
+
+            GameObject go = Instantiate(choice.enemy, spawnPoint.position, Quaternion.identity, enemyParent);
+            go.SetActive(false); // IMPORTANT: keep disabled until SendEnemy
+
+            if (go.TryGetComponent(out Enemy goScript))
+                goScript.enabled = false;
+
+            enemyWave.Add(go);
+            enemyDelay.Add(choice.durationTillPut);
+
+            weight -= choice.weight;
             spawnLeft = enemyWave.Count;
         }
-    }
 
-    IEnumerator SendWaves()
-    {
-        for(int i = 0; i < enemyWave.Count; i++)
-        {
-            SendEnemy(enemyWave[i]);
-            spawnLeft--;
-            currentEnemy.Add(enemyWave[i]);
-            if(i + 1 != enemyWave.Count)
-            {
-                yield return new WaitForSeconds(enemyDelay[i + 1]);
-            }
-        }
+        if (safety <= 0)
+            Debug.LogError("[EnemyManager] Safety tripped while building wave. Check loop conditions.");
     }
 
     public void SendEnemy(GameObject enemy)

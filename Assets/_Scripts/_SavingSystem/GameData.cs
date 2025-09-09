@@ -122,8 +122,15 @@ public class GameData
     //Shop.cs
     public int[] shopSaved;
 
+
     //MainMenu.cs
     public bool hasMadeGame;
+
+    //News
+    public int[] battleNumber;
+    public string[] faction;
+    public int[] dayNumber;
+    public string[] endTalk;
 
     public GameData()
     {
@@ -247,6 +254,12 @@ public class GameData
 
         //MainMenu.cs
         this.hasMadeGame = false;
+
+        //BattleLogs
+        this.battleNumber = new int[0];
+        this.faction = new string[0];
+        this.dayNumber = new int[0];
+        this.endTalk = new string[0];
     }
 
     public void NewFactionGame()

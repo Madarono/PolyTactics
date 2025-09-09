@@ -6,7 +6,7 @@ public class AutoSaveManager : MonoBehaviour
 {
     private void SaveGame()
     {
-        Debug.Log("Game Saved!");
+        // Debug.Log("Game Saved!");
         DataPersistenceManager.instance.SaveGame();
     }
 

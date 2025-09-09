@@ -76,7 +76,7 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
     public void SaveData(GameData data)
     {
         if (hasRecieved)
-        {    
+        {
             data.graphics = this.graphics;
             data.screenShake = this.screenShake;
             data.master = this.master;
@@ -296,13 +296,30 @@ public class PauseSystem : MonoBehaviour, IDataPersistence
         DataPersistenceManager.instance.SaveGame();
         Application.Quit();
     }
-    
+
     IEnumerator GoToMainMenu()
     {
         leaveTransition.SetActive(true);
         MusicLoader.Instance.CallFadeOut();
         yield return new WaitForSecondsRealtime(leaveDuration);
         DataPersistenceManager.instance.SaveGame();
-        SceneManager.LoadScene("MainMenu");
+        LoadSceneAsync("MainMenu");
+    }
+
+    public void LoadSceneAsync(string sceneName)
+    {
+        StartCoroutine(LoadAsync(sceneName));
+    }
+    
+    private IEnumerator LoadAsync(string sceneName)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = true;
+
+        while (!operation.isDone)
+        {
+            //Make loading here or smth
+            yield return null;
+        }
     }
 }

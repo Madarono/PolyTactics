@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
-public class WinCondition : MonoBehaviour
+public class WinCondition : MonoBehaviour, IDataPersistence
 {
     public static WinCondition Instance { get; private set; }
     private Alliances alliances;
@@ -31,6 +32,7 @@ public class WinCondition : MonoBehaviour
     [Header("Transition")]
     public GameObject blackTransition;
     public float sceneLeaveDuration;
+    public bool canSave = false;
 
     [Header("Debug")]
     public bool debug;
@@ -38,6 +40,32 @@ public class WinCondition : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+
+    public void LoadData(GameData data)
+    {
+
+    }
+
+    public void SaveData(GameData data)
+    {
+        if (canSave)
+        {
+            List<int> battleNumber = data.battleNumber.ToList();
+            battleNumber.Add(battleNumber.Count);
+            List<string> faction = data.faction.ToList();
+            faction.Add($"{data.playerFaction} Faction");
+            List<int> dayNumber = data.dayNumber.ToList();
+            dayNumber.Add(data.days);
+            List<string> endTalk = data.endTalk.ToList();
+            string won = hasWon ? "Won!" : "Lost..";
+            endTalk.Add(won);
+
+            data.battleNumber = battleNumber.ToArray();
+            data.faction = faction.ToArray();
+            data.dayNumber = dayNumber.ToArray();
+            data.endTalk = endTalk.ToArray();
+        }
     }
 
     void Start()
@@ -181,6 +209,8 @@ public class WinCondition : MonoBehaviour
     {
         blackTransition.SetActive(true);
         yield return new WaitForSecondsRealtime(sceneLeaveDuration);
+        canSave = true;
+        DataPersistenceManager.instance.SaveGame();
         SceneManager.LoadScene("MainMenu");
         Time.timeScale = 1f;
     }

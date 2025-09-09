@@ -22,7 +22,7 @@ public class MusicLoader : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
+    public void InstantiateStart()
     {
         sounds = SoundManager.Instance;
         source.clip = clip;

@@ -17773,7 +17773,8 @@ MonoBehaviour:
   canvas: {fileID: 1167547479}
   blackTransition: {fileID: 1856427790}
   sceneLeaveDuration: 1.5
-  debug: 1
+  canSave: 0
+  debug: 0
 --- !u!114 &726329476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21150,7 +21151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &907555461
 RectTransform:
   m_ObjectHideFlags: 0
@@ -41867,7 +41868,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startScale: 1
-  endScale: 1.1
+  endScale: 1.05
   speedOfScale: 3
   isContinue: 0
 --- !u!1 &1768073448
@@ -42475,6 +42476,7 @@ GameObject:
   - component: {fileID: 1780877360}
   - component: {fileID: 1780877364}
   - component: {fileID: 1780877363}
+  - component: {fileID: 1780877365}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -42799,6 +42801,18 @@ MonoBehaviour:
   source: {fileID: 1780877363}
   fadeInDuration: 1
   fadeOutDuration: 1.25
+--- !u!114 &1780877365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1780877355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0abdb2d4caf71449ba736eb3c8ac07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1784462219
 GameObject:
   m_ObjectHideFlags: 0
