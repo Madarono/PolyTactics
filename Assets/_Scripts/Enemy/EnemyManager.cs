@@ -235,14 +235,12 @@ public class EnemyManager : MonoBehaviour
         enemyWave.Clear();
         enemyDelay.Clear();
 
-        // STOP ONLY OUR OWN SENDER (don’t kill unrelated coroutines)
         if (_sendRoutine != null)
         {
             StopCoroutine(_sendRoutine);
             _sendRoutine = null;
         }
 
-        // Compute wave weight by difficulty
         float weight = 0f;
         for (int i = 0; i < multiplyer.Length; i++)
         {
@@ -253,10 +251,14 @@ public class EnemyManager : MonoBehaviour
             }
         }
 
-        // Build eligible list by required wave
         List<EnemyWeight> possibleEnemies = new List<EnemyWeight>();
         foreach (EnemyWeight ew in enemy[enemyIndex].enemy)
-            if (currentWave >= ew.requiredWave) possibleEnemies.Add(ew);
+        {
+            if (currentWave >= ew.requiredWave)
+            {
+                possibleEnemies.Add(ew);
+            }
+        }
 
         if (possibleEnemies.Count == 0)
         {
@@ -265,11 +267,14 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
-        // Pre-calc minimum weight to avoid infinite loop
-        int minWeight = int.MaxValue;
-        foreach (var ew in possibleEnemies) minWeight = Mathf.Min(minWeight, ew.weight);
 
-        // SAFETY: if initial weight is smaller than minimum enemy weight, abort
+        int minWeight = int.MaxValue;
+        foreach (var ew in possibleEnemies)
+        {
+            minWeight = Mathf.Min(minWeight, ew.weight);
+        }
+
+
         if (weight < minWeight)
         {
             Debug.LogWarning("[EnemyManager] Remaining weight < min enemy weight, skipping wave content.");
@@ -277,18 +282,20 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
-        // Fill the wave greedily with only candidates that fit the remaining weight
-        int safety = 100000; // safety valve to avoid any accidental infinite loop
+        int safety = 100000;
         while (weight >= minWeight && safety-- > 0)
         {
-            // Filter to only those we can afford now
             List<EnemyWeight> affordable = new List<EnemyWeight>();
             foreach (var ew in possibleEnemies)
-                if (ew.weight <= weight) affordable.Add(ew);
+            {
+                if (ew.weight <= weight)
+                {
+                    affordable.Add(ew);
+                }
+            }
 
             if (affordable.Count == 0)
             {
-                // Nothing fits the remainder -> stop cleanly
                 break;
             }
 
@@ -296,10 +303,12 @@ public class EnemyManager : MonoBehaviour
             EnemyWeight choice = affordable[r];
 
             GameObject go = Instantiate(choice.enemy, spawnPoint.position, Quaternion.identity, enemyParent);
-            go.SetActive(false); // IMPORTANT: keep disabled until SendEnemy
+            go.SetActive(false);
 
             if (go.TryGetComponent(out Enemy goScript))
+            {
                 goScript.enabled = false;
+            }
 
             enemyWave.Add(go);
             enemyDelay.Add(choice.durationTillPut);
@@ -309,7 +318,9 @@ public class EnemyManager : MonoBehaviour
         }
 
         if (safety <= 0)
+        {
             Debug.LogError("[EnemyManager] Safety tripped while building wave. Check loop conditions.");
+        }
     }
 
     public void SendEnemy(GameObject enemy)
